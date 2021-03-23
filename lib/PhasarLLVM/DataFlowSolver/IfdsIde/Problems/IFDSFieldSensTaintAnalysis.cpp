@@ -220,23 +220,29 @@ IFDSFieldSensTaintAnalysis::getSummaryFlowFunction(
   return nullptr;
 }
 
-std::map<const llvm::Instruction *, std::set<ExtendedValue>>
+std::map<IFDSFieldSensTaintAnalysis::n_t,
+         std::set<std::pair<IFDSFieldSensTaintAnalysis::d_t,
+                            EdgeFunction<IFDSFieldSensTaintAnalysis::l_t> *>>>
 IFDSFieldSensTaintAnalysis::initialSeeds() {
-  std::map<const llvm::Instruction *, std::set<ExtendedValue>> SeedMap;
-  for (const auto &EntryPoint : this->EntryPoints) {
-    if (taintConfig.isSink(EntryPoint)) {
-      continue;
-    }
-    SeedMap.insert(
-        std::make_pair(&ICF->getFunction(EntryPoint)->front().front(),
-                       std::set<ExtendedValue>({getZeroValue()})));
-  }
-  // additionally, add initial seeds if there are any
-  auto TaintConfigSeeds = taintConfig.getInitialSeeds();
-  for (auto &Seed : TaintConfigSeeds) {
-    SeedMap[Seed.first].insert(Seed.second.begin(), Seed.second.end());
-  }
+  std::map<IFDSFieldSensTaintAnalysis::n_t,
+           std::set<std::pair<IFDSFieldSensTaintAnalysis::d_t,
+                              EdgeFunction<IFDSFieldSensTaintAnalysis::l_t> *>>>
+      SeedMap;
   return SeedMap;
+  // for (const auto &EntryPoint : this->EntryPoints) {
+  //   if (taintConfig.isSink(EntryPoint)) {
+  //     continue;
+  //   }
+  //   SeedMap.insert(
+  //       std::make_pair(&ICF->getFunction(EntryPoint)->front().front(),
+  //                      std::set<ExtendedValue>({getZeroValue()})));
+  // }
+  // // additionally, add initial seeds if there are any
+  // auto TaintConfigSeeds = taintConfig.getInitialSeeds();
+  // for (auto &Seed : TaintConfigSeeds) {
+  //   SeedMap[Seed.first].insert(Seed.second.begin(), Seed.second.end());
+  // }
+  // return SeedMap;
 }
 
 void IFDSFieldSensTaintAnalysis::emitTextReport(

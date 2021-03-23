@@ -307,15 +307,21 @@ IDETypeStateAnalysis::getSummaryFlowFunction(
   return nullptr;
 }
 
-map<IDETypeStateAnalysis::n_t, set<IDETypeStateAnalysis::d_t>>
+map<IDETypeStateAnalysis::n_t,
+    set<pair<IDETypeStateAnalysis::d_t,
+             EdgeFunction<IDETypeStateAnalysis::l_t> *>>>
 IDETypeStateAnalysis::initialSeeds() {
   // just start in main()
-  map<IDETypeStateAnalysis::n_t, set<IDETypeStateAnalysis::d_t>> SeedMap;
-  for (const auto &EntryPoint : EntryPoints) {
-    SeedMap.insert(make_pair(&ICF->getFunction(EntryPoint)->front().front(),
-                             set<IDETypeStateAnalysis::d_t>({getZeroValue()})));
-  }
+  map<IDETypeStateAnalysis::n_t,
+      set<pair<IDETypeStateAnalysis::d_t,
+               EdgeFunction<IDETypeStateAnalysis::l_t> *>>>
+      SeedMap;
   return SeedMap;
+  // for (const auto &EntryPoint : EntryPoints) {
+  //   SeedMap.insert(make_pair(&ICF->getFunction(EntryPoint)->front().front(),
+  //                            set<IDETypeStateAnalysis::d_t>({getZeroValue()})));
+  // }
+  // return SeedMap;
 }
 
 IDETypeStateAnalysis::d_t IDETypeStateAnalysis::createZeroValue() const {

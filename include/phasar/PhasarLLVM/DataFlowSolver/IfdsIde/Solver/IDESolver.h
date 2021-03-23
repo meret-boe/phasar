@@ -414,7 +414,7 @@ protected:
   // returns if SolverConfig.followReturnPastSeeds is enabled
   std::set<n_t> unbalancedRetSites;
 
-  std::map<n_t, std::set<d_t>> initialSeeds;
+  std::map<n_t, std::set<std::pair<d_t, EdgeFunction<l_t> *>>> initialSeeds;
 
   Table<n_t, d_t, l_t> valtab;
 
@@ -923,7 +923,9 @@ protected:
   void computeValues() {
     LOG_IF_ENABLE(BOOST_LOG_SEV(lg::get(), DEBUG) << "Start computing values");
     // Phase II(i)
-    std::map<n_t, std::set<d_t>> allSeeds(initialSeeds);
+    std::map<n_t, std::set<std::pair<d_t, EdgeFunction<l_t> *>>> allSeeds(
+        initialSeeds);
+    /*
     for (n_t unbalancedRetSite : unbalancedRetSites) {
       if (allSeeds[unbalancedRetSite].empty()) {
         allSeeds.emplace(unbalancedRetSite, std::set<d_t>({ZeroValue}));
@@ -946,6 +948,7 @@ protected:
     const std::set<n_t> allNonCallStartNodes = ICF->allNonCallStartNodes();
     valueComputationTask(
         {allNonCallStartNodes.begin(), allNonCallStartNodes.end()});
+        */
   }
 
   /**
@@ -955,6 +958,7 @@ protected:
    */
   void submitInitialSeeds() {
     PAMM_GET_INSTANCE;
+    /*
     for (const auto &[StartPoint, Facts] : initialSeeds) {
       LOG_IF_ENABLE(BOOST_LOG_SEV(lg::get(), DEBUG)
                     << "Start point: " << IDEProblem.NtoString(StartPoint));
@@ -971,6 +975,7 @@ protected:
       jumpFn->addFunction(ZeroValue, StartPoint, ZeroValue,
                           EdgeIdentity<l_t>::getInstance());
     }
+    */
   }
 
   /**

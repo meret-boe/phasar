@@ -126,9 +126,16 @@ bool WPDSSolverTest::isZeroValue(WPDSSolverTest::d_t D) const {
   return LLVMZeroValue::getInstance()->isLLVMZeroValue(D);
 }
 
-std::map<WPDSSolverTest::n_t, std::set<WPDSSolverTest::d_t>>
+std::map<WPDSSolverTest::n_t,
+         std::set<std::pair<WPDSSolverTest::d_t,
+                            EdgeFunction<WPDSSolverTest::l_t> *>>>
 WPDSSolverTest::initialSeeds() {
-  return {{&ICF->getFunction("main")->front().front(), {getZeroValue()}}};
+  std::map<WPDSSolverTest::n_t,
+           std::set<std::pair<WPDSSolverTest::d_t,
+                              EdgeFunction<WPDSSolverTest::l_t> *>>>
+      SeedMap;
+  return SeedMap;
+  //  return {{&ICF->getFunction("main")->front().front(), {getZeroValue()}}};
 }
 
 std::shared_ptr<EdgeFunction<WPDSSolverTest::l_t>>

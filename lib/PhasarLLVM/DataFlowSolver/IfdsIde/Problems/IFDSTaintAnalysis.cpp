@@ -236,13 +236,18 @@ IFDSTaintAnalysis::getSummaryFlowFunction(IFDSTaintAnalysis::n_t CallStmt,
   }
 }
 
-map<IFDSTaintAnalysis::n_t, set<IFDSTaintAnalysis::d_t>>
+map<IFDSTaintAnalysis::n_t,
+    set<pair<IFDSTaintAnalysis::d_t, EdgeFunction<IFDSTaintAnalysis::l_t> *>>>
 IFDSTaintAnalysis::initialSeeds() {
   LOG_IF_ENABLE(BOOST_LOG_SEV(lg::get(), DEBUG)
                 << "IFDSTaintAnalysis::initialSeeds()");
   // If main function is the entry point, commandline arguments have to be
   // tainted. Otherwise we just use the zero value to initialize the analysis.
-  map<IFDSTaintAnalysis::n_t, set<IFDSTaintAnalysis::d_t>> SeedMap;
+  map<IFDSTaintAnalysis::n_t,
+      set<pair<IFDSTaintAnalysis::d_t, EdgeFunction<IFDSTaintAnalysis::l_t> *>>>
+      SeedMap;
+  return SeedMap;
+  /*
   for (const auto &EntryPoint : EntryPoints) {
     if (EntryPoint == "main") {
       set<IFDSTaintAnalysis::d_t> CmdArgs;
@@ -258,6 +263,7 @@ IFDSTaintAnalysis::initialSeeds() {
     }
   }
   return SeedMap;
+  */
 }
 
 IFDSTaintAnalysis::d_t IFDSTaintAnalysis::createZeroValue() const {

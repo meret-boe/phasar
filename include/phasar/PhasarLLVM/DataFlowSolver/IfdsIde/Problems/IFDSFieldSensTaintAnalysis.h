@@ -75,7 +75,7 @@ public:
   getSummaryFlowFunction(const llvm::Instruction *callStmt,
                          const llvm::Function *destFun) override;
 
-  std::map<const llvm::Instruction *, std::set<ExtendedValue>>
+  std::map<n_t, std::set<std::pair<d_t, EdgeFunction<l_t> *>>>
   initialSeeds() override;
 
   void

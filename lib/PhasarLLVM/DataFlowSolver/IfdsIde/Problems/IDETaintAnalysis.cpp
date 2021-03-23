@@ -74,15 +74,19 @@ IDETaintAnalysis::getSummaryFlowFunction(IDETaintAnalysis::n_t CallStmt,
   return nullptr;
 }
 
-map<IDETaintAnalysis::n_t, set<IDETaintAnalysis::d_t>>
+map<IDETaintAnalysis::n_t,
+    set<pair<IDETaintAnalysis::d_t, EdgeFunction<IDETaintAnalysis::l_t> *>>>
 IDETaintAnalysis::initialSeeds() {
   // just start in main()
-  map<IDETaintAnalysis::n_t, set<IDETaintAnalysis::d_t>> SeedMap;
-  for (const auto &EntryPoint : EntryPoints) {
-    SeedMap.insert(make_pair(&ICF->getFunction(EntryPoint)->front().front(),
-                             set<IDETaintAnalysis::d_t>({getZeroValue()})));
-  }
+  map<IDETaintAnalysis::n_t,
+      set<pair<IDETaintAnalysis::d_t, EdgeFunction<IDETaintAnalysis::l_t> *>>>
+      SeedMap;
   return SeedMap;
+  // for (const auto &EntryPoint : EntryPoints) {
+  //   SeedMap.insert(make_pair(&ICF->getFunction(EntryPoint)->front().front(),
+  //                            set<IDETaintAnalysis::d_t>({getZeroValue()})));
+  // }
+  // return SeedMap;
 }
 
 IDETaintAnalysis::d_t IDETaintAnalysis::createZeroValue() const {

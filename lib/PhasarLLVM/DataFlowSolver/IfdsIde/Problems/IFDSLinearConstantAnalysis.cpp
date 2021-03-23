@@ -94,18 +94,23 @@ IFDSLinearConstantAnalysis::getSummaryFlowFunction(
   return nullptr;
 }
 
-map<IFDSLinearConstantAnalysis::n_t, set<IFDSLinearConstantAnalysis::d_t>>
+map<IFDSLinearConstantAnalysis::n_t,
+    set<pair<IFDSLinearConstantAnalysis::d_t,
+             EdgeFunction<IFDSLinearConstantAnalysis::l_t> *>>>
 IFDSLinearConstantAnalysis::initialSeeds() {
   LOG_IF_ENABLE(BOOST_LOG_SEV(lg::get(), DEBUG)
                 << "IFDSLinearConstantAnalysis::initialSeeds()");
-  map<IFDSLinearConstantAnalysis::n_t, set<IFDSLinearConstantAnalysis::d_t>>
+  map<IFDSLinearConstantAnalysis::n_t,
+      set<pair<IFDSLinearConstantAnalysis::d_t,
+               EdgeFunction<IFDSLinearConstantAnalysis::l_t> *>>>
       SeedMap;
-  for (const auto &EntryPoint : EntryPoints) {
-    SeedMap.insert(
-        make_pair(&ICF->getFunction(EntryPoint)->front().front(),
-                  set<IFDSLinearConstantAnalysis::d_t>({getZeroValue()})));
-  }
   return SeedMap;
+  // for (const auto &EntryPoint : EntryPoints) {
+  //   SeedMap.insert(
+  //       make_pair(&ICF->getFunction(EntryPoint)->front().front(),
+  //                 set<IFDSLinearConstantAnalysis::d_t>({getZeroValue()})));
+  // }
+  // return SeedMap;
 }
 
 IFDSLinearConstantAnalysis::d_t

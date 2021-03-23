@@ -74,7 +74,8 @@ public:
 
   bool isZeroValue(d_t d) const override;
 
-  std::map<n_t, std::set<d_t>> initialSeeds() override;
+  std::map<n_t, std::set<std::pair<d_t, EdgeFunction<l_t> *>>>
+  initialSeeds() override;
 
   std::shared_ptr<EdgeFunction<l_t>> allTopFunction() override;
 

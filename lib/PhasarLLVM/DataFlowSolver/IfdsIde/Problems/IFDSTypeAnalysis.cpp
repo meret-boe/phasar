@@ -88,14 +88,20 @@ IFDSTypeAnalysis::getSummaryFlowFunction(IFDSTypeAnalysis::n_t Curr,
   return nullptr;
 }
 
-map<IFDSTypeAnalysis::n_t, set<IFDSTypeAnalysis::d_t>>
+map<IFDSTypeAnalysis::n_t,
+    set<pair<IFDSTypeAnalysis::d_t, EdgeFunction<IFDSTypeAnalysis::l_t> *>>>
 IFDSTypeAnalysis::initialSeeds() {
-  map<IFDSTypeAnalysis::n_t, set<IFDSTypeAnalysis::d_t>> SeedMap;
+  map<IFDSTypeAnalysis::n_t,
+      set<pair<IFDSTypeAnalysis::d_t, EdgeFunction<IFDSTypeAnalysis::l_t> *>>>
+      SeedMap;
+  return SeedMap;
+  /*
   for (const auto &EntryPoint : EntryPoints) {
     SeedMap.insert(make_pair(&ICF->getFunction(EntryPoint)->front().front(),
                              set<IFDSTypeAnalysis::d_t>({getZeroValue()})));
   }
   return SeedMap;
+  */
 }
 
 IFDSTypeAnalysis::d_t IFDSTypeAnalysis::createZeroValue() const {
