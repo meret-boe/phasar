@@ -120,10 +120,7 @@ WPDSAliasCollector::l_t WPDSAliasCollector::join(WPDSAliasCollector::l_t Lhs,
 bool WPDSAliasCollector::isZeroValue(WPDSAliasCollector::d_t D) const {
   return LLVMZeroValue::getInstance()->isLLVMZeroValue(D);
 }
-
-std::map<WPDSAliasCollector::n_t,
-         std::set<std::pair<WPDSAliasCollector::d_t,
-                            EdgeFunction<WPDSAliasCollector::l_t> *>>>
+std::map<WPDSAliasCollector::n_t, std::set<WPDSAliasCollector::d_t>>
 WPDSAliasCollector::initialSeeds() {
   return {};
 }

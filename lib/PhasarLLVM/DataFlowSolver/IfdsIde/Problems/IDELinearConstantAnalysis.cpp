@@ -265,54 +265,47 @@ IDELinearConstantAnalysis::getSummaryFlowFunction(
   return nullptr;
 }
 
-map<IDELinearConstantAnalysis::n_t,
-    set<pair<IDELinearConstantAnalysis::d_t,
-             EdgeFunction<IDELinearConstantAnalysis::l_t> *>>>
+map<IDELinearConstantAnalysis::n_t, set<IDELinearConstantAnalysis::d_t>>
 IDELinearConstantAnalysis::initialSeeds() {
   // Check commandline arguments, e.g. argc, and generate all integer
   // typed arguments.
-  map<IDELinearConstantAnalysis::n_t,
-      set<pair<IDELinearConstantAnalysis::d_t,
-               EdgeFunction<IDELinearConstantAnalysis::l_t> *>>>
+  map<IDELinearConstantAnalysis::n_t, set<IDELinearConstantAnalysis::d_t>>
       SeedMap;
-  return SeedMap;
   // Collect global variables of integer type
-  // for (const auto &EntryPoint : EntryPoints) {
-  //   set<IDELinearConstantAnalysis::d_t> Globals;
-  //   for (const auto &G :
-  //        IRDB->getModuleDefiningFunction(EntryPoint)->globals()) {
-  //     if (const auto *GV = llvm::dyn_cast<llvm::GlobalVariable>(&G)) {
-  //       if (GV->hasInitializer() &&
-  //           llvm::isa<llvm::ConstantInt>(GV->getInitializer())) {
-  //         Globals.insert(GV);
-  //       }
-  //     }
-  //   }
-  //   Globals.insert(getZeroValue());
-  //   if (!Globals.empty()) {
-  //     SeedMap.insert(
-  //         make_pair(&ICF->getFunction(EntryPoint)->front().front(),
-  //         Globals));
-  //   }
-  //   // Collect commandline arguments of integer type
-  //   if (EntryPoint == "main") {
-  //     set<IDELinearConstantAnalysis::d_t> CmdArgs;
-  //     for (const auto &Arg : ICF->getFunction(EntryPoint)->args()) {
-  //       if (Arg.getType()->isIntegerTy()) {
-  //         CmdArgs.insert(&Arg);
-  //       }
-  //     }
-  //     CmdArgs.insert(getZeroValue());
-  //     SeedMap.insert(
-  //         make_pair(&ICF->getFunction(EntryPoint)->front().front(),
-  //         CmdArgs));
-  //   } else {
-  //     SeedMap.insert(
-  //         make_pair(&ICF->getFunction(EntryPoint)->front().front(),
-  //                   set<IDELinearConstantAnalysis::d_t>({getZeroValue()})));
-  //   }
-  // }
-  // return SeedMap;
+  for (const auto &EntryPoint : EntryPoints) {
+    set<IDELinearConstantAnalysis::d_t> Globals;
+    for (const auto &G :
+         IRDB->getModuleDefiningFunction(EntryPoint)->globals()) {
+      if (const auto *GV = llvm::dyn_cast<llvm::GlobalVariable>(&G)) {
+        if (GV->hasInitializer() &&
+            llvm::isa<llvm::ConstantInt>(GV->getInitializer())) {
+          Globals.insert(GV);
+        }
+      }
+    }
+    Globals.insert(getZeroValue());
+    if (!Globals.empty()) {
+      SeedMap.insert(
+          make_pair(&ICF->getFunction(EntryPoint)->front().front(), Globals));
+    }
+    // Collect commandline arguments of integer type
+    if (EntryPoint == "main") {
+      set<IDELinearConstantAnalysis::d_t> CmdArgs;
+      for (const auto &Arg : ICF->getFunction(EntryPoint)->args()) {
+        if (Arg.getType()->isIntegerTy()) {
+          CmdArgs.insert(&Arg);
+        }
+      }
+      CmdArgs.insert(getZeroValue());
+      SeedMap.insert(
+          make_pair(&ICF->getFunction(EntryPoint)->front().front(), CmdArgs));
+    } else {
+      SeedMap.insert(
+          make_pair(&ICF->getFunction(EntryPoint)->front().front(),
+                    set<IDELinearConstantAnalysis::d_t>({getZeroValue()})));
+    }
+  }
+  return SeedMap;
 }
 
 IDELinearConstantAnalysis::d_t

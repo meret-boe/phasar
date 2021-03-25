@@ -67,22 +67,16 @@ IFDSSolverTest::getSummaryFlowFunction(IFDSSolverTest::n_t CallStmt,
   return nullptr;
 }
 
-map<IFDSSolverTest::n_t,
-    set<pair<IFDSSolverTest::d_t, EdgeFunction<IFDSSolverTest::l_t> *>>>
+map<IFDSSolverTest::n_t, set<IFDSSolverTest::d_t>>
 IFDSSolverTest::initialSeeds() {
   LOG_IF_ENABLE(BOOST_LOG_SEV(lg::get(), DEBUG)
                 << "IFDSSolverTest::initialSeeds()");
-  map<IFDSSolverTest::n_t,
-      set<pair<IFDSSolverTest::d_t, EdgeFunction<IFDSSolverTest::l_t> *>>>
-      SeedMap;
-  return SeedMap;
-  /*
+  map<IFDSSolverTest::n_t, set<IFDSSolverTest::d_t>> SeedMap;
   for (const auto &EntryPoint : EntryPoints) {
     SeedMap.insert(make_pair(&ICF->getFunction(EntryPoint)->front().front(),
                              set<IFDSSolverTest::d_t>({getZeroValue()})));
   }
   return SeedMap;
-  */
 }
 
 IFDSSolverTest::d_t IFDSSolverTest::createZeroValue() const {

@@ -63,19 +63,16 @@ IDESecureHeapPropagation::getSummaryFlowFunction(n_t CallStmt, f_t DestMthd) {
   return nullptr;
 }
 
-std::map<IDESecureHeapPropagation::n_t,
-         std::set<std::pair<IDESecureHeapPropagation::d_t,
-                            EdgeFunction<IDESecureHeapPropagation::l_t> *>>>
+std::map<IDESecureHeapPropagation::n_t, std::set<IDESecureHeapPropagation::d_t>>
 IDESecureHeapPropagation::initialSeeds() {
-  std::map<n_t, std::set<std::pair<d_t, EdgeFunction<l_t> *>>> Seeds;
+  std::map<n_t, std::set<d_t>> Seeds;
+  for (const auto &Entry : EntryPoints) {
+    const auto *Fn = ICF->getFunction(Entry);
+    if (Fn && !Fn->isDeclaration()) {
+      Seeds[&Fn->front().front()] = {getZeroValue()};
+    }
+  }
   return Seeds;
-  // for (const auto &Entry : EntryPoints) {
-  //   const auto *Fn = ICF->getFunction(Entry);
-  //   if (Fn && !Fn->isDeclaration()) {
-  //     Seeds[&Fn->front().front()] = {getZeroValue()};
-  //   }
-  // }
-  // return Seeds;
 }
 
 IDESecureHeapPropagation::d_t

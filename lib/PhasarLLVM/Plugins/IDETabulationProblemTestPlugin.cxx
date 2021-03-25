@@ -76,24 +76,16 @@ IDETabulationProblemTestPlugin::getSummaryFlowFunction(
   return nullptr;
 }
 
-map<IDETabulationProblemTestPlugin::n_t,
-    set<pair<IDETabulationProblemTestPlugin::d_t,
-             EdgeFunction<IDETabulationProblemTestPlugin::l_t> *>>>
+map<const llvm::Instruction *, set<const FlowFact *>>
 IDETabulationProblemTestPlugin::initialSeeds() {
   cout << "IDETabulationProblemTestPlugin::initialSeeds()\n";
-  map<IDETabulationProblemTestPlugin::n_t,
-      set<pair<IDETabulationProblemTestPlugin::d_t,
-               EdgeFunction<IDETabulationProblemTestPlugin::l_t> *>>>
-      SeedMap;
-  return SeedMap;
-  /*
+  map<const llvm::Instruction *, set<const FlowFact *>> SeedMap;
   for (auto &EntryPoint : EntryPoints) {
     SeedMap.insert(
         std::make_pair(&ICF->getFunction(EntryPoint)->front().front(),
                        set<const FlowFact *>({getZeroValue()})));
   }
   return SeedMap;
-  */
 }
 
 IDETabulationProblemTestPlugin::EdgeFunctionPtrType

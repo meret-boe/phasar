@@ -73,19 +73,14 @@ IDESolverTest::getSummaryFlowFunction(IDESolverTest::n_t CallStmt,
   return nullptr;
 }
 
-map<IDESolverTest::n_t,
-    set<pair<IDESolverTest::d_t, EdgeFunction<IDESolverTest::l_t> *>>>
-IDESolverTest::initialSeeds() {
+map<IDESolverTest::n_t, set<IDESolverTest::d_t>> IDESolverTest::initialSeeds() {
   cout << "IDESolverTest::initialSeeds()\n";
-  map<IDESolverTest::n_t,
-      set<pair<IDESolverTest::d_t, EdgeFunction<IDESolverTest::l_t> *>>>
-      SeedMap;
+  map<IDESolverTest::n_t, set<IDESolverTest::d_t>> SeedMap;
+  for (auto &EntryPoint : EntryPoints) {
+    SeedMap.insert(make_pair(&ICF->getFunction(EntryPoint)->front().front(),
+                             set<IDESolverTest::d_t>({getZeroValue()})));
+  }
   return SeedMap;
-  // for (auto &EntryPoint : EntryPoints) {
-  //   SeedMap.insert(make_pair(&ICF->getFunction(EntryPoint)->front().front(),
-  //                            set<IDESolverTest::d_t>({getZeroValue()})));
-  // }
-  // return SeedMap;
 }
 
 IDESolverTest::d_t IDESolverTest::createZeroValue() const {

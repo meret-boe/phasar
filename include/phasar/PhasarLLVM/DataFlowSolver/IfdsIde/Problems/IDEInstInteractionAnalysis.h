@@ -459,11 +459,7 @@ public:
     return nullptr;
   }
 
-  inline std::map<n_t, std::set<std::pair<d_t, EdgeFunction<l_t> *>>>
-  initialSeeds() override {
-    std::map<n_t, std::set<std::pair<d_t, EdgeFunction<l_t> *>>> SeedMap;
-    return SeedMap;
-    /*
+  inline std::map<n_t, container_type> initialSeeds() override {
     std::map<n_t, container_type> SeedMap;
     for (const auto &EntryPoint : this->EntryPoints) {
       for (const auto *StartPoint :
@@ -473,7 +469,6 @@ public:
       }
     }
     return SeedMap;
-    */
   }
 
   [[nodiscard]] inline d_t createZeroValue() const override {

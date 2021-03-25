@@ -74,20 +74,15 @@ IDEProtoAnalysis::getSummaryFlowFunction(IDEProtoAnalysis::n_t CallStmt,
   return nullptr;
 }
 
-map<IDEProtoAnalysis::n_t,
-    set<pair<IDEProtoAnalysis::d_t, EdgeFunction<IDEProtoAnalysis::l_t> *>>>
+map<IDEProtoAnalysis::n_t, set<IDEProtoAnalysis::d_t>>
 IDEProtoAnalysis::initialSeeds() {
   cout << "IDEProtoAnalysis::initialSeeds()\n";
-  map<IDEProtoAnalysis::n_t,
-      set<pair<IDEProtoAnalysis::d_t, EdgeFunction<IDEProtoAnalysis::l_t> *>>>
-      SeedMap;
+  map<IDEProtoAnalysis::n_t, set<IDEProtoAnalysis::d_t>> SeedMap;
+  for (const auto &EntryPoint : EntryPoints) {
+    SeedMap.insert(make_pair(&ICF->getFunction(EntryPoint)->front().front(),
+                             set<IDEProtoAnalysis::d_t>({getZeroValue()})));
+  }
   return SeedMap;
-
-  // for (const auto &EntryPoint : EntryPoints) {
-  //   SeedMap.insert(make_pair(&ICF->getFunction(EntryPoint)->front().front(),
-  //                            set<IDEProtoAnalysis::d_t>({getZeroValue()})));
-  // }
-  // return SeedMap;
 }
 
 IDEProtoAnalysis::d_t IDEProtoAnalysis::createZeroValue() const {

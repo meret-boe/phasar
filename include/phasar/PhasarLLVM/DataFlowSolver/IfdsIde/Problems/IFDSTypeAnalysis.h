@@ -52,8 +52,7 @@ public:
 
   FlowFunctionPtrType getSummaryFlowFunction(n_t curr, f_t destFun) override;
 
-  std::map<n_t, std::set<std::pair<d_t, EdgeFunction<l_t> *>>>
-  initialSeeds() override;
+  std::map<n_t, std::set<d_t>> initialSeeds() override;
 
   d_t createZeroValue() const override;
 

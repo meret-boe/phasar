@@ -95,23 +95,14 @@ IFDSSFB901TaintAnalysis::getSummaryFlowFunction(
   return nullptr;
 }
 
-map<IFDSSFB901TaintAnalysis::n_t,
-    set<pair<IFDSSFB901TaintAnalysis::d_t,
-             EdgeFunction<IFDSSFB901TaintAnalysis::l_t> *>>>
+map<const llvm::Instruction *, set<const FlowFact *>>
 IFDSSFB901TaintAnalysis::initialSeeds() {
   cout << "IFDSSFB901TaintAnalysis::initialSeeds()\n";
-  map<IFDSSFB901TaintAnalysis::n_t,
-      set<pair<IFDSSFB901TaintAnalysis::d_t,
-               EdgeFunction<IFDSSFB901TaintAnalysis::l_t> *>>>
-      SeedMap;
-  return SeedMap;
-  /*
   map<const llvm::Instruction *, set<const FlowFact *>> SeedMap;
   SeedMap.insert(std::make_pair(
       &ICF->getFunction("run_service_contrast_cpu")->front().front(),
       set<const FlowFact *>({getZeroValue()})));
   return SeedMap;
-  */
 }
 
 } // namespace psr

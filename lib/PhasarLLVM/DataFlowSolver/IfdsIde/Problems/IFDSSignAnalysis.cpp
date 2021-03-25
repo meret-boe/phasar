@@ -67,19 +67,15 @@ IFDSSignAnalysis::getSummaryFlowFunction(IFDSSignAnalysis::n_t CallStmt,
   return Identity<IFDSSignAnalysis::d_t>::getInstance();
 }
 
-map<IFDSSignAnalysis::n_t,
-    set<pair<IFDSSignAnalysis::d_t, EdgeFunction<IFDSSignAnalysis::l_t> *>>>
+map<IFDSSignAnalysis::n_t, set<IFDSSignAnalysis::d_t>>
 IFDSSignAnalysis::initialSeeds() {
   cout << "IFDSSignAnalysis::initialSeeds()\n";
-  map<IFDSSignAnalysis::n_t,
-      set<pair<IFDSSignAnalysis::d_t, EdgeFunction<IFDSSignAnalysis::l_t> *>>>
-      SeedMap;
+  map<IFDSSignAnalysis::n_t, set<IFDSSignAnalysis::d_t>> SeedMap;
+  for (const auto &EntryPoint : EntryPoints) {
+    SeedMap.insert(make_pair(&ICF->getFunction(EntryPoint)->front().front(),
+                             set<IFDSSignAnalysis::d_t>({getZeroValue()})));
+  }
   return SeedMap;
-  // for (const auto &EntryPoint : EntryPoints) {
-  //   SeedMap.insert(make_pair(&ICF->getFunction(EntryPoint)->front().front(),
-  //                            set<IFDSSignAnalysis::d_t>({getZeroValue()})));
-  // }
-  // return SeedMap;
 }
 
 IFDSSignAnalysis::d_t IFDSSignAnalysis::createZeroValue() const {

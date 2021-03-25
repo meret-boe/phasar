@@ -208,21 +208,15 @@ IFDSConstAnalysis::getSummaryFlowFunction(IFDSConstAnalysis::n_t CallStmt,
   return nullptr;
 }
 
-map<IFDSConstAnalysis::n_t,
-    set<pair<IFDSConstAnalysis::d_t, EdgeFunction<IFDSConstAnalysis::l_t> *>>>
+map<IFDSConstAnalysis::n_t, set<IFDSConstAnalysis::d_t>>
 IFDSConstAnalysis::initialSeeds() {
   // just start in main()
-  map<IFDSConstAnalysis::n_t,
-      set<pair<IFDSConstAnalysis::d_t, EdgeFunction<IFDSConstAnalysis::l_t> *>>>
-      SeedMap;
+  map<IFDSConstAnalysis::n_t, set<IFDSConstAnalysis::d_t>> SeedMap;
+  for (const auto &EntryPoint : EntryPoints) {
+    SeedMap.insert(make_pair(&ICF->getFunction(EntryPoint)->front().front(),
+                             set<IFDSConstAnalysis::d_t>({getZeroValue()})));
+  }
   return SeedMap;
-  // for (const auto &EntryPoint : EntryPoints) {
-  //   IFDSConstAnalysis::n_t Inst =
-  //   &ICF->getFunction(EntryPoint)->front().front(); SeedMap[Inst] =
-  //   set<pair<IFDSConstAnalysis::d_t, EdgeFunction<l_t>
-  //   *>>(make_pair(getZeroValue(), nullptr));
-  // }
-  // return SeedMap;
 }
 
 IFDSConstAnalysis::d_t IFDSConstAnalysis::createZeroValue() const {

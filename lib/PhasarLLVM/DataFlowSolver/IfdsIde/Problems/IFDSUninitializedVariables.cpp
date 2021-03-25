@@ -400,25 +400,18 @@ IFDSUninitializedVariables::getSummaryFlowFunction(
   return nullptr;
 }
 
-map<IFDSUninitializedVariables::n_t,
-    set<pair<IFDSUninitializedVariables::d_t,
-             EdgeFunction<IFDSUninitializedVariables::l_t> *>>>
+map<IFDSUninitializedVariables::n_t, set<IFDSUninitializedVariables::d_t>>
 IFDSUninitializedVariables::initialSeeds() {
   LOG_IF_ENABLE(BOOST_LOG_SEV(lg::get(), DEBUG)
                 << "IFDSUninitializedVariables::initialSeeds()");
-  map<IFDSUninitializedVariables::n_t,
-      set<pair<IFDSUninitializedVariables::d_t,
-               EdgeFunction<IFDSUninitializedVariables::l_t> *>>>
+  map<IFDSUninitializedVariables::n_t, set<IFDSUninitializedVariables::d_t>>
       SeedMap;
-  return SeedMap;
-  /*
   for (const auto &EntryPoint : EntryPoints) {
     SeedMap.insert(
         make_pair(&ICF->getFunction(EntryPoint)->front().front(),
                   set<IFDSUninitializedVariables::d_t>({getZeroValue()})));
   }
   return SeedMap;
-  */
 }
 
 IFDSUninitializedVariables::d_t

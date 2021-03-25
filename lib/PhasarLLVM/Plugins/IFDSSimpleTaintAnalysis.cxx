@@ -119,25 +119,16 @@ IFDSSimpleTaintAnalysis::getSummaryFlowFunction(
   return nullptr;
 }
 
-map<IFDSSimpleTaintAnalysis::n_t,
-    set<pair<IFDSSimpleTaintAnalysis::d_t,
-             EdgeFunction<IFDSSimpleTaintAnalysis::l_t> *>>>
+map<const llvm::Instruction *, set<const FlowFact *>>
 IFDSSimpleTaintAnalysis::initialSeeds() {
   cout << "IFDSSimpleTaintAnalysis::initialSeeds()\n";
-  map<IFDSSimpleTaintAnalysis::n_t,
-      set<pair<IFDSSimpleTaintAnalysis::d_t,
-               EdgeFunction<IFDSSimpleTaintAnalysis::l_t> *>>>
-      SeedMap;
+  map<const llvm::Instruction *, set<const FlowFact *>> SeedMap;
+  for (auto &EntryPoint : EntryPoints) {
+    SeedMap.insert(
+        std::make_pair(&ICF->getFunction(EntryPoint)->front().front(),
+                       set<const FlowFact *>({getZeroValue()})));
+  }
   return SeedMap;
-
-  /*
-    for (auto &EntryPoint : EntryPoints) {
-      SeedMap.insert(
-          std::make_pair(&ICF->getFunction(EntryPoint)->front().front(),
-                         set<const FlowFact *>({getZeroValue()})));
-    }
-    return SeedMap;
-    */
 }
 
 } // namespace psr
