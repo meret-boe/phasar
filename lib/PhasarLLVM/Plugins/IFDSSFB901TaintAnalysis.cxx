@@ -95,7 +95,8 @@ IFDSSFB901TaintAnalysis::getSummaryFlowFunction(
   return nullptr;
 }
 
-map<const llvm::Instruction *, set<const FlowFact *>>
+InitialSeeds<const llvm::Instruction *, const FlowFact *,
+             IFDSSFB901TaintAnalysis::l_t>
 IFDSSFB901TaintAnalysis::initialSeeds() {
   cout << "IFDSSFB901TaintAnalysis::initialSeeds()\n";
   map<const llvm::Instruction *, set<const FlowFact *>> SeedMap;

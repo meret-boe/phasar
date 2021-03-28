@@ -220,7 +220,8 @@ IFDSFieldSensTaintAnalysis::getSummaryFlowFunction(
   return nullptr;
 }
 
-std::map<const llvm::Instruction *, std::set<ExtendedValue>>
+InitialSeeds<const llvm::Instruction *, ExtendedValue,
+             IFDSFieldSensTaintAnalysis::l_t>
 IFDSFieldSensTaintAnalysis::initialSeeds() {
   std::map<const llvm::Instruction *, std::set<ExtendedValue>> SeedMap;
   for (const auto &EntryPoint : this->EntryPoints) {

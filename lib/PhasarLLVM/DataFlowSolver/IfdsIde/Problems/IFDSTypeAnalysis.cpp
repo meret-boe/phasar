@@ -88,7 +88,8 @@ IFDSTypeAnalysis::getSummaryFlowFunction(IFDSTypeAnalysis::n_t Curr,
   return nullptr;
 }
 
-map<IFDSTypeAnalysis::n_t, set<IFDSTypeAnalysis::d_t>>
+InitialSeeds<IFDSTypeAnalysis::n_t, IFDSTypeAnalysis::d_t,
+             IFDSTypeAnalysis::l_t>
 IFDSTypeAnalysis::initialSeeds() {
   map<IFDSTypeAnalysis::n_t, set<IFDSTypeAnalysis::d_t>> SeedMap;
   for (const auto &EntryPoint : EntryPoints) {

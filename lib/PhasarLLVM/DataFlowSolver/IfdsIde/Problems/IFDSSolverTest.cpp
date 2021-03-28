@@ -67,7 +67,7 @@ IFDSSolverTest::getSummaryFlowFunction(IFDSSolverTest::n_t CallStmt,
   return nullptr;
 }
 
-map<IFDSSolverTest::n_t, set<IFDSSolverTest::d_t>>
+InitialSeeds<IFDSSolverTest::n_t, IFDSSolverTest::d_t, IFDSSolverTest::l_t>
 IFDSSolverTest::initialSeeds() {
   LOG_IF_ENABLE(BOOST_LOG_SEV(lg::get(), DEBUG)
                 << "IFDSSolverTest::initialSeeds()");

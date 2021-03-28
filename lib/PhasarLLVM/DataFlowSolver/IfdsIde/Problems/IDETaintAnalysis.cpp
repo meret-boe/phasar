@@ -74,7 +74,8 @@ IDETaintAnalysis::getSummaryFlowFunction(IDETaintAnalysis::n_t CallStmt,
   return nullptr;
 }
 
-map<IDETaintAnalysis::n_t, set<IDETaintAnalysis::d_t>>
+InitialSeeds<IDETaintAnalysis::n_t, IDETaintAnalysis::d_t,
+             IDETaintAnalysis::l_t>
 IDETaintAnalysis::initialSeeds() {
   // just start in main()
   map<IDETaintAnalysis::n_t, set<IDETaintAnalysis::d_t>> SeedMap;

@@ -236,7 +236,8 @@ IFDSTaintAnalysis::getSummaryFlowFunction(IFDSTaintAnalysis::n_t CallStmt,
   }
 }
 
-map<IFDSTaintAnalysis::n_t, set<IFDSTaintAnalysis::d_t>>
+InitialSeeds<IFDSTaintAnalysis::n_t, IFDSTaintAnalysis::d_t,
+             IFDSTaintAnalysis::l_t>
 IFDSTaintAnalysis::initialSeeds() {
   LOG_IF_ENABLE(BOOST_LOG_SEV(lg::get(), DEBUG)
                 << "IFDSTaintAnalysis::initialSeeds()");

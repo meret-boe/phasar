@@ -42,8 +42,9 @@ public:
   getNormalFlowFunction(const llvm::Instruction *curr,
                         const llvm::Instruction *succ) override;
 
-  FlowFunctionPtrType getCallFlowFunction(const llvm::Instruction *callStmt,
-                                       const llvm::Function *destMthd) override;
+  FlowFunctionPtrType
+  getCallFlowFunction(const llvm::Instruction *callStmt,
+                      const llvm::Function *destMthd) override;
 
   FlowFunctionPtrType
   getRetFlowFunction(const llvm::Instruction *callSite,
@@ -60,7 +61,7 @@ public:
   getSummaryFlowFunction(const llvm::Instruction *callStmt,
                          const llvm::Function *destMthd) override;
 
-  std::map<const llvm::Instruction *, std::set<const psr::FlowFact *>>
+  InitialSeeds<const llvm::Instruction *, const psr::FlowFact *, l_t>
   initialSeeds() override;
 };
 

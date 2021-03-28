@@ -27,6 +27,7 @@
 #include "phasar/PhasarLLVM/DataFlowSolver/IfdsIde/FlowFunctions.h"
 #include "phasar/PhasarLLVM/DataFlowSolver/IfdsIde/IFDSIDESolverConfig.h"
 #include "phasar/PhasarLLVM/DataFlowSolver/IfdsIde/Solver/SolverResults.h"
+#include "phasar/PhasarLLVM/Utils/InitialSeeds.h"
 #include "phasar/PhasarLLVM/Utils/Printer.h"
 #include "phasar/Utils/Soundness.h"
 
@@ -54,6 +55,7 @@ public:
   using t_t = typename AnalysisDomainTy::t_t;
   using v_t = typename AnalysisDomainTy::v_t;
   using i_t = typename AnalysisDomainTy::i_t;
+  using l_t = typename AnalysisDomainTy::l_t;
 
   static_assert(std::is_base_of_v<ICFG<n_t, f_t>, i_t>,
                 "I must implement the ICFG interface!");
@@ -89,7 +91,7 @@ public:
 
   /// Returns initial seeds to be used for the analysis. This is a mapping of
   /// statements to initial analysis facts.
-  virtual std::map<n_t, std::set<d_t>> initialSeeds() = 0;
+  virtual InitialSeeds<n_t, d_t, l_t> initialSeeds() = 0;
 
   /// Returns the special tautological lambda (or zero) fact.
   d_t getZeroValue() const { return ZeroValue; }

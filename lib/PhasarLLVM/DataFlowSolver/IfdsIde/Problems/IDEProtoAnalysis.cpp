@@ -74,7 +74,8 @@ IDEProtoAnalysis::getSummaryFlowFunction(IDEProtoAnalysis::n_t CallStmt,
   return nullptr;
 }
 
-map<IDEProtoAnalysis::n_t, set<IDEProtoAnalysis::d_t>>
+InitialSeeds<IDEProtoAnalysis::n_t, IDEProtoAnalysis::d_t,
+             IDEProtoAnalysis::l_t>
 IDEProtoAnalysis::initialSeeds() {
   cout << "IDEProtoAnalysis::initialSeeds()\n";
   map<IDEProtoAnalysis::n_t, set<IDEProtoAnalysis::d_t>> SeedMap;

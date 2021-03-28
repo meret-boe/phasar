@@ -14,29 +14,32 @@
  *      Author: Alexander Meinhold
  */
 
-#ifndef PHASAR_PHASARLLVM_UTILS_InitialSeeds_H_
-#define PHASAR_PHASARLLVM_UTILS_InitialSeeds_H_
+#ifndef PHASAR_PHASARLLVM_UTILS_INITIALSEEDS_H_
+#define PHASAR_PHASARLLVM_UTILS_INITIALSEEDS_H_
 
 #include <map>
+#include <memory>
 #include <set>
 #include <utility>
-#include <memory>
 
 #include "phasar/PhasarLLVM/DataFlowSolver/IfdsIde/EdgeFunctions.h"
 #include "phasar/PhasarLLVM/Utils/BinaryDomain.h"
 
 namespace psr {
 
-template <typename N, typename D, typename L = BinaryDomain> struct InitialSeeds {
+template <typename N, typename D, typename L = BinaryDomain>
+struct InitialSeeds {
 public:
-  InitialSeeds(std::map<N, std::set<std::pair<D, std::shared_ptr<EdgeFunction<L>>>>> Seeds) : Seeds(Seeds) {};
+  InitialSeeds(std::map<N, std::set<D>> Seeds) : Seeds(Seeds) {}
+  // InitialSeeds(std::map<N, std::set<std::pair<D,
+  // std::shared_ptr<EdgeFunction<L>>>>> Seeds) : Seeds(Seeds) {}
 
-  InitialSeeds(std::map<N, std::set<D>> Seeds) {
-    // TODO: implement
-  };
+  std::map<N, std::set<D>> get() { return Seeds; }
+
 private:
-  std::map<N, std::set<std::pair<D, std::shared_ptr<EdgeFunction<L>>>>>
-      Seeds;
+  std::map<N, std::set<D>> Seeds;
+  // std::map<N, std::set<std::pair<D, std::shared_ptr<EdgeFunction<L>>>>>
+  //     Seeds;
 };
 
 } // namespace psr

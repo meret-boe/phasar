@@ -119,7 +119,8 @@ IFDSSimpleTaintAnalysis::getSummaryFlowFunction(
   return nullptr;
 }
 
-map<const llvm::Instruction *, set<const FlowFact *>>
+InitialSeeds<const llvm::Instruction *, const FlowFact *,
+             IFDSSimpleTaintAnalysis::l_t>
 IFDSSimpleTaintAnalysis::initialSeeds() {
   cout << "IFDSSimpleTaintAnalysis::initialSeeds()\n";
   map<const llvm::Instruction *, set<const FlowFact *>> SeedMap;

@@ -76,7 +76,8 @@ IDETabulationProblemTestPlugin::getSummaryFlowFunction(
   return nullptr;
 }
 
-map<const llvm::Instruction *, set<const FlowFact *>>
+InitialSeeds<const llvm::Instruction *, const FlowFact *,
+             IDETabulationProblemTestPlugin::l_t>
 IDETabulationProblemTestPlugin::initialSeeds() {
   cout << "IDETabulationProblemTestPlugin::initialSeeds()\n";
   map<const llvm::Instruction *, set<const FlowFact *>> SeedMap;

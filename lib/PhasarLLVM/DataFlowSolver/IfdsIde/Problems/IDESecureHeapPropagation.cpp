@@ -63,7 +63,8 @@ IDESecureHeapPropagation::getSummaryFlowFunction(n_t CallStmt, f_t DestMthd) {
   return nullptr;
 }
 
-std::map<IDESecureHeapPropagation::n_t, std::set<IDESecureHeapPropagation::d_t>>
+InitialSeeds<IDESecureHeapPropagation::n_t, IDESecureHeapPropagation::d_t,
+             IDESecureHeapPropagation::l_t>
 IDESecureHeapPropagation::initialSeeds() {
   std::map<n_t, std::set<d_t>> Seeds;
   for (const auto &Entry : EntryPoints) {

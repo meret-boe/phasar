@@ -110,7 +110,7 @@ MyIFDSProblem::getSummaryFlowFunction(const llvm::Instruction *callStmt,
 // Return(s) set(s) of flow fact(s) that hold(s) initially at a corresponding
 // statement. The analysis will start at these instructions and propagate the
 // flow facts according to the analysis description.
-map<const llvm::Instruction *, set<const FlowFact *>>
+InitialSeeds<const llvm::Instruction *, const FlowFact *, l_t>
 MyIFDSProblem::initialSeeds() {
   cout << "MyIFDSProblem::initialSeeds()\n";
   map<const llvm::Instruction *, set<const FlowFact *>> SeedMap;

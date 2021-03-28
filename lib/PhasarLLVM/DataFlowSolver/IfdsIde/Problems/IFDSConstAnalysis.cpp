@@ -208,7 +208,8 @@ IFDSConstAnalysis::getSummaryFlowFunction(IFDSConstAnalysis::n_t CallStmt,
   return nullptr;
 }
 
-map<IFDSConstAnalysis::n_t, set<IFDSConstAnalysis::d_t>>
+InitialSeeds<IFDSConstAnalysis::n_t, IFDSConstAnalysis::d_t,
+             IFDSConstAnalysis::l_t>
 IFDSConstAnalysis::initialSeeds() {
   // just start in main()
   map<IFDSConstAnalysis::n_t, set<IFDSConstAnalysis::d_t>> SeedMap;

@@ -265,7 +265,8 @@ IDELinearConstantAnalysis::getSummaryFlowFunction(
   return nullptr;
 }
 
-map<IDELinearConstantAnalysis::n_t, set<IDELinearConstantAnalysis::d_t>>
+InitialSeeds<IDELinearConstantAnalysis::n_t, IDELinearConstantAnalysis::d_t,
+             IDELinearConstantAnalysis::l_t>
 IDELinearConstantAnalysis::initialSeeds() {
   // Check commandline arguments, e.g. argc, and generate all integer
   // typed arguments.

@@ -105,7 +105,7 @@ public:
         cachedFlowEdgeFunctions(Problem), allTop(Problem.allTopFunction()),
         jumpFn(std::make_shared<JumpFunctions<AnalysisDomainTy, Container>>(
             allTop, IDEProblem)),
-        initialSeeds(Problem.initialSeeds()) {}
+        initialSeeds(Problem.initialSeeds().get()) {}
 
   IDESolver(const IDESolver &) = delete;
   IDESolver &operator=(const IDESolver &) = delete;
@@ -414,6 +414,7 @@ protected:
   // returns if SolverConfig.followReturnPastSeeds is enabled
   std::set<n_t> unbalancedRetSites;
 
+  // TODO: use InitialSeed type here too
   std::map<n_t, std::set<d_t>> initialSeeds;
 
   Table<n_t, d_t, l_t> valtab;
@@ -439,7 +440,7 @@ protected:
         allTop(IDEProblem.allTopFunction()),
         jumpFn(std::make_shared<JumpFunctions<AnalysisDomainTy, Container>>(
             allTop, IDEProblem)),
-        initialSeeds(IDEProblem.initialSeeds()) {}
+        initialSeeds(IDEProblem.initialSeeds().get()) {}
 
   /**
    * Lines 13-20 of the algorithm; processing a call site in the caller's

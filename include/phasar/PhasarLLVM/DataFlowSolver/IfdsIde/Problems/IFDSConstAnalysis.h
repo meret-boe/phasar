@@ -141,7 +141,7 @@ public:
    * all memory locations are considered immutable.
    * @brief Provides data-flow facts that are valid at the program entry point.
    */
-  std::map<n_t, std::set<d_t>> initialSeeds() override;
+  InitialSeeds<n_t, d_t, l_t> initialSeeds() override;
 
   /**
    * @brief Returns appropriate zero value.

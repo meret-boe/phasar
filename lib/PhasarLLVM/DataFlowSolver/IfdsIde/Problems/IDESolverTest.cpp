@@ -73,7 +73,8 @@ IDESolverTest::getSummaryFlowFunction(IDESolverTest::n_t CallStmt,
   return nullptr;
 }
 
-map<IDESolverTest::n_t, set<IDESolverTest::d_t>> IDESolverTest::initialSeeds() {
+InitialSeeds<IDESolverTest::n_t, IDESolverTest::d_t, IDESolverTest::l_t>
+IDESolverTest::initialSeeds() {
   cout << "IDESolverTest::initialSeeds()\n";
   map<IDESolverTest::n_t, set<IDESolverTest::d_t>> SeedMap;
   for (auto &EntryPoint : EntryPoints) {

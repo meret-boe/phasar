@@ -459,7 +459,7 @@ public:
     return nullptr;
   }
 
-  inline std::map<n_t, container_type> initialSeeds() override {
+  inline InitialSeeds<n_t, d_t, l_t> initialSeeds() override {
     std::map<n_t, container_type> SeedMap;
     for (const auto &EntryPoint : this->EntryPoints) {
       for (const auto *StartPoint :

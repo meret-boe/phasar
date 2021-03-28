@@ -94,7 +94,8 @@ IFDSLinearConstantAnalysis::getSummaryFlowFunction(
   return nullptr;
 }
 
-map<IFDSLinearConstantAnalysis::n_t, set<IFDSLinearConstantAnalysis::d_t>>
+InitialSeeds<IFDSLinearConstantAnalysis::n_t, IFDSLinearConstantAnalysis::d_t,
+             IFDSLinearConstantAnalysis::l_t>
 IFDSLinearConstantAnalysis::initialSeeds() {
   LOG_IF_ENABLE(BOOST_LOG_SEV(lg::get(), DEBUG)
                 << "IFDSLinearConstantAnalysis::initialSeeds()");

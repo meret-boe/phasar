@@ -67,7 +67,8 @@ IFDSSignAnalysis::getSummaryFlowFunction(IFDSSignAnalysis::n_t CallStmt,
   return Identity<IFDSSignAnalysis::d_t>::getInstance();
 }
 
-map<IFDSSignAnalysis::n_t, set<IFDSSignAnalysis::d_t>>
+InitialSeeds<IFDSSignAnalysis::n_t, IFDSSignAnalysis::d_t,
+             IFDSSignAnalysis::l_t>
 IFDSSignAnalysis::initialSeeds() {
   cout << "IFDSSignAnalysis::initialSeeds()\n";
   map<IFDSSignAnalysis::n_t, set<IFDSSignAnalysis::d_t>> SeedMap;

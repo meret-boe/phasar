@@ -89,7 +89,8 @@ IFDSTabulationProblemTestPlugin::getSummaryFlowFunction(
   return nullptr;
 }
 
-map<const llvm::Instruction *, set<const FlowFact *>>
+InitialSeeds<const llvm::Instruction *, const FlowFact *,
+             IFDSTabulationProblemTestPlugin::l_t>
 IFDSTabulationProblemTestPlugin::initialSeeds() {
   cout << "IFDSTabulationProblemTestPlugin::initialSeeds()\n";
   map<const llvm::Instruction *, set<const FlowFact *>> SeedMap;

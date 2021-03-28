@@ -222,7 +222,8 @@ IDEGeneralizedLCA::getSummaryFlowFunction(IDEGeneralizedLCA::n_t CallStmt,
   return nullptr;
 }
 
-std::map<IDEGeneralizedLCA::n_t, std::set<IDEGeneralizedLCA::d_t>>
+InitialSeeds<IDEGeneralizedLCA::n_t, IDEGeneralizedLCA::d_t,
+             IDEGeneralizedLCA::l_t>
 IDEGeneralizedLCA::initialSeeds() {
   std::map<IDEGeneralizedLCA::n_t, std::set<IDEGeneralizedLCA::d_t>> SeedMap;
   // For now, out only entrypoint is main:

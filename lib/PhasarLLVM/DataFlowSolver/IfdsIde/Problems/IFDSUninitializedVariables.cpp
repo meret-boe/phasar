@@ -400,7 +400,8 @@ IFDSUninitializedVariables::getSummaryFlowFunction(
   return nullptr;
 }
 
-map<IFDSUninitializedVariables::n_t, set<IFDSUninitializedVariables::d_t>>
+InitialSeeds<IFDSUninitializedVariables::n_t, IFDSUninitializedVariables::d_t,
+             IFDSUninitializedVariables::l_t>
 IFDSUninitializedVariables::initialSeeds() {
   LOG_IF_ENABLE(BOOST_LOG_SEV(lg::get(), DEBUG)
                 << "IFDSUninitializedVariables::initialSeeds()");
