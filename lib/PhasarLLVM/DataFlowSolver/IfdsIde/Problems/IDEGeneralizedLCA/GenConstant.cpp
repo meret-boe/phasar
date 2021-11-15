@@ -16,7 +16,11 @@
 
 namespace psr {
 
+<<<<<<< HEAD
 GenConstant::GenConstant(const IDEGeneralizedLCA::l_t &Val, size_t MaxSize) //NOLINT
+=======
+GenConstant::GenConstant(const IDEGeneralizedLCA::l_t &Val, size_t MaxSize)
+>>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
     : Val(Val), MaxSize(MaxSize) {
   // TODO: remove this?
   /*std::cout << "GenConstant: {";
@@ -31,7 +35,11 @@ GenConstant::GenConstant(const IDEGeneralizedLCA::l_t &Val, size_t MaxSize) //NO
   std::cout << "}" << std::endl;*/
 }
 IDEGeneralizedLCA::l_t
+<<<<<<< HEAD
 GenConstant::computeTarget(IDEGeneralizedLCA::l_t  /*Source*/) {
+=======
+GenConstant::computeTarget([[maybe_unused]] IDEGeneralizedLCA::l_t Source) {
+>>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
   // std::cout << "GenConstant computation (" << source << ")"
   //         << " = " << val << std::endl;
   return Val;
@@ -48,7 +56,11 @@ std::shared_ptr<EdgeFunction<IDEGeneralizedLCA::l_t>> GenConstant::composeWith(
   }
   if (dynamic_cast<GenConstant *>(SecondFunction.get())) {
     return SecondFunction;
+<<<<<<< HEAD
 }
+=======
+  }
+>>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
   // return std::make_shared<EdgeFunctionComposer>(shared_from_this(),
   //                                              secondFunction, maxSize);
   return std::make_shared<GenConstant>(SecondFunction->computeTarget(Val),
@@ -71,7 +83,11 @@ std::shared_ptr<EdgeFunction<IDEGeneralizedLCA::l_t>> GenConstant::joinWith(
   }
   if (AllBot::isBot(Other)) {
     return AllBot::getInstance();
+<<<<<<< HEAD
 }
+=======
+  }
+>>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
   return std::make_shared<JoinEdgeFunction>(shared_from_this(), Other, MaxSize);
 }
 
@@ -82,7 +98,13 @@ bool GenConstant::equalTo(
   }
   return false;
 }
+<<<<<<< HEAD
 void GenConstant::print(std::ostream &OS, bool  /*IsForDebug*/) const {
+=======
+
+void GenConstant::print(std::ostream &OS,
+                        [[maybe_unused]] bool IsForDebug) const {
+>>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
   OS << "GenConstantEdgeFn(" << Val << ")";
 }
 

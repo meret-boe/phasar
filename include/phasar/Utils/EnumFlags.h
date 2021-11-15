@@ -71,8 +71,13 @@ constexpr void operator^=(T &Lhs, T Rhs) {
 
 template <typename T,
           typename = typename std::enable_if_t<std::is_enum<T>::value, T>>
+<<<<<<< HEAD
 constexpr T operator~(T VarT) {
   return static_cast<T>(~static_cast<typename std::underlying_type_t<T>>(VarT));
+=======
+constexpr T operator~(T Val) {
+  return static_cast<T>(~static_cast<typename std::underlying_type_t<T>>(Val));
+>>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
 }
 
 template <typename T,

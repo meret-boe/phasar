@@ -99,8 +99,13 @@ public:
   ~PhasarConfig() = default;
   PhasarConfig(const PhasarConfig &) = delete;
   PhasarConfig(PhasarConfig &&) = delete;
+<<<<<<< HEAD
   PhasarConfig& operator=(const PhasarConfig& Other);
   PhasarConfig& operator=(PhasarConfig&& Other) noexcept;
+=======
+  PhasarConfig& operator=(const PhasarConfig&) = default;
+  PhasarConfig& operator=(PhasarConfig&&) = default;
+>>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
 
 private:
   PhasarConfig();
@@ -130,15 +135,15 @@ private:
   static const std::string PhasarDir;
 
   /// Name of the file storing all glibc function names.
-  const std::string GLIBCFunctionListFileName =
+  static const inline std::string GLIBCFunctionListFileName =
       "glibc_function_list_v1-04.05.17.conf";
 
   /// Name of the file storing all LLVM intrinsic function names.
-  const std::string LLVMIntrinsicFunctionListFileName =
+  static const inline std::string LLVMIntrinsicFunctionListFileName =
       "llvm_intrinsics_function_list_v1-04.05.17.conf";
 
   /// Log file directory
-  const std::string LogFileDirectory = "log/";
+  static const inline std::string LogFileDirectory = "log/";
 };
 
 } // namespace psr

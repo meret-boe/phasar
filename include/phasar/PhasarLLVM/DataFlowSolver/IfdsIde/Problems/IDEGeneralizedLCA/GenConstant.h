@@ -34,6 +34,10 @@ public:
 
   bool equalTo(std::shared_ptr<EdgeFunction<IDEGeneralizedLCA::l_t>> Other)
       const override;
+<<<<<<< HEAD
+=======
+
+>>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
   void print(std::ostream &OS, bool IsForDebug = false) const override;
 };
 

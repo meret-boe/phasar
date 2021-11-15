@@ -25,7 +25,11 @@ public:
 
   [[nodiscard]] virtual std::vector<F> getAllFunctions() const = 0;
 
+<<<<<<< HEAD
   virtual int getIndex(F VarF) const = 0;
+=======
+  virtual int getIndex(F Fun) const = 0;
+>>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
 
   [[nodiscard]] virtual bool empty() const = 0;
 

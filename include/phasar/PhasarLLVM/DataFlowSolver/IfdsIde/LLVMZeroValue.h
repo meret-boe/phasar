@@ -78,8 +78,13 @@ public:
   }
 
   // Do not specify a destructor (at all)!
+<<<<<<< HEAD
   static LLVMZeroValue *getInstance() {
     static auto *Zv = new LLVMZeroValue; //NOLINT
+=======
+  static const LLVMZeroValue *getInstance() {
+    static const auto *Zv = new LLVMZeroValue;
+>>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
     return Zv;
   }
 };

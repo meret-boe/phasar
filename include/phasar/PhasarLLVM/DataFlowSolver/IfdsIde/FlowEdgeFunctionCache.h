@@ -10,15 +10,6 @@
 #ifndef PHASAR_PHASARLLVM_IFDSIDE_FLOWEDGEFUNCTIONCACHE_H_
 #define PHASAR_PHASARLLVM_IFDSIDE_FLOWEDGEFUNCTIONCACHE_H_
 
-#include "phasar/PhasarLLVM/DataFlowSolver/IfdsIde/EdgeFact.h"
-#include "phasar/PhasarLLVM/DataFlowSolver/IfdsIde/EdgeFunctions.h"
-#include "phasar/PhasarLLVM/DataFlowSolver/IfdsIde/IDETabulationProblem.h"
-#include "phasar/Utils/EquivalenceClassMap.h"
-#include "phasar/Utils/Logger.h"
-#include "phasar/Utils/PAMMMacros.h"
-
-#include "llvm/ADT/DenseMap.h"
-
 #include <algorithm>
 #include <map>
 #include <memory>
@@ -26,6 +17,15 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+
+#include "llvm/ADT/DenseMap.h"
+
+#include "phasar/PhasarLLVM/DataFlowSolver/IfdsIde/EdgeFact.h"
+#include "phasar/PhasarLLVM/DataFlowSolver/IfdsIde/EdgeFunctions.h"
+#include "phasar/PhasarLLVM/DataFlowSolver/IfdsIde/IDETabulationProblem.h"
+#include "phasar/Utils/EquivalenceClassMap.h"
+#include "phasar/Utils/Logger.h"
+#include "phasar/Utils/PAMMMacros.h"
 
 namespace psr {
 template <typename KeyT> class DefaultMapKeyCompressor {
@@ -153,8 +153,8 @@ public:
     REG_COUNTER("CallToRet-FF Construction", 0, PAMM_SEVERITY_LEVEL::Full);
     REG_COUNTER("CallToRet-FF Cache Hit", 0, PAMM_SEVERITY_LEVEL::Full);
     // Counters for the summary flow functions
-    // REG_COUNTER("Summary-FF Construction", 0, PAMM_SEVERITY_LEVEL::Full);
-    // REG_COUNTER("Summary-FF Cache Hit", 0, PAMM_SEVERITY_LEVEL::Full);
+    REG_COUNTER("Summary-FF Construction", 0, PAMM_SEVERITY_LEVEL::Full);
+    REG_COUNTER("Summary-FF Cache Hit", 0, PAMM_SEVERITY_LEVEL::Full);
     // Counters for the normal edge functions
     REG_COUNTER("Normal-EF Construction", 0, PAMM_SEVERITY_LEVEL::Full);
     REG_COUNTER("Normal-EF Cache Hit", 0, PAMM_SEVERITY_LEVEL::Full);
@@ -492,15 +492,21 @@ public:
       auto SearchEdgeFunc = SearchInnerMap->second.find(
           createEdgeFunctionNodeKey(CallNode, RetSiteNode));
       if (SearchEdgeFunc != SearchInnerMap->second.end()) {
-        INC_COUNTER("CTR-EF Cache Hit", 1, PAMM_SEVERITY_LEVEL::Full);
+        INC_COUNTER("CallToRet-EF Cache Hit", 1, PAMM_SEVERITY_LEVEL::Full);
         LOG_IF_ENABLE(BOOST_LOG_SEV(lg::get(), DEBUG)
                           << "Edge function fetched from cache";
                       BOOST_LOG_SEV(lg::get(), DEBUG) << ' ');
         return SearchEdgeFunc->second;
       }
+<<<<<<< HEAD
       INC_COUNTER("CTR-EF Construction", 1, PAMM_SEVERITY_LEVEL::Full);
       auto Ef = Problem.getCallToRetEdgeFunction(CallSite, CallNode, RetSite,
                                                  RetSiteNode, Callees);
+=======
+      INC_COUNTER("CallToRet-EF Construction", 1, PAMM_SEVERITY_LEVEL::Full);
+      auto ef = problem.getCallToRetEdgeFunction(callSite, callNode, retSite,
+                                                 retSiteNode, callees);
+>>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
 
       SearchInnerMap->second.insert(
           createEdgeFunctionNodeKey(CallNode, RetSiteNode), Ef);
@@ -511,9 +517,15 @@ public:
       return Ef;
     }
 
+<<<<<<< HEAD
     INC_COUNTER("CTR-EF Construction", 1, PAMM_SEVERITY_LEVEL::Full);
     auto Ef = Problem.getCallToRetEdgeFunction(CallSite, CallNode, RetSite,
                                                RetSiteNode, Callees);
+=======
+    INC_COUNTER("CallToRet-EF Construction", 1, PAMM_SEVERITY_LEVEL::Full);
+    auto ef = problem.getCallToRetEdgeFunction(callSite, callNode, retSite,
+                                               retSiteNode, callees);
+>>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
 
     CallToRetEdgeFunctionCache.emplace(
         OuterMapKey,
@@ -588,12 +600,12 @@ public:
       LOG_IF_ENABLE(BOOST_LOG_SEV(lg::get(), INFO)
                     << "Call-to-Return-flow function constructions: "
                     << GET_COUNTER("CallToRet-FF Construction"));
-      // LOG_IF_ENABLE(BOOST_LOG_SEV(lg::get(), INFO) << "Summary-flow function
-      // cache hits: "
-      //                        << GET_COUNTER("Summary-FF Cache Hit"));
-      // LOG_IF_ENABLE(BOOST_LOG_SEV(lg::get(), INFO) << "Summary-flow function
-      // constructions: "
-      //                         << GET_COUNTER("Summary-FF Construction"));
+      LOG_IF_ENABLE(BOOST_LOG_SEV(lg::get(), INFO)
+                    << "Summary-flow function cache hits: "
+                    << GET_COUNTER("Summary-FF Cache Hit"));
+      LOG_IF_ENABLE(BOOST_LOG_SEV(lg::get(), INFO)
+                    << "Summary-flow function constructions: "
+                    << GET_COUNTER("Summary-FF Construction"));
       LOG_IF_ENABLE(
           BOOST_LOG_SEV(lg::get(), INFO)
           << "Total flow function cache hits: "
