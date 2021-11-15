@@ -20,16 +20,9 @@ BinaryEdgeFunction::computeTarget(IDEGeneralizedLCA::l_t Source) {
   std::cout << "Binary(" << source << ") = " << ret << std::endl;
   return ret;*/
   if (LeftConst) {
-<<<<<<< HEAD
     return performBinOp(Op, Cnst, Source, MaxSize);
   }  
     return performBinOp(Op, Source, Cnst, MaxSize);
- 
-=======
-    return performBinOp(Op, Const, Source, MaxSize);
-  }
-  return performBinOp(Op, Source, Const, MaxSize);
->>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
 }
 
 std::shared_ptr<EdgeFunction<IDEGeneralizedLCA::l_t>>
@@ -68,12 +61,7 @@ bool BinaryEdgeFunction::equalTo(
   return this == Other.get();
 }
 
-<<<<<<< HEAD
 void BinaryEdgeFunction::print(std::ostream &OS, bool  /*IsForDebug*/) const {
-=======
-void BinaryEdgeFunction::print(std::ostream &OS,
-                               [[maybe_unused]] bool IsForDebug) const {
->>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
   OS << "Binary_" << Op;
 }
 

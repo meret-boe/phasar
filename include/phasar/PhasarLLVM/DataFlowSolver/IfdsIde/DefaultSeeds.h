@@ -27,13 +27,8 @@ template <typename N, typename D> class DefaultSeeds {
 public:
   static std::map<N, std::set<D>> make(std::vector<N> Nodes, D ZeroNode) {
     std::map<N, std::set<D>> Res;
-<<<<<<< HEAD
-    for (N Var : Node) {
+    for (N Var : Nodes) {
       Res.insert(Var, std::set<D>{ZeroNode});
-=======
-    for (N Node : Nodes) {
-      Res.insert(Node, std::set<D>{ZeroNode});
->>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
     }
     return Res;
   }

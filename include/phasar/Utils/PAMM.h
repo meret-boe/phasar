@@ -64,19 +64,11 @@ private:
       Histogram;
 
 public:
-<<<<<<< HEAD
   /// PAMM is used as singleton.
   PAMM(const PAMM &Pm) = delete;
   PAMM(PAMM &&Pm) = delete;
   PAMM &operator=(const PAMM &Pm) = delete;
   PAMM &operator=(PAMM &&Pm) = delete;
-=======
-  // PAMM is used as singleton.
-  PAMM(const PAMM &pm) = delete;
-  PAMM(PAMM &&pm) = delete;
-  PAMM &operator=(const PAMM &pm) = delete;
-  PAMM &operator=(PAMM &&pm) = delete;
->>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
 
   /// \brief Returns a reference to the PAMM object (singleton) - associated
   /// macro: PAMM_GET_INSTANCE.
@@ -186,17 +178,11 @@ public:
 
   void printHistograms(std::ostream &Os);
 
-<<<<<<< HEAD
   /**
    * @brief Prints the measured data to the commandline - associated macro:
    * PRINT_MEASURED_DATA
    */
   void printMeasuredData(std::ostream &Os);
-=======
-  /// \brief Prints the measured data to the commandline - associated macro:
-  /// PRINT_MEASURED_DATA
-  void printMeasuredData(std::ostream &os);
->>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
 
   /// \brief Exports the measured data to JSON - associated macro:
   /// EXPORT_MEASURED_DATA(PATH).

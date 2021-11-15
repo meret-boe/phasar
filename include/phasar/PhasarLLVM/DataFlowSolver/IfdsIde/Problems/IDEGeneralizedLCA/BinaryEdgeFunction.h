@@ -22,25 +22,15 @@ class BinaryEdgeFunction
     : public EdgeFunction<IDEGeneralizedLCA::l_t>,
       public std::enable_shared_from_this<BinaryEdgeFunction> {
   llvm::BinaryOperator::BinaryOps Op;
-<<<<<<< HEAD
   const IDEGeneralizedLCA::l_t Cnst;
-=======
-  const IDEGeneralizedLCA::l_t Const;
->>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
   bool LeftConst;
   size_t MaxSize;
 
 public:
   BinaryEdgeFunction(llvm::BinaryOperator::BinaryOps Op,
-<<<<<<< HEAD
                      IDEGeneralizedLCA::l_t Cnst, bool LeftConst,
                      size_t MaxSize)
       : Op(Op), Cnst(std::move(Cnst)), LeftConst(LeftConst), MaxSize(MaxSize) {}
-=======
-                     const IDEGeneralizedLCA::l_t &Const, bool LeftConst,
-                     size_t MaxSize)
-      : Op(Op), Const(Const), LeftConst(LeftConst), MaxSize(MaxSize) {}
->>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
 
   IDEGeneralizedLCA::l_t computeTarget(IDEGeneralizedLCA::l_t Source) override;
 

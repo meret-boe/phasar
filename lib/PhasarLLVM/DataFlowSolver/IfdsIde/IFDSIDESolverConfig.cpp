@@ -19,11 +19,7 @@ namespace psr {
 IFDSIDESolverConfig::IFDSIDESolverConfig() {
   setFlag(
       Options, SolverConfigOptions::EmitESG,
-<<<<<<< HEAD
       PhasarConfig::getPhasarConfig().variablesMap().count("emit-esg-as-dot")); //NOLINT
-=======
-      PhasarConfig::getPhasarConfig().variablesMap().count("emit-esg-as-dot"));
->>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
 }
 IFDSIDESolverConfig::IFDSIDESolverConfig(SolverConfigOptions Options)
     : Options(Options) {}

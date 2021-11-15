@@ -39,13 +39,8 @@ public:
 
 private:
   // For debug purpose only
-<<<<<<< HEAD
   const unsigned EfComposerId;
   static inline unsigned CurrEfComposerId = 0; //NOLINT
-=======
-  const unsigned EFComposerId;
-  static inline unsigned CurrEFComposerId = 0;
->>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
 
 protected:
   /// First edge function
@@ -55,11 +50,7 @@ protected:
 
 public:
   EdgeFunctionComposer(EdgeFunctionPtrType F, EdgeFunctionPtrType G)
-<<<<<<< HEAD
       : EfComposerId(++CurrEfComposerId), F(F), G(G) {}
-=======
-      : EFComposerId(++CurrEFComposerId), F(F), G(G) {}
->>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
 
   ~EdgeFunctionComposer() override = default;
 
@@ -93,24 +84,14 @@ public:
 
   bool equalTo(EdgeFunctionPtrType Other) const override {
     if (auto EFC = dynamic_cast<EdgeFunctionComposer<L> *>(Other.get())) {
-<<<<<<< HEAD
     return F->equalTo(EFC->F) && G->equalTo(EFC->G);
-=======
-      return F->equalTo(EFC->F) && G->equalTo(EFC->G);
->>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
     }
     return false;
   }
 
-<<<<<<< HEAD
   void print(std::ostream &OS, bool  /*IsForDebug*/ = false) const override {
     OS << "COMP[ " << F.get()->str() << " , " << G.get()->str()
        << " ] (EF:" << EfComposerId << ')';
-=======
-  void print(std::ostream &OS, [[maybe_unused]] bool IsForDebug = false) const override {
-    OS << "COMP[ " << F.get()->str() << " , " << G.get()->str()
-       << " ] (EF:" << EFComposerId << ')';
->>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
   }
 };
 

@@ -498,15 +498,9 @@ public:
                       BOOST_LOG_SEV(lg::get(), DEBUG) << ' ');
         return SearchEdgeFunc->second;
       }
-<<<<<<< HEAD
       INC_COUNTER("CTR-EF Construction", 1, PAMM_SEVERITY_LEVEL::Full);
       auto Ef = Problem.getCallToRetEdgeFunction(CallSite, CallNode, RetSite,
                                                  RetSiteNode, Callees);
-=======
-      INC_COUNTER("CallToRet-EF Construction", 1, PAMM_SEVERITY_LEVEL::Full);
-      auto ef = problem.getCallToRetEdgeFunction(callSite, callNode, retSite,
-                                                 retSiteNode, callees);
->>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
 
       SearchInnerMap->second.insert(
           createEdgeFunctionNodeKey(CallNode, RetSiteNode), Ef);
@@ -517,15 +511,9 @@ public:
       return Ef;
     }
 
-<<<<<<< HEAD
     INC_COUNTER("CTR-EF Construction", 1, PAMM_SEVERITY_LEVEL::Full);
     auto Ef = Problem.getCallToRetEdgeFunction(CallSite, CallNode, RetSite,
                                                RetSiteNode, Callees);
-=======
-    INC_COUNTER("CallToRet-EF Construction", 1, PAMM_SEVERITY_LEVEL::Full);
-    auto ef = problem.getCallToRetEdgeFunction(callSite, callNode, retSite,
-                                               retSiteNode, callees);
->>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
 
     CallToRetEdgeFunctionCache.emplace(
         OuterMapKey,

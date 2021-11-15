@@ -111,13 +111,8 @@ public:
     container_type Current(Source);
     for (const FlowFunctionType &Func : Funcs) {
       container_type Next;
-<<<<<<< HEAD
       for (const D & Val : Current) {
         container_type Target = Func.computeTargets(Val);
-=======
-      for (const D &Data : Current) {
-        container_type Target = Func.computeTargets(Data);
->>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
         Next.insert(Target.begin(), Target.end());
       }
       Current = Next;
@@ -133,11 +128,7 @@ public:
         Vec.insert(Func);
       }
     }
-<<<<<<< HEAD
     if (!Vec.empty()) {
-=======
-    if (Vec.size == 1) {
->>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
       return Vec[0];
     }
     if (Vec.empty()) {
@@ -293,11 +284,8 @@ public:
   virtual ~KillAll() = default;
   KillAll(const KillAll &K) = delete;
   KillAll &operator=(const KillAll &K) = delete;
-<<<<<<< HEAD
   container_type computeTargets(D  /*Source*/) override { return container_type(); }
-=======
-  container_type computeTargets() override { return container_type(); }
->>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
+
   static std::shared_ptr<KillAll<D>> getInstance() {
     static std::shared_ptr<KillAll> Instance =
         std::shared_ptr<KillAll>(new KillAll);
@@ -368,14 +356,8 @@ public:
     }
     if (Source == ToValue) {
       return {};
-<<<<<<< HEAD
     } 
     return {Source};
-   
-=======
-    }
-    return {Source};
->>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
   }
 
 protected:

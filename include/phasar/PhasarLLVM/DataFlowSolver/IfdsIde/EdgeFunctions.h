@@ -119,18 +119,9 @@ public:
 
   ~AllTop() override = default;
 
-<<<<<<< HEAD
   L computeTarget(L  /*Source*/) override { return TopElement; }
 
   EdgeFunctionPtrType composeWith(EdgeFunctionPtrType  /*SecondFunction*/) override {
-=======
-  L computeTarget(L Source) override {
-    (void) Source;
-    return TopElement; }
-
-  EdgeFunctionPtrType composeWith(EdgeFunctionPtrType SecondFunction) override {
-    (void) SecondFunction;
->>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
     return this->shared_from_this();
   }
 
@@ -145,11 +136,7 @@ public:
     return false;
   }
 
-<<<<<<< HEAD
   void print(std::ostream &OS, bool  /*IsForDebug*/ = false) const override {
-=======
-  void print(std::ostream &OS, [[maybe_unused]] bool IsForDebug = false) const override {
->>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
     OS << "AllTop";
   }
 };
@@ -170,13 +157,8 @@ public:
 
   ~AllBottom() override = default;
 
-<<<<<<< HEAD
   L computeTarget(L  /*Source*/) override { return BottomElement; }
-=======
-  L computeTarget(L Source) override {
-    (void) Source;
-    return BottomElement; }
->>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
+
 
   EdgeFunctionPtrType composeWith(EdgeFunctionPtrType SecondFunction) override {
     if (auto *Ab = dynamic_cast<AllBottom<L> *>(SecondFunction.get())) {
@@ -209,11 +191,7 @@ public:
     return false;
   }
 
-<<<<<<< HEAD
   void print(std::ostream &OS, bool  /*IsForDebug*/ = false) const override {
-=======
-  void print(std::ostream &OS, [[maybe_unused]] bool IsForDebug = false) const override {
->>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
     OS << "AllBottom";
   }
 };
@@ -264,12 +242,8 @@ public:
     static EdgeFunctionPtrType Instance(new EdgeIdentity<L>());
     return Instance;
   }
-
-<<<<<<< HEAD
+  
   void print(std::ostream &OS, bool  /*IsPAMM_SEVERITY_LEVELForDebug*/ = false) const override {
-=======
-  void print(std::ostream &OS, [[maybe_unused]] bool IsForDebug = false) const override {
->>>>>>> b64c0176c1c39f7ad73feffb391fd6e22688d506
     OS << "EdgeIdentity";
   }
 };
