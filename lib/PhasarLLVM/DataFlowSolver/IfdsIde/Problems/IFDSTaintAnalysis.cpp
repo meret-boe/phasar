@@ -45,7 +45,7 @@ IFDSTaintAnalysis::IFDSTaintAnalysis(
 
 IFDSTaintAnalysis::FlowFunctionPtrType
 IFDSTaintAnalysis::getNormalFlowFunction(IFDSTaintAnalysis::n_t Curr,
-                                         IFDSTaintAnalysis::n_t Succ) {
+                                         IFDSTaintAnalysis::n_t  /*Succ*/) {
   // If a tainted value is stored, the store location must be tainted too
   if (const auto *Store = llvm::dyn_cast<llvm::StoreInst>(Curr)) {
     struct TAFF : FlowFunction<IFDSTaintAnalysis::d_t> {
@@ -56,12 +56,12 @@ IFDSTaintAnalysis::getNormalFlowFunction(IFDSTaintAnalysis::n_t Curr,
         if (Store->getValueOperand() == Source) {
           return set<IFDSTaintAnalysis::d_t>{Store->getPointerOperand(),
                                              Source};
-        } else if (Store->getValueOperand() != Source &&
+        } if (Store->getValueOperand() != Source &&
                    Store->getPointerOperand() == Source) {
           return {};
-        } else {
-          return {Source};
-        }
+        } 
+                   return {Source};
+       
       }
     };
     return make_shared<TAFF>(Store);
@@ -109,12 +109,12 @@ IFDSTaintAnalysis::getCallFlowFunction(IFDSTaintAnalysis::n_t CallSite,
 
 IFDSTaintAnalysis::FlowFunctionPtrType IFDSTaintAnalysis::getRetFlowFunction(
     IFDSTaintAnalysis::n_t CallSite, IFDSTaintAnalysis::f_t CalleeFun,
-    IFDSTaintAnalysis::n_t ExitSite, IFDSTaintAnalysis::n_t RetSite) {
+    IFDSTaintAnalysis::n_t ExitInst, IFDSTaintAnalysis::n_t  /*RetSite*/) {
   // We must check if the return value and formal parameter are tainted, if so
   // we must taint all user's of the function call. We are only interested in
   // formal parameters of pointer/reference type.
   return make_shared<MapFactsToCaller<>>(
-      llvm::cast<llvm::CallBase>(CallSite), CalleeFun, ExitSite,
+      llvm::cast<llvm::CallBase>(CallSite), CalleeFun, ExitInst,
       [](IFDSTaintAnalysis::d_t Formal) {
         return Formal->getType()->isPointerTy();
       });
@@ -122,9 +122,9 @@ IFDSTaintAnalysis::FlowFunctionPtrType IFDSTaintAnalysis::getRetFlowFunction(
 }
 
 IFDSTaintAnalysis::FlowFunctionPtrType
-IFDSTaintAnalysis::getCallToRetFlowFunction(
-    IFDSTaintAnalysis::n_t CallSite, IFDSTaintAnalysis::n_t RetSite,
-    set<IFDSTaintAnalysis::f_t> Callees) {
+IFDSTaintAnalysis::getCallToRetFlowFunction( //NOLINT
+    IFDSTaintAnalysis::n_t CallSite, IFDSTaintAnalysis::n_t  /*RetSite*/,
+    set<IFDSTaintAnalysis::f_t>  /*Callees*/) {
   // Process the effects of source or sink functions that are called
   for (const auto *Callee : ICF->getCalleesOfCallAt(CallSite)) {
     string FunctionName = llvm::demangle(Callee->getName().str());
@@ -137,7 +137,7 @@ IFDSTaintAnalysis::getCallToRetFlowFunction(
       LOG_IF_ENABLE(BOOST_LOG_SEV(lg::get(), DEBUG) << "Plugin SOURCE effects");
       auto Source = SourceSinkFunctions.getSource(FunctionName);
       set<IFDSTaintAnalysis::d_t> ToGenerate;
-      const llvm::CallBase *CS = llvm::cast<llvm::CallBase>(CallSite);
+      const auto *CS = llvm::cast<llvm::CallBase>(CallSite);
       if (auto *Pval =
               std::get_if<TaintConfiguration<IFDSTaintAnalysis::d_t>::All>(
                   &Source.TaintedArgs)) {
@@ -218,7 +218,7 @@ IFDSTaintAnalysis::getCallToRetFlowFunction(
 }
 
 IFDSTaintAnalysis::FlowFunctionPtrType
-IFDSTaintAnalysis::getSummaryFlowFunction(IFDSTaintAnalysis::n_t CallSite,
+IFDSTaintAnalysis::getSummaryFlowFunction(IFDSTaintAnalysis::n_t  /*CallSite*/,
                                           IFDSTaintAnalysis::f_t DestFun) {
   SpecialSummaries<IFDSTaintAnalysis::d_t> &SS =
       SpecialSummaries<IFDSTaintAnalysis::d_t>::getInstance();
@@ -229,11 +229,10 @@ IFDSTaintAnalysis::getSummaryFlowFunction(IFDSTaintAnalysis::n_t CallSite,
       !SourceSinkFunctions.isSource(FunctionName) &&
       !SourceSinkFunctions.isSink(FunctionName)) {
     return SS.getSpecialFlowFunctionSummary(FunctionName);
-  } else {
-    // Otherwise we indicate, that not special summary exists
+  }      // Otherwise we indicate, that not special summary exists
     // and the solver thus calls the call flow function instead
     return nullptr;
-  }
+ 
 }
 
 map<IFDSTaintAnalysis::n_t, set<IFDSTaintAnalysis::d_t>>
@@ -268,7 +267,7 @@ IFDSTaintAnalysis::d_t IFDSTaintAnalysis::createZeroValue() const {
 }
 
 bool IFDSTaintAnalysis::isZeroValue(IFDSTaintAnalysis::d_t D) const {
-  return LLVMZeroValue::getInstance()->isLLVMZeroValue(D);
+  return LLVMZeroValue::getInstance()->isLLVMZeroValue(D); //NOLINT
 }
 
 void IFDSTaintAnalysis::printNode(ostream &OS, IFDSTaintAnalysis::n_t N) const {
@@ -286,7 +285,7 @@ void IFDSTaintAnalysis::printFunction(ostream &OS,
 }
 
 void IFDSTaintAnalysis::emitTextReport(
-    const SolverResults<n_t, d_t, BinaryDomain> &SR, std::ostream &OS) {
+    const SolverResults<n_t, d_t, BinaryDomain> & /*SR*/, std::ostream &OS) {
   OS << "\n----- Found the following leaks -----\n";
   if (Leaks.empty()) {
     OS << "No leaks found!\n";

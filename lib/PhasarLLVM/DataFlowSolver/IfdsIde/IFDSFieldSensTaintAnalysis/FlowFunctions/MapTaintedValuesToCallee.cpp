@@ -15,7 +15,7 @@
 namespace psr {
 
 std::set<ExtendedValue>
-MapTaintedValuesToCallee::computeTargets(ExtendedValue Fact) {
+MapTaintedValuesToCallee::computeTargets(ExtendedValue Fact) { //NOLINT
   bool IsFactVarArgTemplate = Fact.isVarArgTemplate();
   if (IsFactVarArgTemplate) {
     return {};
@@ -33,7 +33,7 @@ MapTaintedValuesToCallee::computeTargets(ExtendedValue Fact) {
   long VarArgIndex = 0L;
 
   const auto SanitizedArgList = DataFlowUtils::getSanitizedArgList(
-      callInst, destFun, zeroValue.getValue());
+      CallInst, DestFun, ZeroValue.getValue());
 
   for (const auto &ArgParamTriple : SanitizedArgList) {
 
@@ -42,7 +42,7 @@ MapTaintedValuesToCallee::computeTargets(ExtendedValue Fact) {
     const auto *const Param = std::get<2>(ArgParamTriple);
 
     bool IsVarArgParam =
-        DataFlowUtils::isVarArgParam(Param, zeroValue.getValue());
+        DataFlowUtils::isVarArgParam(Param, ZeroValue.getValue());
     bool IsVarArgFact = Fact.isVarArg();
 
     bool IsArgMemLocation = !ArgMemLocationSeq.empty();
@@ -110,7 +110,7 @@ MapTaintedValuesToCallee::computeTargets(ExtendedValue Fact) {
 
   bool AddLineNumber = !TargetParamFacts.empty();
   if (AddLineNumber) {
-    traceStats.add(callInst);
+    TraceStats.add(CallInst);
   }
 
   std::set<ExtendedValue> TargetFacts;

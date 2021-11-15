@@ -7,8 +7,8 @@
  *     Philipp Schubert and others
  *****************************************************************************/
 
-#ifndef PHASAR_PHASARLLVM_IFDSIDE_LLVMFLOWFUNCTIONS_H
-#define PHASAR_PHASARLLVM_IFDSIDE_LLVMFLOWFUNCTIONS_H
+#ifndef PHASAR_PHASARLLVM_DATAFLOWSOLVER_IFDSIDE_LLVMFLOWFUNCTIONS_H
+#define PHASAR_PHASARLLVM_DATAFLOWSOLVER_IFDSIDE_LLVMFLOWFUNCTIONS_H
 
 #include <functional>
 #include <memory>
@@ -39,17 +39,17 @@ namespace psr {
 /// \brief Automatically kills temporary loads that are no longer in use.
 class AutoKillTMPs : public FlowFunction<const llvm::Value *> {
 protected:
-  FlowFunctionPtrType delegate;
-  const llvm::Instruction *inst;
+  FlowFunctionPtrType Delegate;
+  const llvm::Instruction *Inst;
 
 public:
   AutoKillTMPs(FlowFunctionPtrType FF, const llvm::Instruction *In)
-      : delegate(std::move(FF)), inst(In) {}
-  virtual ~AutoKillTMPs() = default;
+      : Delegate(std::move(FF)), Inst(In) {}
+   ~AutoKillTMPs() override = default;
 
   container_type computeTargets(const llvm::Value *Source) override {
-    container_type Result = delegate->computeTargets(Source);
-    for (const llvm::Use &U : inst->operands()) {
+    container_type Result = Delegate->computeTargets(Source);
+    for (const llvm::Use &U : Inst->operands()) {
       if (llvm::isa<llvm::LoadInst>(U)) {
         Result.erase(U);
       }
@@ -102,7 +102,7 @@ public:
 
   container_type computeTargets(const llvm::Value *Source) override {
     // Pass ZeroValue as is
-    if (LLVMZeroValue::getInstance()->isLLVMZeroValue(Source)) {
+    if (LLVMZeroValue::getInstance()->isLLVMZeroValue(Source)) { //NOLINT
       return {Source};
     }
     // Pass global variables as is, if desired
@@ -138,7 +138,7 @@ public:
       const llvm::CallBase *CallSite, const llvm::Function *DestFun,
       bool PropagateGlobals = true,
       std::function<bool(const llvm::Value *)> Predicate =
-          [](const llvm::Value *) { return true; })
+          [](const llvm::Value * /*unused*/) { return true; })
       : DestFun(DestFun), PropagateGlobals(PropagateGlobals),
         Predicate(std::move(Predicate)) {
     // Set up the actual parameters
@@ -153,14 +153,14 @@ public:
 
   ~MapFactsToCallee() override = default;
 
-  container_type computeTargets(const llvm::Value *Source) override {
+  container_type computeTargets(const llvm::Value *Source) override { //NOLINT
     // If DestFun is a declaration we cannot follow this call, we thus need to
     // kill everything
     if (DestFun->isDeclaration()) {
       return {};
     }
     // Pass ZeroValue as is
-    if (LLVMZeroValue::getInstance()->isLLVMZeroValue(Source)) {
+    if (LLVMZeroValue::getInstance()->isLLVMZeroValue(Source)) { //NOLINT
       return {Source};
     }
     // Pass global variables as is, if desired
@@ -203,18 +203,17 @@ public:
         }
       }
       return Res;
-    } else {
-      // Handle ordinary case
-      // Map actual parameters to corresponding formal parameters.
-      for (unsigned Idx = 0; Idx < Actuals.size(); ++Idx) {
-        if (Source == Actuals[Idx] && Predicate(Actuals[Idx])) {
-          assert(Idx < Formals.size() &&
-                 "Out of bound access to formal parameters!");
-          Res.insert(Formals[Idx]); // corresponding formal
-        }
+    } 
+    // Handle ordinary case
+    // Map actual parameters to corresponding formal parameters.
+    for (unsigned Idx = 0; Idx < Actuals.size(); ++Idx) {
+      if (Source == Actuals[Idx] && Predicate(Actuals[Idx])) {
+        assert(Idx < Formals.size() &&
+                "Out of bound access to formal parameters!");
+        Res.insert(Formals[Idx]); // corresponding formal
       }
-      return Res;
     }
+    return Res;
   }
 }; // namespace psr
 
@@ -243,9 +242,9 @@ public:
       const llvm::CallBase *CallSite, const llvm::Function *CalleeFun,
       const llvm::Instruction *ExitInst, bool PropagateGlobals = true,
       std::function<bool(const llvm::Value *)> ParamPredicate =
-          [](const llvm::Value *) { return true; },
+          [](const llvm::Value * /*unused*/) { return true; },
       std::function<bool(const llvm::Function *)> ReturnPredicate =
-          [](const llvm::Function *) { return true; })
+          [](const llvm::Function * /*unused*/) { return true; })
       : CallSite(CallSite), CalleeFun(CalleeFun),
         ExitInst(llvm::dyn_cast<llvm::ReturnInst>(ExitInst)),
         PropagateGlobals(PropagateGlobals),
@@ -265,11 +264,11 @@ public:
   ~MapFactsToCaller() override = default;
 
   // std::set<const llvm::Value *>
-  container_type computeTargets(const llvm::Value *Source) override {
+  container_type computeTargets(const llvm::Value *Source) override { //NOLINT
     assert(!CalleeFun->isDeclaration() &&
            "Cannot perform mapping to caller for function declaration");
     // Pass ZeroValue as is
-    if (LLVMZeroValue::getInstance()->isLLVMZeroValue(Source)) {
+    if (LLVMZeroValue::getInstance()->isLLVMZeroValue(Source)) { //NOLINT
       return {Source};
     }
     // Pass global variables as is, if desired
@@ -332,11 +331,11 @@ public:
   PropagateLoad(const llvm::LoadInst *L) : Load(L) {}
   virtual ~PropagateLoad() = default;
 
-  std::set<D> computeTargets(D source) override {
-    if (source == Load->getPointerOperand()) {
-      return {source, Load};
+  std::set<D> computeTargets(D Source) override {
+    if (Source == Load->getPointerOperand()) {
+      return {Source, Load};
     }
-    return {source};
+    return {Source};
   }
 };
 
@@ -348,11 +347,11 @@ public:
   PropagateStore(const llvm::StoreInst *S) : Store(S) {}
   virtual ~PropagateStore() = default;
 
-  std::set<D> computeTargets(D source) override {
-    if (Store->getValueOperand() == source) {
-      return {source, Store->getPointerOperand()};
+  std::set<D> computeTargets(D Source) override {
+    if (Store->getValueOperand() == Source) {
+      return {Source, Store->getPointerOperand()};
     }
-    return {source};
+    return {Source};
   }
 };
 
@@ -369,17 +368,17 @@ public:
       : Store(S), Predicate(P) {}
   virtual ~StrongUpdateStore() = default;
 
-  std::set<D> computeTargets(D source) override {
-    if (source == Store->getPointerOperand()) {
+  std::set<D> computeTargets(D Source) override {
+    if (Source == Store->getPointerOperand()) {
       return {};
-    } else if (Predicate(source)) {
-      return {source, Store->getPointerOperand()};
-    } else {
-      return {source};
+    } 
+    if (Predicate(Source)) {
+    return {Source, Store->getPointerOperand()};
     }
+    return {Source};
   }
 };
 
 } // namespace psr
 
-#endif // PHASAR_PHASARLLVM_IFDSIDE_LLVMFLOWFUNCTIONS_H
+#endif // PHASAR_PHASARLLVM_DATAFLOWSOLVER_IFDSIDE_LLVMFLOWFUNCTIONS_H

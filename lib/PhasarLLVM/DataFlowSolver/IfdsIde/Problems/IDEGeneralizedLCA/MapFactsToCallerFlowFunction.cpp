@@ -31,7 +31,7 @@ MapFactsToCallerFlowFunction::MapFactsToCallerFlowFunction(
   }
 }
 std::set<const llvm::Value *>
-MapFactsToCallerFlowFunction::computeTargets(const llvm::Value *Source) {
+MapFactsToCallerFlowFunction::computeTargets(const llvm::Value *Source) { //NOLINT
   // most copied from phasar
   std::set<const llvm::Value *> Res;
   // Handle C-style varargs functions
@@ -69,7 +69,7 @@ MapFactsToCallerFlowFunction::computeTargets(const llvm::Value *Source) {
   }
   // Collect return value facts
   if (Source == ExitStmt->getReturnValue() ||
-      (LLVMZeroValue::getInstance()->isLLVMZeroValue(Source) &&
+      (LLVMZeroValue::getInstance()->isLLVMZeroValue(Source) && //NOLINT
        ExitStmt->getReturnValue() && isConstant(ExitStmt->getReturnValue()))) {
     Res.insert(CallSite);
   }

@@ -37,33 +37,33 @@ IFDSSolverTest::IFDSSolverTest(const ProjectIRDB *IRDB,
 }
 
 IFDSSolverTest::FlowFunctionPtrType
-IFDSSolverTest::getNormalFlowFunction(IFDSSolverTest::n_t Curr,
-                                      IFDSSolverTest::n_t Succ) {
+IFDSSolverTest::getNormalFlowFunction(IFDSSolverTest::n_t  /*Curr*/,
+                                      IFDSSolverTest::n_t  /*Succ*/) {
   return Identity<IFDSSolverTest::d_t>::getInstance();
 }
 
 IFDSSolverTest::FlowFunctionPtrType
-IFDSSolverTest::getCallFlowFunction(IFDSSolverTest::n_t CallSite,
-                                    IFDSSolverTest::f_t DestFun) {
+IFDSSolverTest::getCallFlowFunction(IFDSSolverTest::n_t  /*CallSite*/,
+                                    IFDSSolverTest::f_t  /*DestFun*/) {
   return Identity<IFDSSolverTest::d_t>::getInstance();
 }
 
 IFDSSolverTest::FlowFunctionPtrType IFDSSolverTest::getRetFlowFunction(
-    IFDSSolverTest::n_t CallSite, IFDSSolverTest::f_t CalleeFun,
-    IFDSSolverTest::n_t ExitSite, IFDSSolverTest::n_t RetSite) {
+    IFDSSolverTest::n_t  /*CallSite*/, IFDSSolverTest::f_t  /*CalleeFun*/,
+    IFDSSolverTest::n_t  /*ExitInst*/, IFDSSolverTest::n_t  /*RetSite*/) {
   return Identity<IFDSSolverTest::d_t>::getInstance();
 }
 
 IFDSSolverTest::FlowFunctionPtrType
-IFDSSolverTest::getCallToRetFlowFunction(IFDSSolverTest::n_t CallSite,
-                                         IFDSSolverTest::n_t RetSite,
-                                         set<IFDSSolverTest::f_t> Callees) {
+IFDSSolverTest::getCallToRetFlowFunction(IFDSSolverTest::n_t  /*CallSite*/,
+                                         IFDSSolverTest::n_t  /*RetSite*/,
+                                         set<IFDSSolverTest::f_t>  /*Callees*/) {
   return Identity<IFDSSolverTest::d_t>::getInstance();
 }
 
 IFDSSolverTest::FlowFunctionPtrType
-IFDSSolverTest::getSummaryFlowFunction(IFDSSolverTest::n_t CallSite,
-                                       IFDSSolverTest::f_t DestFun) {
+IFDSSolverTest::getSummaryFlowFunction(IFDSSolverTest::n_t  /*CallSite*/,
+                                       IFDSSolverTest::f_t  /*DestFun*/) {
   return nullptr;
 }
 
@@ -85,7 +85,7 @@ IFDSSolverTest::d_t IFDSSolverTest::createZeroValue() const {
 }
 
 bool IFDSSolverTest::isZeroValue(IFDSSolverTest::d_t D) const {
-  return LLVMZeroValue::getInstance()->isLLVMZeroValue(D);
+  return LLVMZeroValue::getInstance()->isLLVMZeroValue(D); //NOLINT
 }
 
 void IFDSSolverTest::printNode(ostream &OS, IFDSSolverTest::n_t N) const {

@@ -49,15 +49,15 @@ public:
 
   void print() {
     std::cout << "DynamicSummaries:\n";
-    for (auto &entry : SummaryMap) {
-      std::cout << "Function: " << entry.first << "\n";
-      for (auto &context_summaries : entry.second) {
+    for (auto &Entry : SummaryMap) {
+      std::cout << "Function: " << Entry.first << "\n";
+      for (auto &ContextSummaries : Entry.second) {
         std::cout << "Context: ";
-        for_each(context_summaries.first.begin(), context_summaries.first.end(),
-                 [](bool b) { std::cout << b; });
+        for_each(ContextSummaries.first.begin(), ContextSummaries.first.end(),
+                 [](bool B) { std::cout << B; });
         std::cout << "\n";
         std::cout << "Beg results:\n";
-        for (auto &result : context_summaries.second) {
+        for (auto &Result : ContextSummaries.second) {
           // result->dump();
           std::cout << "fixme\n";
         }

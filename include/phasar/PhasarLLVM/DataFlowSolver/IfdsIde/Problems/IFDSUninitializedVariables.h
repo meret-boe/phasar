@@ -37,16 +37,16 @@ class IFDSUninitializedVariables
 private:
   struct UninitResult {
     UninitResult() = default;
-    unsigned int line = 0;
-    std::string func_name;
-    std::string file_path;
-    std::string src_code;
-    std::vector<std::string> var_names;
+    unsigned int Line = 0;
+    std::string FuncName;
+    std::string FilePath;
+    std::string SrcCode;
+    std::vector<std::string> VarNames;
     std::map<IFDSUninitializedVariables::n_t,
              std::set<IFDSUninitializedVariables::d_t>>
-        ir_trace;
-    bool empty() const;
-    void print(std::ostream &os);
+        IrTrace;
+    [[nodiscard]] bool empty() const;
+    void print(std::ostream &Os);
   };
   std::map<n_t, std::set<d_t>> UndefValueUses;
 
@@ -58,35 +58,35 @@ public:
 
   ~IFDSUninitializedVariables() override = default;
 
-  FlowFunctionPtrType getNormalFlowFunction(n_t curr, n_t succ) override;
+  FlowFunctionPtrType getNormalFlowFunction(n_t Curr, n_t Succ) override;
 
-  FlowFunctionPtrType getCallFlowFunction(n_t callSite, f_t destFun) override;
+  FlowFunctionPtrType getCallFlowFunction(n_t CallSite, f_t DestFun) override;
 
-  FlowFunctionPtrType getRetFlowFunction(n_t callSite, f_t calleeFun,
-                                         n_t exitInst, n_t retSite) override;
+  FlowFunctionPtrType getRetFlowFunction(n_t CallSite, f_t CalleeFun,
+                                         n_t ExitInst, n_t RetSite) override;
 
-  FlowFunctionPtrType getCallToRetFlowFunction(n_t callSite, n_t retSite,
-                                               std::set<f_t> callees) override;
+  FlowFunctionPtrType getCallToRetFlowFunction(n_t CallSite, n_t RetSite,
+                                               std::set<f_t> Callees) override;
 
-  FlowFunctionPtrType getSummaryFlowFunction(n_t callSite,
-                                             f_t destFun) override;
+  FlowFunctionPtrType getSummaryFlowFunction(n_t CallSite,
+                                             f_t DestFun) override;
 
   std::map<n_t, std::set<d_t>> initialSeeds() override;
 
-  d_t createZeroValue() const override;
+  [[nodiscard]] d_t createZeroValue() const override;
 
-  bool isZeroValue(d_t d) const override;
+  bool isZeroValue(d_t D) const override;
 
-  void printNode(std::ostream &os, n_t n) const override;
+  void printNode(std::ostream &Os, n_t N) const override;
 
-  void printDataFlowFact(std::ostream &os, d_t d) const override;
+  void printDataFlowFact(std::ostream &Os, d_t D) const override;
 
-  void printFunction(std::ostream &os, f_t m) const override;
+  void printFunction(std::ostream &Os, f_t M) const override;
 
   void emitTextReport(const SolverResults<n_t, d_t, BinaryDomain> &SR,
                       std::ostream &OS = std::cout) override;
 
-  const std::map<n_t, std::set<d_t>> &getAllUndefUses() const;
+  [[nodiscard]] const std::map<n_t, std::set<d_t>> &getAllUndefUses() const;
 
   std::vector<UninitResult> aggregateResults();
 };

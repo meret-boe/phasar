@@ -7,6 +7,8 @@
  *     Fabian Schiebel and others
  *****************************************************************************/
 
+#include <utility>
+
 #include "phasar/PhasarLLVM/DataFlowSolver/IfdsIde/Problems/IDEGeneralizedLCA/LCAEdgeFunctionComposer.h"
 #include "phasar/PhasarLLVM/DataFlowSolver/IfdsIde/EdgeFunctions.h"
 #include "phasar/PhasarLLVM/DataFlowSolver/IfdsIde/Problems/IDEGeneralizedLCA/AllBot.h"
@@ -27,7 +29,7 @@ EdgeFunctionComposer::computeTarget(IDEGeneralizedLCA::l_t source) {
 LCAEdgeFunctionComposer::LCAEdgeFunctionComposer(
     std::shared_ptr<EdgeFunction<IDEGeneralizedLCA::l_t>> F,
     std::shared_ptr<EdgeFunction<IDEGeneralizedLCA::l_t>> G, size_t MaxSize)
-    : EdgeFunctionComposer<IDEGeneralizedLCA::l_t>(F, G), maxSize(MaxSize) {}
+    : EdgeFunctionComposer<IDEGeneralizedLCA::l_t>(std::move(F), std::move(G)), maxSize(MaxSize) {}
 
 std::shared_ptr<EdgeFunction<IDEGeneralizedLCA::l_t>>
 LCAEdgeFunctionComposer::composeWith(
@@ -47,7 +49,7 @@ LCAEdgeFunctionComposer::composeWith(
     return SecondFunction;
   }
   auto GPrime = G->composeWith(SecondFunction);
-  if (GPrime->equal_to(G)) {
+  if (GPrime->equalTo(G)) {
     return shared_from_this();
   }
   return F->composeWith(GPrime);
@@ -58,7 +60,7 @@ LCAEdgeFunctionComposer::joinWith(
     std::shared_ptr<EdgeFunction<IDEGeneralizedLCA::l_t>> OtherFunction) {
   // see <phasar/PhasarLVM/IfdsIde/IDELinearConstantAnalysis.h>
   if (OtherFunction.get() == this ||
-      OtherFunction->equal_to(this->shared_from_this())) {
+      OtherFunction->equalTo(this->shared_from_this())) {
     return this->shared_from_this();
   }
   if (auto *AT =

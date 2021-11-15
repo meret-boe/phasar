@@ -19,15 +19,15 @@ namespace psr {
 
 template <typename N, typename D, typename F, typename V> class IDESummaries {
 private:
-  Table<N, D, Table<N, D, std::shared_ptr<EdgeFunction<V>>>> summaries;
+  Table<N, D, Table<N, D, std::shared_ptr<EdgeFunction<V>>>> Summaries;
 
 public:
   void
   addSummaries(Table<N, D, Table<N, D, std::shared_ptr<EdgeFunction<V>>>> Sum) {
-    summaries.insert(Sum);
+    Summaries.insert(Sum);
   }
   Table<N, D, Table<N, D, std::shared_ptr<EdgeFunction<V>>>> getSummaries() {
-    return summaries;
+    return Summaries;
   }
 };
 

@@ -160,13 +160,13 @@ public:
     return Modules.size();
   };
 
-  [[nodiscard]] llvm::Instruction *getInstruction(std::size_t id);
+  [[nodiscard]] llvm::Instruction *getInstruction(std::size_t Id);
 
   [[nodiscard]] static std::size_t getInstructionID(const llvm::Instruction *I);
 
   void print() const;
 
-  void emitPreprocessedIR(std::ostream &os = std::cout,
+  void emitPreprocessedIR(std::ostream &Os = std::cout,
                           bool ShortenIR = false) const;
 
   /**

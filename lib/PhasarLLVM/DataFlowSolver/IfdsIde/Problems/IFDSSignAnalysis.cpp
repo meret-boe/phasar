@@ -37,33 +37,33 @@ IFDSSignAnalysis::IFDSSignAnalysis(const ProjectIRDB *IRDB,
 }
 
 IFDSSignAnalysis::FlowFunctionPtrType
-IFDSSignAnalysis::getNormalFlowFunction(IFDSSignAnalysis::n_t Curr,
-                                        IFDSSignAnalysis::n_t Succ) {
+IFDSSignAnalysis::getNormalFlowFunction(IFDSSignAnalysis::n_t  /*Curr*/,
+                                        IFDSSignAnalysis::n_t  /*Succ*/) {
   return Identity<IFDSSignAnalysis::d_t>::getInstance();
 }
 
 IFDSSignAnalysis::FlowFunctionPtrType
-IFDSSignAnalysis::getCallFlowFunction(IFDSSignAnalysis::n_t CallSite,
-                                      IFDSSignAnalysis::f_t DestFun) {
+IFDSSignAnalysis::getCallFlowFunction(IFDSSignAnalysis::n_t  /*CallSite*/,
+                                      IFDSSignAnalysis::f_t  /*DestFun*/) {
   return Identity<IFDSSignAnalysis::d_t>::getInstance();
 }
 
 IFDSSignAnalysis::FlowFunctionPtrType IFDSSignAnalysis::getRetFlowFunction(
-    IFDSSignAnalysis::n_t CallSite, IFDSSignAnalysis::f_t CalleeFun,
-    IFDSSignAnalysis::n_t ExitSite, IFDSSignAnalysis::n_t RetSite) {
+    IFDSSignAnalysis::n_t  /*CallSite*/, IFDSSignAnalysis::f_t  /*CalleeFun*/,
+    IFDSSignAnalysis::n_t  /*ExitInst*/, IFDSSignAnalysis::n_t  /*RetSite*/) {
   return Identity<IFDSSignAnalysis::d_t>::getInstance();
 }
 
 IFDSSignAnalysis::FlowFunctionPtrType
-IFDSSignAnalysis::getCallToRetFlowFunction(IFDSSignAnalysis::n_t CallSite,
-                                           IFDSSignAnalysis::n_t RetSite,
-                                           set<IFDSSignAnalysis::f_t> Callees) {
+IFDSSignAnalysis::getCallToRetFlowFunction(IFDSSignAnalysis::n_t  /*CallSite*/,
+                                           IFDSSignAnalysis::n_t  /*RetSite*/,
+                                           set<IFDSSignAnalysis::f_t>  /*Callees*/) {
   return Identity<IFDSSignAnalysis::d_t>::getInstance();
 }
 
 IFDSSignAnalysis::FlowFunctionPtrType
-IFDSSignAnalysis::getSummaryFlowFunction(IFDSSignAnalysis::n_t CallSite,
-                                         IFDSSignAnalysis::f_t DestFun) {
+IFDSSignAnalysis::getSummaryFlowFunction(IFDSSignAnalysis::n_t  /*CallSite*/,
+                                         IFDSSignAnalysis::f_t  /*DestFun*/) {
   return Identity<IFDSSignAnalysis::d_t>::getInstance();
 }
 
@@ -84,7 +84,7 @@ IFDSSignAnalysis::d_t IFDSSignAnalysis::createZeroValue() const {
 }
 
 bool IFDSSignAnalysis::isZeroValue(IFDSSignAnalysis::d_t D) const {
-  return LLVMZeroValue::getInstance()->isLLVMZeroValue(D);
+  return LLVMZeroValue::getInstance()->isLLVMZeroValue(D); //NOLINT
 }
 
 void IFDSSignAnalysis::printNode(ostream &OS, IFDSSignAnalysis::n_t N) const {

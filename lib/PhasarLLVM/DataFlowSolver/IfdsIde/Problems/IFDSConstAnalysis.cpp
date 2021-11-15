@@ -49,8 +49,8 @@ IFDSConstAnalysis::IFDSConstAnalysis(const ProjectIRDB *IRDB,
 }
 
 IFDSConstAnalysis::FlowFunctionPtrType
-IFDSConstAnalysis::getNormalFlowFunction(IFDSConstAnalysis::n_t Curr,
-                                         IFDSConstAnalysis::n_t Succ) {
+IFDSConstAnalysis::getNormalFlowFunction(IFDSConstAnalysis::n_t Curr, //NOLINT
+                                         IFDSConstAnalysis::n_t  /*Succ*/) {
   // Check all store instructions.
   if (const auto *Store = llvm::dyn_cast<llvm::StoreInst>(Curr)) {
     // If the store instruction sets up or updates the vtable, i.e. value
@@ -156,11 +156,11 @@ IFDSConstAnalysis::getCallFlowFunction(IFDSConstAnalysis::n_t CallSite,
 
 IFDSConstAnalysis::FlowFunctionPtrType IFDSConstAnalysis::getRetFlowFunction(
     IFDSConstAnalysis::n_t CallSite, IFDSConstAnalysis::f_t CalleeFun,
-    IFDSConstAnalysis::n_t ExitSite, IFDSConstAnalysis::n_t RetSite) {
+    IFDSConstAnalysis::n_t ExitInst, IFDSConstAnalysis::n_t  /*RetSite*/) {
   // return KillAll<IFDSConstAnalysis::d_t>::getInstance();
   // Map formal parameter back to the actual parameter in the caller.
   return make_shared<MapFactsToCaller<>>(
-      llvm::cast<llvm::CallBase>(CallSite), CalleeFun, ExitSite, true,
+      llvm::cast<llvm::CallBase>(CallSite), CalleeFun, ExitInst, true,
       [](IFDSConstAnalysis::d_t Formal) {
         return Formal->getType()->isPointerTy();
       },
@@ -172,8 +172,8 @@ IFDSConstAnalysis::FlowFunctionPtrType IFDSConstAnalysis::getRetFlowFunction(
 
 IFDSConstAnalysis::FlowFunctionPtrType
 IFDSConstAnalysis::getCallToRetFlowFunction(
-    IFDSConstAnalysis::n_t CallSite, IFDSConstAnalysis::n_t RetSite,
-    set<IFDSConstAnalysis::f_t> Callees) {
+    IFDSConstAnalysis::n_t CallSite, IFDSConstAnalysis::n_t  /*RetSite*/,
+    set<IFDSConstAnalysis::f_t>  /*Callees*/) {
   // Process the effects of a llvm memory intrinsic function.
   if (llvm::isa<llvm::MemIntrinsic>(CallSite)) {
     IFDSConstAnalysis::d_t PointerOp = CallSite->getOperand(0);
@@ -204,8 +204,8 @@ IFDSConstAnalysis::getCallToRetFlowFunction(
 }
 
 IFDSConstAnalysis::FlowFunctionPtrType
-IFDSConstAnalysis::getSummaryFlowFunction(IFDSConstAnalysis::n_t CallSite,
-                                          IFDSConstAnalysis::f_t DestFun) {
+IFDSConstAnalysis::getSummaryFlowFunction(IFDSConstAnalysis::n_t  /*CallSite*/,
+                                          IFDSConstAnalysis::f_t  /*DestFun*/) {
   return nullptr;
 }
 
@@ -228,7 +228,7 @@ IFDSConstAnalysis::d_t IFDSConstAnalysis::createZeroValue() const {
 }
 
 bool IFDSConstAnalysis::isZeroValue(IFDSConstAnalysis::d_t D) const {
-  return LLVMZeroValue::getInstance()->isLLVMZeroValue(D);
+  return LLVMZeroValue::getInstance()->isLLVMZeroValue(D); //NOLINT
 }
 
 void IFDSConstAnalysis::printNode(ostream &OS, IFDSConstAnalysis::n_t N) const {
@@ -256,7 +256,7 @@ void IFDSConstAnalysis::printInitMemoryLocations() {
 #endif
 }
 
-set<IFDSConstAnalysis::d_t> IFDSConstAnalysis::getContextRelevantPointsToSet(
+set<IFDSConstAnalysis::d_t> IFDSConstAnalysis::getContextRelevantPointsToSet( //NOLINT
     set<IFDSConstAnalysis::d_t> &PointsToSet,
     IFDSConstAnalysis::f_t CurrentContext) {
   PAMM_GET_INSTANCE;
@@ -313,7 +313,7 @@ size_t IFDSConstAnalysis::initMemoryLocationCount() {
   return Initialized.size();
 }
 
-void IFDSConstAnalysis::emitTextReport(
+void IFDSConstAnalysis::emitTextReport( //NOLINT
     const SolverResults<IFDSConstAnalysis::n_t, IFDSConstAnalysis::d_t,
                         BinaryDomain> &SR,
     ostream &OS) {

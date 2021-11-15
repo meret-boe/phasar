@@ -15,6 +15,7 @@
 #include <memory>
 #include <set>
 #include <string>
+#include <utility>
 
 #include "phasar/PhasarLLVM/DataFlowSolver/IfdsIde/EdgeFunctionComposer.h"
 #include "phasar/PhasarLLVM/DataFlowSolver/IfdsIde/IDETabulationProblem.h"
@@ -42,9 +43,9 @@ class IDELinearConstantAnalysis
     : public IDETabulationProblem<IDELinearConstantAnalysisDomain> {
 private:
   // For debug purpose only
-  static unsigned CurrGenConstantId;
-  static unsigned CurrLCAIDId;
-  static unsigned CurrBinaryId;
+  static unsigned CurrGenConstantId; //NOLINT
+  static unsigned CurrLCAIDId; //NOLINT
+  static unsigned CurrBinaryId; //NOLINT
 
 public:
   using IDETabProblemType =
@@ -66,14 +67,16 @@ public:
                             std::set<std::string> EntryPoints = {"main"});
 
   ~IDELinearConstantAnalysis() override;
+  IDELinearConstantAnalysis(const IDELinearConstantAnalysis& Other);
+  IDELinearConstantAnalysis& operator=(IDELinearConstantAnalysis Other);
 
   struct LCAResult {
     LCAResult() = default;
-    unsigned line_nr = 0;
-    std::string src_code;
-    std::map<std::string, l_t> variableToValue;
-    std::vector<n_t> ir_trace;
-    void print(std::ostream &os);
+    unsigned LineNr = 0;
+    std::string SrcCode;
+    std::map<std::string, l_t> VariableToValue;
+    std::vector<n_t> IrTrace;
+    void print(std::ostream &Os);
   };
 
   using lca_results_t = std::map<std::string, std::map<unsigned, LCAResult>>;
@@ -82,52 +85,52 @@ public:
 
   // start formulating our analysis by specifying the parts required for IFDS
 
-  FlowFunctionPtrType getNormalFlowFunction(n_t curr, n_t succ) override;
+  FlowFunctionPtrType getNormalFlowFunction(n_t Curr, n_t Succ) override;
 
-  FlowFunctionPtrType getCallFlowFunction(n_t callSite, f_t destFun) override;
+  FlowFunctionPtrType getCallFlowFunction(n_t CallSite, f_t DestFun) override;
 
-  FlowFunctionPtrType getRetFlowFunction(n_t callSite, f_t calleeFun,
-                                         n_t exitInst, n_t retSite) override;
+  FlowFunctionPtrType getRetFlowFunction(n_t CallSite, f_t CalleeFun,
+                                         n_t ExitInst, n_t RetSite) override;
 
-  FlowFunctionPtrType getCallToRetFlowFunction(n_t callSite, n_t retSite,
-                                               std::set<f_t> callees) override;
+  FlowFunctionPtrType getCallToRetFlowFunction(n_t CallSite, n_t RetSite,
+                                               std::set<f_t> Callees) override;
 
-  FlowFunctionPtrType getSummaryFlowFunction(n_t callSite,
-                                             f_t destFun) override;
+  FlowFunctionPtrType getSummaryFlowFunction(n_t CallSite,
+                                             f_t DestFun) override;
 
   std::map<n_t, std::set<d_t>> initialSeeds() override;
 
-  d_t createZeroValue() const override;
+  [[nodiscard]] d_t createZeroValue() const override;
 
-  bool isZeroValue(d_t d) const override;
+  bool isZeroValue(d_t D) const override;
 
   // in addition provide specifications for the IDE parts
 
   std::shared_ptr<EdgeFunction<l_t>>
-  getNormalEdgeFunction(n_t curr, d_t currNode, n_t succ,
-                        d_t succNode) override;
+  getNormalEdgeFunction(n_t Curr, d_t CurrNode, n_t Succ,
+                        d_t SuccNode) override;
 
   std::shared_ptr<EdgeFunction<l_t>>
-  getCallEdgeFunction(n_t callSite, d_t srcNode, f_t destinationFunction,
-                      d_t destNode) override;
+  getCallEdgeFunction(n_t CallSite, d_t SrcNode, f_t DestinationFunction,
+                      d_t DestNode) override;
 
   std::shared_ptr<EdgeFunction<l_t>>
-  getReturnEdgeFunction(n_t callSite, f_t calleeFunction, n_t exitInst,
-                        d_t exitNode, n_t reSite, d_t retNode) override;
+  getReturnEdgeFunction(n_t CallSite, f_t CalleeFunction, n_t ExitInst,
+                        d_t ExitNode, n_t ReSite, d_t RetNode) override;
 
   std::shared_ptr<EdgeFunction<l_t>>
-  getCallToRetEdgeFunction(n_t callSite, d_t callNode, n_t retSite,
-                           d_t retSiteNode, std::set<f_t> callees) override;
+  getCallToRetEdgeFunction(n_t CallSite, d_t CallNode, n_t RetSite,
+                           d_t RetSiteNode, std::set<f_t> Callees) override;
 
   std::shared_ptr<EdgeFunction<l_t>>
-  getSummaryEdgeFunction(n_t callSite, d_t callNode, n_t retSite,
-                         d_t retSiteNode) override;
+  getSummaryEdgeFunction(n_t CallSite, d_t CallNode, n_t RetSite,
+                         d_t RetSiteNode) override;
 
   l_t topElement() override;
 
   l_t bottomElement() override;
 
-  l_t join(l_t lhs, l_t rhs) override;
+  l_t join(l_t Lhs, l_t Rhs) override;
 
   std::shared_ptr<EdgeFunction<l_t>> allTopFunction() override;
 
@@ -137,78 +140,78 @@ public:
   public:
     LCAEdgeFunctionComposer(std::shared_ptr<EdgeFunction<l_t>> F,
                             std::shared_ptr<EdgeFunction<l_t>> G)
-        : EdgeFunctionComposer<l_t>(F, G){};
+        : EdgeFunctionComposer<l_t>(std::move(F), std::move(G)){};
 
     std::shared_ptr<EdgeFunction<l_t>>
-    composeWith(std::shared_ptr<EdgeFunction<l_t>> secondFunction) override;
+    composeWith(std::shared_ptr<EdgeFunction<l_t>> SecondFunction) override;
 
     std::shared_ptr<EdgeFunction<l_t>>
-    joinWith(std::shared_ptr<EdgeFunction<l_t>> otherFunction) override;
+    joinWith(std::shared_ptr<EdgeFunction<l_t>> OtherFunction) override;
   };
 
   class GenConstant : public EdgeFunction<l_t>,
                       public std::enable_shared_from_this<GenConstant> {
   private:
-    const unsigned GenConstant_Id;
+    const unsigned GenConstantId;
     const l_t IntConst;
 
   public:
     explicit GenConstant(l_t IntConst);
 
-    l_t computeTarget(l_t source) override;
+    l_t computeTarget(l_t Source) override;
 
     std::shared_ptr<EdgeFunction<l_t>>
-    composeWith(std::shared_ptr<EdgeFunction<l_t>> secondFunction) override;
+    composeWith(std::shared_ptr<EdgeFunction<l_t>> SecondFunction) override;
 
     std::shared_ptr<EdgeFunction<l_t>>
-    joinWith(std::shared_ptr<EdgeFunction<l_t>> otherFunction) override;
+    joinWith(std::shared_ptr<EdgeFunction<l_t>> OtherFunction) override;
 
-    bool equal_to(std::shared_ptr<EdgeFunction<l_t>> other) const override;
+    bool equalTo(std::shared_ptr<EdgeFunction<l_t>> Other) const override;
 
-    void print(std::ostream &OS, bool isForDebug = false) const override;
+    void print(std::ostream &OS, bool IsForDebug = false) const override;
   };
 
   class LCAIdentity : public EdgeFunction<l_t>,
                       public std::enable_shared_from_this<LCAIdentity> {
   private:
-    const unsigned LCAID_Id;
+    const unsigned LcaidId{};
 
   public:
-    explicit LCAIdentity();
+    explicit LCAIdentity() = default;
 
-    l_t computeTarget(l_t source) override;
-
-    std::shared_ptr<EdgeFunction<l_t>>
-    composeWith(std::shared_ptr<EdgeFunction<l_t>> secondFunction) override;
+    l_t computeTarget(l_t Source) override;
 
     std::shared_ptr<EdgeFunction<l_t>>
-    joinWith(std::shared_ptr<EdgeFunction<l_t>> otherFunction) override;
+    composeWith(std::shared_ptr<EdgeFunction<l_t>> SecondFunction) override;
 
-    bool equal_to(std::shared_ptr<EdgeFunction<l_t>> other) const override;
+    std::shared_ptr<EdgeFunction<l_t>>
+    joinWith(std::shared_ptr<EdgeFunction<l_t>> OtherFunction) override;
 
-    void print(std::ostream &OS, bool isForDebug = false) const override;
+    bool equalTo(std::shared_ptr<EdgeFunction<l_t>> Other) const override;
+
+    void print(std::ostream &OS, bool IsForDebug = false) const override;
   };
 
   class BinOp : public EdgeFunction<l_t>,
                 public std::enable_shared_from_this<BinOp> {
   private:
     const unsigned EdgeFunctionID, Op;
-    d_t lop, rop, currNode;
+    d_t Lop, Rop, CurrNode;
 
   public:
-    BinOp(const unsigned Op, d_t lop, d_t rop, d_t currNode);
+    BinOp( unsigned Op, d_t Lop, d_t Rop, d_t CurrNode);
 
-    l_t computeTarget(l_t source) override;
-
-    std::shared_ptr<EdgeFunction<l_t>>
-    composeWith(std::shared_ptr<EdgeFunction<l_t>> secondFunction) override;
+    l_t computeTarget(l_t Source) override;
 
     std::shared_ptr<EdgeFunction<l_t>>
-    joinWith(std::shared_ptr<EdgeFunction<l_t>> otherFunction) override;
+    composeWith(std::shared_ptr<EdgeFunction<l_t>> SecondFunction) override;
 
-    bool equal_to(std::shared_ptr<EdgeFunction<l_t>> other) const override;
+    std::shared_ptr<EdgeFunction<l_t>>
+    joinWith(std::shared_ptr<EdgeFunction<l_t>> OtherFunction) override;
 
-    void print(std::ostream &OS, bool isForDebug = false) const override;
+    bool equalTo(std::shared_ptr<EdgeFunction<l_t>> Other) const override;
+
+    void print(std::ostream &OS, bool IsForDebug = false) const override;
   };
 
   // Helper functions
@@ -223,23 +226,23 @@ public:
    *
    * @brief Computes the result of a binary operation.
    * @param op operator
-   * @param lop left operand
-   * @param rop right operand
+   * @param Lop left operand
+   * @param Rop right operand
    * @return Result of binary operation
    */
-  static l_t executeBinOperation(const unsigned op, l_t lop, l_t rop);
+  static l_t executeBinOperation( unsigned Op, l_t Lop, l_t Rop);
 
-  static char opToChar(const unsigned op);
+  static char opToChar(unsigned Op);
 
-  bool isEntryPoint(const std::string &FunctionName) const;
+  [[nodiscard]] bool isEntryPoint(const std::string &FunctionName) const;
 
-  void printNode(std::ostream &os, n_t n) const override;
+  void printNode(std::ostream &Os, n_t N) const override;
 
-  void printDataFlowFact(std::ostream &os, d_t d) const override;
+  void printDataFlowFact(std::ostream &Os, d_t D) const override;
 
-  void printFunction(std::ostream &os, f_t m) const override;
+  void printFunction(std::ostream &Os, f_t M) const override;
 
-  void printEdgeFact(std::ostream &os, l_t l) const override;
+  void printEdgeFact(std::ostream &Os, l_t L) const override;
 
   lca_results_t getLCAResults(SolverResults<n_t, d_t, l_t> SR);
 

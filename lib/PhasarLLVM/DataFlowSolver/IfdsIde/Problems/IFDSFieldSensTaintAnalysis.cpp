@@ -104,11 +104,11 @@ IFDSFieldSensTaintAnalysis::getCallFlowFunction(
 
 IFDSFieldSensTaintAnalysis::FlowFunctionPtrType
 IFDSFieldSensTaintAnalysis::getRetFlowFunction(
-    const llvm::Instruction *CallSite, const llvm::Function *CalleeFun,
-    const llvm::Instruction *ExitSite, const llvm::Instruction *RetSite) {
+    const llvm::Instruction *CallSite, const llvm::Function * /*CalleeFun*/,
+    const llvm::Instruction *ExitInst, const llvm::Instruction * /*RetSite*/) {
   return std::make_shared<MapTaintedValuesToCaller>(
       llvm::cast<llvm::CallInst>(CallSite),
-      llvm::cast<llvm::ReturnInst>(ExitSite), traceStats, getZeroValue());
+      llvm::cast<llvm::ReturnInst>(ExitInst), traceStats, getZeroValue());
 }
 
 /*
@@ -119,8 +119,8 @@ IFDSFieldSensTaintAnalysis::getRetFlowFunction(
  */
 IFDSFieldSensTaintAnalysis::FlowFunctionPtrType
 IFDSFieldSensTaintAnalysis::getCallToRetFlowFunction(
-    const llvm::Instruction *CallSite, const llvm::Instruction *RetSite,
-    std::set<const llvm::Function *> Callees) {
+    const llvm::Instruction *CallSite, const llvm::Instruction * /*RetSite*/,
+    std::set<const llvm::Function *>  /*Callees*/) {
   /*
    * It is important to wrap the identity call here. Consider the following
    * example:
@@ -240,8 +240,8 @@ IFDSFieldSensTaintAnalysis::initialSeeds() {
 
 void IFDSFieldSensTaintAnalysis::emitTextReport(
     const SolverResults<const llvm::Instruction *, ExtendedValue, BinaryDomain>
-        &SolverResults,
-    std::ostream &OS) {
+        & /*SolverResults*/,
+    std::ostream & /*OS*/) {
   std::string FirstEntryPoints = *EntryPoints.begin();
   const std::string LcovTraceFile =
       DataFlowUtils::getTraceFilenamePrefix(FirstEntryPoints + "-trace.txt");

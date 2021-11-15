@@ -18,85 +18,86 @@
 #include "phasar/PhasarLLVM/DataFlowSolver/IfdsIde/Problems/IDEGeneralizedLCA/EdgeValueSet.h"
 
 namespace psr {
+using std::get;
 
 std::ostream &printSemantics(const llvm::APFloat &Fl) {
   if (&Fl.getSemantics() == &llvm::APFloat::IEEEdouble()) {
     return std::cout << "IEEEdouble";
-  } else if (&Fl.getSemantics() == &llvm::APFloat::IEEEhalf()) {
+  } if (&Fl.getSemantics() == &llvm::APFloat::IEEEhalf()) {
     return std::cout << "IEEEhalf";
-  } else if (&Fl.getSemantics() == &llvm::APFloat::IEEEquad()) {
+  } if (&Fl.getSemantics() == &llvm::APFloat::IEEEquad()) {
     return std::cout << "IEEEquad";
-  } else if (&Fl.getSemantics() == &llvm::APFloat::IEEEsingle()) {
+  } if (&Fl.getSemantics() == &llvm::APFloat::IEEEsingle()) {
     return std::cout << "IEEEsingle";
-  } else if (&Fl.getSemantics() == &llvm::APFloat::PPCDoubleDouble()) {
+  } if (&Fl.getSemantics() == &llvm::APFloat::PPCDoubleDouble()) {
     return std::cout << "PPCDoubleDouble";
-  } else if (&Fl.getSemantics() == &llvm::APFloat::x87DoubleExtended()) {
+  } if (&Fl.getSemantics() == &llvm::APFloat::x87DoubleExtended()) {
     return std::cout << "x87DoubleExtended";
-  } else if (&Fl.getSemantics() == &llvm::APFloat::Bogus()) {
+  } if (&Fl.getSemantics() == &llvm::APFloat::Bogus()) {
     return std::cout << "Bogus";
-  } else {
-    return std::cout << "Sth else";
   }
+  return std::cout << "Sth else";
+ 
 }
 
-const EdgeValue EdgeValue::top = EdgeValue(nullptr);
+const EdgeValue EdgeValue::To = EdgeValue(nullptr);
 
-EdgeValue::EdgeValue(const llvm::Value *Val) : type(Top) {
-  if (auto Cnst = llvm::dyn_cast<llvm::Constant>(Val)) {
+EdgeValue::EdgeValue(const llvm::Value *Val) : Typ(Top) {
+  if (const auto *Cnst = llvm::dyn_cast<llvm::Constant>(Val)) {
     if (Cnst->getType()->isIntegerTy()) {
-      type = Integer;
-      value = llvm::APInt(llvm::cast<llvm::ConstantInt>(Cnst)->getValue());
+      Typ = Integer;
+      Value = llvm::APInt(llvm::cast<llvm::ConstantInt>(Cnst)->getValue());
     } else if (Cnst->getType()->isFloatingPointTy()) {
-      type = FloatingPoint;
-      auto &CnstFP = llvm::cast<llvm::ConstantFP>(Cnst)->getValueAPF();
+      Typ = FloatingPoint;
+      const auto &CnstFP = llvm::cast<llvm::ConstantFP>(Cnst)->getValueAPF();
 
       llvm::APFloat Apf(CnstFP);
       bool Unused;
       Apf.convert(llvm::APFloat::IEEEdouble(),
                   llvm::APFloat::roundingMode::NearestTiesToEven, &Unused);
-      value = llvm::APFloat(Apf);
+      Value = llvm::APFloat(Apf);
     } else if (llvm::isa<llvm::ConstantPointerNull>(Cnst)) {
-      type = String;
-      value = std::string();
+      Typ = String;
+      Value = std::string();
     } else if (Cnst->getType()->isPointerTy() &&
                Cnst->getType()->getPointerElementType()->isIntegerTy()) {
-      type = String;
-      auto Gep = llvm::cast<llvm::ConstantExpr>(
+      Typ = String;
+      const auto *Gep = llvm::cast<llvm::ConstantExpr>(
           Cnst); // already checked, hence cast instead of dyn_cast
-      if (auto Glob =
+      if (auto *Glob =
               llvm::dyn_cast<llvm::GlobalVariable>(Gep->getOperand(0))) {
-        value = std::string(
+        Value = std::string(
             llvm::cast<llvm::ConstantDataArray>(Glob->getInitializer())
                 ->getAsCString()
                 .str());
       } else {
         // inttoptr
-        value = nullptr;
-        type = Top;
+        Value = nullptr;
+        Typ = Top;
       }
     } else {
-      value = nullptr;
-      type = Top;
+      Value = nullptr;
+      Typ = Top;
     }
   } else {
-    value = nullptr;
-    type = Top;
+    Value = nullptr;
+    Typ = Top;
   }
 }
 
-EdgeValue::EdgeValue(const EdgeValue &Ev) : type(Ev.type) {
-  switch (type) {
+EdgeValue::EdgeValue(const EdgeValue &Ev) : Typ(Ev.Typ) {
+  switch (Typ) {
   case Top:
-    value = nullptr;
+    Value = nullptr;
     break;
   case Integer:
-    value = std::get<llvm::APInt>(Ev.value);
+    Value = std::get<llvm::APInt>(Ev.Value);
     break;
   case FloatingPoint:
-    value = std::get<llvm::APFloat>(Ev.value);
+    Value = std::get<llvm::APFloat>(Ev.Value);
     break;
   case String:
-    value = std::get<std::string>(Ev.value);
+    Value = std::get<std::string>(Ev.Value);
     break;
   }
 }
@@ -107,84 +108,87 @@ EdgeValue &EdgeValue::operator=(const EdgeValue &Ev) {
   return *this;
 }
 
-EdgeValue::~EdgeValue() { value.~variant(); }
+EdgeValue::~EdgeValue() { Value.~variant(); }
 
-EdgeValue::EdgeValue(llvm::APInt &&Vi) : type(EdgeValue::Integer) {
-  value = llvm::APInt(std::move(Vi));
+EdgeValue::EdgeValue(llvm::APInt &&Vi) : Typ(EdgeValue::Integer) {
+  Value = llvm::APInt(std::move(Vi));
 }
 
-EdgeValue::EdgeValue(const llvm::APInt &Vi) : type(EdgeValue::Integer) {
-  value = llvm::APInt(Vi);
+EdgeValue::EdgeValue(const llvm::APInt &Vi) : Typ(EdgeValue::Integer) {
+  Value = llvm::APInt(Vi);
 }
 
-EdgeValue::EdgeValue(llvm::APFloat &&Vf) : type(EdgeValue::FloatingPoint) {
+EdgeValue::EdgeValue(llvm::APFloat &&Vf) : Typ(EdgeValue::FloatingPoint) {
   llvm::APFloat Fp = llvm::APFloat(std::move(Vf));
   bool Unused;
   Fp.convert(llvm::APFloat::IEEEdouble(),
              llvm::APFloat::roundingMode::NearestTiesToEven, &Unused);
-  value = Fp;
+  Value = Fp;
 }
 
-EdgeValue::EdgeValue(long long Vi) : type(EdgeValue::Integer) {
-  value = llvm::APInt(llvm::APInt(sizeof(long long) << 3, Vi));
+EdgeValue::EdgeValue(long long Vi) : Typ(EdgeValue::Integer) {
+  Value = llvm::APInt(llvm::APInt(sizeof(long long) << 3, Vi));
 }
 
-EdgeValue::EdgeValue(int Vi) : type(EdgeValue::Integer) {
-  value = llvm::APInt(llvm::APInt(sizeof(int) << 3, Vi));
+EdgeValue::EdgeValue(int Vi) : Typ(EdgeValue::Integer) {
+  Value = llvm::APInt(llvm::APInt(sizeof(int) << 3, Vi));
 }
 
-EdgeValue::EdgeValue(double D) : type(EdgeValue::FloatingPoint) {
-  value = llvm::APFloat(D);
+EdgeValue::EdgeValue(double D) : Typ(EdgeValue::FloatingPoint) {
+  Value = llvm::APFloat(D);
 }
 
-EdgeValue::EdgeValue(float D) : type(EdgeValue::FloatingPoint) {
-  value = llvm::APFloat(D);
+EdgeValue::EdgeValue(float D) : Typ(EdgeValue::FloatingPoint) {
+  Value = llvm::APFloat(D);
 }
 
-EdgeValue::EdgeValue(std::string &&Vs) : type(EdgeValue::String) {
-  value = std::string(Vs);
+EdgeValue::EdgeValue(std::string &&Vs) : Typ(EdgeValue::String) {
+  Value = std::string(Vs);
 }
 
-EdgeValue::EdgeValue(std::nullptr_t) : type(EdgeValue::Top) {}
+EdgeValue::EdgeValue(std::nullptr_t) : Typ(EdgeValue::Top) {}
 bool EdgeValue::tryGetInt(uint64_t &Res) const {
-  if (type != Integer)
+  if (Typ != Integer) {
     return false;
-  Res = std::get<llvm::APInt>(value).getLimitedValue();
+}
+  Res = std::get<llvm::APInt>(Value).getLimitedValue();
   return true;
 }
 
 bool EdgeValue::tryGetFP(double &Res) const {
-  if (type != FloatingPoint)
+  if (Typ != FloatingPoint) {
     return false;
-  Res = std::get<llvm::APFloat>(value).convertToDouble();
+}
+  Res = std::get<llvm::APFloat>(Value).convertToDouble();
   return true;
 }
 
 bool EdgeValue::tryGetString(std::string &Res) const {
-  if (type != String)
+  if (Typ != String) {
     return false;
-  Res = std::get<std::string>(value);
+}
+  Res = get<std::string>(Value);
   return true;
 }
 
-bool EdgeValue::isTop() const { return type == Top; }
+bool EdgeValue::isTop() const { return Typ == Top; }
 
 bool EdgeValue::isNumeric() const {
-  return type == Integer || type == FloatingPoint;
+  return Typ == Integer || Typ == FloatingPoint;
 }
 
-bool EdgeValue::isString() const { return type == String; }
+bool EdgeValue::isString() const { return Typ == String; }
 
-EdgeValue::Type EdgeValue::getKind() const { return type; }
+EdgeValue::Type EdgeValue::getKind() const { return Typ; }
 
 EdgeValue::operator bool() {
-  switch (type) {
+  switch (Typ) {
   case Integer:
-    return !std::get<llvm::APInt>(value).isNullValue();
+    return !std::get<llvm::APInt>(Value).isNullValue();
   case FloatingPoint:
-    return std::get<llvm::APFloat>(value).isNonZero();
+    return std::get<llvm::APFloat>(Value).isNonZero();
   case String:
-    return !std::get<std::string>(value).empty();
+    return !std::get<std::string>(Value).empty();
   default:
     break;
   }
@@ -193,36 +197,36 @@ EdgeValue::operator bool() {
 
 bool operator==(const EdgeValue &V1, const EdgeValue &V2) {
   // std::cout << "Compare edge values" << std::endl;
-  if (V1.type != V2.type) {
+  if (V1.Typ != V2.Typ) {
     // std::cout << "Comparing incompatible types" << std::endl;
     return false;
   }
-  switch (V1.type) {
+  switch (V1.Typ) {
   case EdgeValue::Top:
     return true;
   case EdgeValue::Integer:
-    // if (v1.value.asInt != v2.value.asInt)
+    // if (v1.Value.asInt != v2.Value.asInt)
     //  std::cout << "integer unequal" << std::endl;
-    return std::get<llvm::APInt>(V1.value) == std::get<llvm::APInt>(V2.value);
+    return std::get<llvm::APInt>(V1.Value) == std::get<llvm::APInt>(V2.Value);
   case EdgeValue::FloatingPoint: {
     // std::cout << "compare floating points" << std::endl;
-    auto Cp = std::get<llvm::APFloat>(V1.value).compare(
-        std::get<llvm::APFloat>(V2.value));
+    auto Cp = std::get<llvm::APFloat>(V1.Value).compare(
+        std::get<llvm::APFloat>(V2.Value));
     if (Cp == llvm::APFloat::cmpResult::cmpEqual) {
       // std::cout << "FP equal" << std::endl;
       return true;
     }
-    auto D1 = std::get<llvm::APFloat>(V1.value).convertToDouble();
-    auto D2 = std::get<llvm::APFloat>(V2.value).convertToDouble();
+    auto D1 = std::get<llvm::APFloat>(V1.Value).convertToDouble();
+    auto D2 = std::get<llvm::APFloat>(V2.Value).convertToDouble();
 
     const double Epsilon = 0.000001;
     // std::cout << "Compare " << d1 << " against " << d2 << std::endl;
     return D1 == D2 || D1 - D2 < Epsilon || D2 - D1 < Epsilon;
   }
   case EdgeValue::String:
-    // if (v1.value.asString != v2.value.asString)
+    // if (v1.Value.asString != v2.Value.asString)
     //  std::cout << "String unequal" << std::endl;
-    return std::get<std::string>(V1.value) == std::get<std::string>(V2.value);
+    return std::get<std::string>(V1.Value) == std::get<std::string>(V2.Value);
   default: // will not happen
     std::cerr << "FATAL ERROR" << std::endl;
     return false;
@@ -230,85 +234,90 @@ bool operator==(const EdgeValue &V1, const EdgeValue &V2) {
 }
 
 bool EdgeValue::sqSubsetEq(const EdgeValue &Other) const {
-  return Other.isTop() || Other.type == type;
+  return Other.isTop() || Other.Typ == Typ;
 }
 
 // binary operators
 EdgeValue operator+(const EdgeValue &V1, const EdgeValue &V2) {
-  if (V1.type != V2.type)
+  if (V1.Typ != V2.Typ) {
     return EdgeValue(nullptr);
-  switch (V1.type) {
+}
+  switch (V1.Typ) {
   case EdgeValue::Integer:
-    return EdgeValue(std::get<llvm::APInt>(V1.value) +
-                     std::get<llvm::APInt>(V2.value));
+    return EdgeValue(std::get<llvm::APInt>(V1.Value) +
+                     std::get<llvm::APInt>(V2.Value));
   case EdgeValue::FloatingPoint:
-    return EdgeValue(std::get<llvm::APFloat>(V1.value) +
-                     std::get<llvm::APFloat>(V2.value));
+    return EdgeValue(std::get<llvm::APFloat>(V1.Value) +
+                     std::get<llvm::APFloat>(V2.Value));
   case EdgeValue::String:
-    return EdgeValue(std::get<std::string>(V1.value) +
-                     std::get<std::string>(V2.value));
+    return EdgeValue(std::get<std::string>(V1.Value) +
+                     std::get<std::string>(V2.Value));
   default:
     return EdgeValue(nullptr);
   }
 }
 
 EdgeValue operator-(const EdgeValue &V1, const EdgeValue &V2) {
-  if (V1.type != V2.type)
+  if (V1.Typ != V2.Typ) {
     return EdgeValue(nullptr);
-  switch (V1.type) {
+}
+  switch (V1.Typ) {
   case EdgeValue::Integer:
-    return EdgeValue(std::get<llvm::APInt>(V1.value) -
-                     std::get<llvm::APInt>(V1.value));
+    return EdgeValue(std::get<llvm::APInt>(V1.Value) -
+                     std::get<llvm::APInt>(V1.Value));
   case EdgeValue::FloatingPoint:
-    // printSemantics(v1.value.asFP) << " <=> ";
-    // printSemantics(v2.value.asFP) << std::endl;
-    return EdgeValue(std::get<llvm::APFloat>(V1.value) -
-                     std::get<llvm::APFloat>(V2.value));
+    // printSemantics(v1.Value.asFP) << " <=> ";
+    // printSemantics(v2.Value.asFP) << std::endl;
+    return EdgeValue(std::get<llvm::APFloat>(V1.Value) -
+                     std::get<llvm::APFloat>(V2.Value));
   default:
     return EdgeValue(nullptr);
   }
 }
 
 EdgeValue operator*(const EdgeValue &V1, const EdgeValue &V2) {
-  if (V1.type != V2.type)
+  if (V1.Typ != V2.Typ) {
     return EdgeValue(nullptr);
-  switch (V1.type) {
+}
+  switch (V1.Typ) {
   case EdgeValue::Integer:
-    return EdgeValue(std::get<llvm::APInt>(V1.value) *
-                     std::get<llvm::APInt>(V2.value));
+    return EdgeValue(std::get<llvm::APInt>(V1.Value) *
+                     std::get<llvm::APInt>(V2.Value));
   case EdgeValue::FloatingPoint:
-    return EdgeValue(std::get<llvm::APFloat>(V1.value) *
-                     std::get<llvm::APFloat>(V2.value));
+    return EdgeValue(std::get<llvm::APFloat>(V1.Value) *
+                     std::get<llvm::APFloat>(V2.Value));
   default:
     return EdgeValue(nullptr);
   }
 }
 
 EdgeValue operator/(const EdgeValue &V1, const EdgeValue &V2) {
-  if (V1.type != V2.type)
+  if (V1.Typ != V2.Typ) {
     return EdgeValue(nullptr);
-  switch (V1.type) {
+}
+  switch (V1.Typ) {
   case EdgeValue::Integer:
     return EdgeValue(
-        std::get<llvm::APInt>(V1.value).sdiv(std::get<llvm::APInt>(V2.value)));
+        std::get<llvm::APInt>(V1.Value).sdiv(std::get<llvm::APInt>(V2.Value)));
   case EdgeValue::FloatingPoint:
-    return EdgeValue(std::get<llvm::APFloat>(V1.value) /
-                     std::get<llvm::APFloat>(V2.value));
+    return EdgeValue(std::get<llvm::APFloat>(V1.Value) /
+                     std::get<llvm::APFloat>(V2.Value));
   default:
     return EdgeValue(nullptr);
   }
 }
 
 EdgeValue operator%(const EdgeValue &V1, const EdgeValue &V2) {
-  if (V1.type != V2.type)
+  if (V1.Typ != V2.Typ) {
     return EdgeValue(nullptr);
-  switch (V1.type) {
+}
+  switch (V1.Typ) {
   case EdgeValue::Integer:
     return EdgeValue(
-        std::get<llvm::APInt>(V1.value).srem(std::get<llvm::APInt>(V2.value)));
+        std::get<llvm::APInt>(V1.Value).srem(std::get<llvm::APInt>(V2.Value)));
   case EdgeValue::FloatingPoint: {
-    llvm::APFloat Fl = std::get<llvm::APFloat>(V1.value);
-    Fl.remainder(std::get<llvm::APFloat>(V2.value));
+    llvm::APFloat Fl = std::get<llvm::APFloat>(V1.Value);
+    Fl.remainder(std::get<llvm::APFloat>(V2.Value));
     return EdgeValue(std::move(Fl));
   }
   default:
@@ -317,60 +326,65 @@ EdgeValue operator%(const EdgeValue &V1, const EdgeValue &V2) {
 }
 
 EdgeValue operator&(const EdgeValue &V1, const EdgeValue &V2) {
-  if (V1.type != V2.type)
+  if (V1.Typ != V2.Typ) {
     return EdgeValue(nullptr);
-  switch (V1.type) {
+}
+  switch (V1.Typ) {
   case EdgeValue::Integer:
-    return EdgeValue(std::get<llvm::APInt>(V1.value) &
-                     std::get<llvm::APInt>(V2.value));
+    return EdgeValue(std::get<llvm::APInt>(V1.Value) &
+                     std::get<llvm::APInt>(V2.Value));
   default:
     return EdgeValue(nullptr);
   }
 }
 
 EdgeValue operator|(const EdgeValue &V1, const EdgeValue &V2) {
-  if (V1.type != V2.type)
+  if (V1.Typ != V2.Typ) {
     return EdgeValue(nullptr);
-  switch (V1.type) {
+}
+  switch (V1.Typ) {
   case EdgeValue::Integer:
-    return EdgeValue(std::get<llvm::APInt>(V1.value) |
-                     std::get<llvm::APInt>(V2.value));
+    return EdgeValue(std::get<llvm::APInt>(V1.Value) |
+                     std::get<llvm::APInt>(V2.Value));
   default:
     return EdgeValue(nullptr);
   }
 }
 
 EdgeValue operator^(const EdgeValue &V1, const EdgeValue &V2) {
-  if (V1.type != V2.type)
+  if (V1.Typ != V2.Typ) {
     return EdgeValue(nullptr);
-  switch (V1.type) {
+}
+  switch (V1.Typ) {
   case EdgeValue::Integer:
-    return EdgeValue(std::get<llvm::APInt>(V1.value) ^
-                     std::get<llvm::APInt>(V2.value));
+    return EdgeValue(std::get<llvm::APInt>(V1.Value) ^
+                     std::get<llvm::APInt>(V2.Value));
   default:
     return EdgeValue(nullptr);
   }
 }
 
 EdgeValue operator<<(const EdgeValue &V1, const EdgeValue &V2) {
-  if (V1.type != V2.type)
+  if (V1.Typ != V2.Typ) {
     return EdgeValue(nullptr);
-  switch (V1.type) {
+}
+  switch (V1.Typ) {
   case EdgeValue::Integer:
-    return EdgeValue(std::get<llvm::APInt>(V1.value)
-                     << std::get<llvm::APInt>(V2.value));
+    return EdgeValue(std::get<llvm::APInt>(V1.Value)
+                     << std::get<llvm::APInt>(V2.Value));
   default:
     return EdgeValue(nullptr);
   }
 }
 
 EdgeValue operator>>(const EdgeValue &V1, const EdgeValue &V2) {
-  if (V1.type != V2.type)
+  if (V1.Typ != V2.Typ) {
     return EdgeValue(nullptr);
-  switch (V1.type) {
+}
+  switch (V1.Typ) {
   case EdgeValue::Integer:
     return EdgeValue(
-        std::get<llvm::APInt>(V1.value).ashr(std::get<llvm::APInt>(V2.value)));
+        std::get<llvm::APInt>(V1.Value).ashr(std::get<llvm::APInt>(V2.Value)));
   default:
     return EdgeValue(nullptr);
   }
@@ -378,38 +392,41 @@ EdgeValue operator>>(const EdgeValue &V1, const EdgeValue &V2) {
 
 // unary operators
 EdgeValue EdgeValue::operator-() const {
-  if (type == Integer)
-    return EdgeValue(-std::get<llvm::APInt>(value));
+  if (Typ == Integer) {
+    return EdgeValue(-std::get<llvm::APInt>(Value));
+}
   return EdgeValue(nullptr);
 }
 
 EdgeValue EdgeValue::operator~() const {
-  if (type == Integer)
-    return EdgeValue(~std::get<llvm::APInt>(value));
+  if (Typ == Integer) {
+    return EdgeValue(~std::get<llvm::APInt>(Value));
+}
   return EdgeValue(nullptr);
 }
 
-int EdgeValue::compare(const EdgeValue &V1, const EdgeValue &V2) {
-  switch (V1.type) {
+int EdgeValue::compare(const EdgeValue &V1, const EdgeValue &V2) { //NOLINT
+  switch (V1.Typ) {
   case EdgeValue::Integer: {
-    auto V1val = std::get<llvm::APInt>(V1.value).getLimitedValue();
+    auto V1val = std::get<llvm::APInt>(V1.Value).getLimitedValue();
     uint64_t V2val;
     double V2valFp;
     if (V2.tryGetInt(V2val)) {
-      return V1val - V2val;
-    } else if (V2.tryGetFP(V2valFp)) {
-      return V1val < V2valFp ? -1 : (V1val > V2valFp ? 1 : 0);
+      return V1val - V2val; //NOLINT
+    } if (V2.tryGetFP(V2valFp)) {
+      return V1val < V2valFp ? -1 : (V1val > V2valFp ? 1 : 0); //NOLINT
     }
     break;
   }
   case EdgeValue::FloatingPoint: {
-    auto V1val = std::get<llvm::APFloat>(V1.value).convertToDouble();
+    auto V1val = std::get<llvm::APFloat>(V1.Value).convertToDouble();
     uint64_t V2val;
     double V2valFp;
     bool IsInt = V2.tryGetInt(V2val);
     if (IsInt || V2.tryGetFP(V2valFp)) {
-      if (IsInt)
-        V2valFp = V2val;
+      if (IsInt) {
+        V2valFp = V2val; //NOLINT
+}
 
       return V1val < V2valFp ? -1 : (V1val > V2valFp ? 1 : 0);
     }
@@ -419,7 +436,7 @@ int EdgeValue::compare(const EdgeValue &V1, const EdgeValue &V2) {
   case EdgeValue::String: {
     std::string V2val;
     if (V2.tryGetString(V2val)) {
-      return std::get<std::string>(V1.value).compare(V2val);
+      return std::get<std::string>(V1.Value).compare(V2val);
     }
     break;
   }
@@ -431,37 +448,38 @@ int EdgeValue::compare(const EdgeValue &V1, const EdgeValue &V2) {
 }
 
 std::ostream &operator<<(std::ostream &Os, const EdgeValue &Ev) {
-  switch (Ev.type) {
+  switch (Ev.Typ) {
   case EdgeValue::Integer: {
     std::string S;
     llvm::raw_string_ostream Ros(S);
-    Ros << std::get<llvm::APInt>(Ev.value);
+    Ros << std::get<llvm::APInt>(Ev.Value);
     return Os << Ros.str();
   }
   case EdgeValue::String:
-    return Os << "\"" << std::get<std::string>(Ev.value) << "\"";
+    return Os << "\"" << std::get<std::string>(Ev.Value) << "\"";
   case EdgeValue::FloatingPoint: {
-    return Os << std::get<llvm::APFloat>(Ev.value).convertToDouble();
+    return Os << std::get<llvm::APFloat>(Ev.Value).convertToDouble();
   }
   default:
     return Os << "<TOP>";
   }
 }
 
-EdgeValue EdgeValue::typecast(Type Dest, unsigned Bits) const {
+EdgeValue EdgeValue::typecast(enum Type Dest, unsigned Bits) const {
   switch (Dest) {
 
   case Integer:
-    switch (type) {
+    switch (Typ) {
     case Integer:
-      if (std::get<llvm::APInt>(value).getBitWidth() <= Bits)
+      if (std::get<llvm::APInt>(Value).getBitWidth() <= Bits) {
         return *this;
-      else
-        return EdgeValue(std::get<llvm::APInt>(value) & ((1 << Bits) - 1));
+      } else {
+        return EdgeValue(std::get<llvm::APInt>(Value) & ((1 << Bits) - 1));
+}
     case FloatingPoint: {
       bool Unused;
       llvm::APSInt Ai;
-      std::get<llvm::APFloat>(value).convertToInteger(
+      std::get<llvm::APFloat>(Value).convertToInteger(
           Ai, llvm::APFloat::roundingMode::NearestTiesToEven, &Unused);
       return EdgeValue(Ai);
     }
@@ -469,12 +487,13 @@ EdgeValue EdgeValue::typecast(Type Dest, unsigned Bits) const {
       return EdgeValue(nullptr);
     }
   case FloatingPoint:
-    switch (type) {
+    switch (Typ) {
     case Integer:
-      if (Bits > 32)
-        return EdgeValue((double)std::get<llvm::APInt>(value).getSExtValue());
-      else
-        return EdgeValue((float)std::get<llvm::APInt>(value).getSExtValue());
+      if (Bits > 32) {
+        return EdgeValue((double)std::get<llvm::APInt>(Value).getSExtValue());
+      } else {
+        return EdgeValue((float)std::get<llvm::APInt>(Value).getSExtValue());
+}
     case FloatingPoint:
       return *this;
     default:
@@ -499,12 +518,13 @@ EdgeValue EdgeValue::performBinOp(llvm::BinaryOperator::BinaryOps Op,
   case llvm::BinaryOperator::BinaryOps::SDiv:
     return *this / Other;
   case llvm::BinaryOperator::BinaryOps::LShr: {
-    if (type != Other.type)
+    if (Typ != Other.Typ) {
       return EdgeValue(nullptr);
-    switch (type) {
+}
+    switch (Typ) {
     case EdgeValue::Integer:
-      return EdgeValue(std::get<llvm::APInt>(value).lshr(
-          std::get<llvm::APInt>(Other.value)));
+      return EdgeValue(std::get<llvm::APInt>(Value).lshr(
+          std::get<llvm::APInt>(Other.Value)));
     default:
       return EdgeValue(nullptr);
     }
@@ -523,23 +543,25 @@ EdgeValue EdgeValue::performBinOp(llvm::BinaryOperator::BinaryOps Op,
   case llvm::BinaryOperator::BinaryOps::FSub:
     return *this - Other;
   case llvm::BinaryOperator::BinaryOps::UDiv: {
-    if (type != Other.type)
+    if (Typ != Other.Typ) {
       return EdgeValue(nullptr);
-    switch (type) {
+}
+    switch (Typ) {
     case EdgeValue::Integer:
-      return EdgeValue(std::get<llvm::APInt>(value).udiv(
-          std::get<llvm::APInt>(Other.value)));
+      return EdgeValue(std::get<llvm::APInt>(Value).udiv(
+          std::get<llvm::APInt>(Other.Value)));
     default:
       return EdgeValue(nullptr);
     }
   }
   case llvm::BinaryOperator::BinaryOps::URem: {
-    if (type != Other.type)
+    if (Typ != Other.Typ) {
       return EdgeValue(nullptr);
-    switch (type) {
+}
+    switch (Typ) {
     case EdgeValue::Integer:
-      return EdgeValue(std::get<llvm::APInt>(value).urem(
-          std::get<llvm::APInt>(Other.value)));
+      return EdgeValue(std::get<llvm::APInt>(Value).urem(
+          std::get<llvm::APInt>(Other.Value)));
     default:
       return EdgeValue(nullptr);
     }
@@ -560,8 +582,8 @@ ev_t performBinOp(llvm::BinaryOperator::BinaryOps Op, const ev_t &V1,
     return {EdgeValue(nullptr)};
   }
   ev_t Ret({});
-  for (auto &Ev1 : V1) {
-    for (auto &Ev2 : V2) {
+  for (const auto &Ev1 : V1) {
+    for (const auto &Ev2 : V2) {
 
       Ret.insert(Ev1.performBinOp(Op, Ev2));
       if (Ret.size() > MaxSize) {
@@ -580,20 +602,21 @@ ev_t performTypecast(const ev_t &Ev, EdgeValue::Type Dest, unsigned Bits) {
     return {EdgeValue(nullptr)};
   }
   ev_t Ret({});
-  for (auto &V : Ev) {
+  for (const auto &V : Ev) {
     auto Tc = V.typecast(Dest, Bits);
-    if (Tc.isTop())
+    if (Tc.isTop()) {
       return ev_t({EdgeValue(nullptr)});
+}
     Ret.insert(Tc);
   }
   return Ret;
 }
 
 Ordering compare(const ev_t &V1, const ev_t &V2) {
-  auto &Smaller = V1.size() <= V2.size() ? V1 : V2;
-  auto &Larger = V1.size() > V2.size() ? V1 : V2;
+  const auto &Smaller = V1.size() <= V2.size() ? V1 : V2;
+  const auto &Larger = V1.size() > V2.size() ? V1 : V2;
 
-  for (auto &Elem : Smaller) {
+  for (const auto &Elem : Smaller) {
     if (!Larger.count(Elem)) {
       return Ordering::Incomparable;
     }
@@ -611,7 +634,7 @@ ev_t join(const ev_t &V1, const ev_t &V2, size_t MaxSize) {
   }
   ev_t Ret(V1.begin(), V1.end());
 
-  for (auto &Elem : V2) {
+  for (const auto &Elem : V2) {
     Ret.insert(Elem);
     if (Ret.size() > MaxSize) {
       // std::cout << "\t=> <TOP>" << std::endl;
@@ -627,11 +650,12 @@ bool isTopValue(const ev_t &V) { return V.size() == 1 && V.begin()->isTop(); }
 std::ostream &operator<<(std::ostream &Os, const ev_t &V) {
   Os << "{";
   bool Frst = true;
-  for (auto &Elem : V) {
-    if (Frst)
+  for (const auto &Elem : V) {
+    if (Frst) {
       Frst = false;
-    else
+    } else {
       Os << ", ";
+}
     Os << Elem;
   }
   return Os << "}";
@@ -639,17 +663,18 @@ std::ostream &operator<<(std::ostream &Os, const ev_t &V) {
 
 bool operator<(const ev_t &V1, const ev_t &V2) {
   if (V1.size() >= V2.size()) {
-    return V1 != V2 && (V1.empty() || V2 == ev_t({EdgeValue::top}));
-  } else {
-    for (auto &Elem : V1) {
-      if (!V2.count(Elem))
+    return V1 != V2 && (V1.empty() || V2 == ev_t({EdgeValue::Top}));
+  }  
+    for (const auto &Elem : V1) { //NOLINT
+      if (!V2.count(Elem)) {
         return false;
+}
     }
     return true;
-  }
+ 
 }
 
-std::string EdgeValue::typeToString(Type Ty) {
+std::string EdgeValue::typeToString(enum Type Ty) {
   switch (Ty) {
   case Integer:
     return "Integer";

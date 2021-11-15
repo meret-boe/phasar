@@ -14,7 +14,7 @@
 namespace psr {
 
 std::set<ExtendedValue>
-MapTaintedValuesToCaller::computeTargets(ExtendedValue Fact) {
+MapTaintedValuesToCaller::computeTargets(ExtendedValue Fact) { //NOLINT
   std::set<ExtendedValue> TargetGlobalFacts;
   std::set<ExtendedValue> TargetRetFacts;
 
@@ -24,7 +24,7 @@ MapTaintedValuesToCaller::computeTargets(ExtendedValue Fact) {
     TargetGlobalFacts.insert(Fact);
   }
 
-  auto *const RetValMemLocationMatr = retInst->getReturnValue();
+  auto *const RetValMemLocationMatr = RetInst->getReturnValue();
   if (!RetValMemLocationMatr) {
     return TargetGlobalFacts;
   }
@@ -48,7 +48,7 @@ MapTaintedValuesToCaller::computeTargets(ExtendedValue Fact) {
       const auto RelocatableMemLocationSeq =
           DataFlowUtils::getRelocatableMemoryLocationSeq(FactMemLocationSeq,
                                                          RetValMemLocationSeq);
-      std::vector<const llvm::Value *> PatchablePart{callInst};
+      std::vector<const llvm::Value *> PatchablePart{CallInst};
       const auto PatchableMemLocationSeq =
           DataFlowUtils::joinMemoryLocationSeqs(PatchablePart,
                                                 RelocatableMemLocationSeq);
@@ -59,38 +59,39 @@ MapTaintedValuesToCaller::computeTargets(ExtendedValue Fact) {
        * a memory address). We then land in the else branch below and need to
        * find the call instance (see test case 230-function-ptr-2).
        */
-      ExtendedValue EV(callInst);
-      EV.setMemLocationSeq(PatchableMemLocationSeq);
+      ExtendedValue Ev(CallInst);
+      Ev.setMemLocationSeq(PatchableMemLocationSeq);
 
-      TargetRetFacts.insert(EV);
+      TargetRetFacts.insert(Ev);
 
       LOG_DEBUG("Added patchable memory location (caller <- callee)");
       LOG_DEBUG("Source");
       DataFlowUtils::dumpFact(Fact);
       LOG_DEBUG("Destination");
-      DataFlowUtils::dumpFact(EV);
+      DataFlowUtils::dumpFact(Ev);
     }
   } else {
     bool GenFact = DataFlowUtils::isValueTainted(RetValMemLocationMatr, Fact);
     if (GenFact) {
-      std::vector<const llvm::Value *> PatchablePart{callInst};
+      std::vector<const llvm::Value *> PatchablePart{CallInst};
 
-      ExtendedValue EV(callInst);
-      EV.setMemLocationSeq(PatchablePart);
 
-      TargetRetFacts.insert(EV);
+      ExtendedValue Ev(CallInst);
+      Ev.setMemLocationSeq(PatchablePart);
+
+      TargetRetFacts.insert(Ev);
 
       LOG_DEBUG("Added patchable memory location (caller <- callee)");
       LOG_DEBUG("Source");
       DataFlowUtils::dumpFact(Fact);
       LOG_DEBUG("Destination");
-      DataFlowUtils::dumpFact(EV);
+      DataFlowUtils::dumpFact(Ev);
     }
   }
 
   bool AddLineNumbers = !TargetRetFacts.empty();
   if (AddLineNumbers) {
-    traceStats.add(callInst);
+    TraceStats.add(CallInst);
   }
 
   std::set<ExtendedValue> TargetFacts;

@@ -105,12 +105,13 @@ getGlobalCtorsDtorsImpl(const llvm::Module *M, llvm::StringRef Fun) {
 } // anonymous namespace
 
 namespace psr {
+using llvm::CallBase;
 
 struct LLVMBasedICFG::dependency_visitor : boost::default_dfs_visitor {
   std::vector<vertex_t> &Vertices;
   dependency_visitor(std::vector<vertex_t> &V) : Vertices(V) {}
   template <typename Vertex, typename Graph>
-  void finish_vertex(Vertex U, const Graph &G) {
+  void finish_vertex(Vertex U, const Graph & /*G*/) {
     Vertices.push_back(U);
   }
 };
@@ -132,13 +133,13 @@ std::string LLVMBasedICFG::EdgeProperties::getCallSiteAsString() const {
 // Need to provide copy constructor explicitly to avoid multiple frees of TH and
 // PT in case any of them is allocated within the constructor. To this end, we
 // set UserTHInfos and UserPTInfos to true here.
-LLVMBasedICFG::LLVMBasedICFG(const LLVMBasedICFG &ICF)
+LLVMBasedICFG::LLVMBasedICFG(const LLVMBasedICFG &ICF) //NOLINT
     : IRDB(ICF.IRDB), CGType(ICF.CGType), S(ICF.S), TH(ICF.TH), PT(ICF.PT),
       // TODO copy resolver
       Res(nullptr), VisitedFunctions(ICF.VisitedFunctions),
       CallGraph(ICF.CallGraph), FunctionVertexMap(ICF.FunctionVertexMap) {}
 
-LLVMBasedICFG::LLVMBasedICFG(ProjectIRDB &IRDB, CallGraphAnalysisType CGType,
+LLVMBasedICFG::LLVMBasedICFG(ProjectIRDB &IRDB, CallGraphAnalysisType CGType, //NOLINT
                              const std::set<std::string> &EntryPoints,
                              LLVMTypeHierarchy *TH, LLVMPointsToInfo *PT,
                              Soundness S)
@@ -205,7 +206,7 @@ LLVMBasedICFG::~LLVMBasedICFG() {
   }
 }
 
-void LLVMBasedICFG::processFunction(const llvm::Function *F, Resolver &Resolver,
+void LLVMBasedICFG::processFunction(const llvm::Function *F, Resolver &Resolver, //NOLINT
                                     bool &FixpointReached) {
   LOG_IF_ENABLE(BOOST_LOG_SEV(lg::get(), DEBUG)
                 << "Walking in function: " << F->getName().str());
@@ -233,7 +234,7 @@ void LLVMBasedICFG::processFunction(const llvm::Function *F, Resolver &Resolver,
       if (llvm::isa<llvm::CallInst>(I) || llvm::isa<llvm::InvokeInst>(I)) {
         Resolver.preCall(&I);
 
-        const llvm::CallBase *CS = llvm::cast<llvm::CallBase>(&I);
+        const auto *CS = llvm::cast<llvm::CallBase>(&I);
         set<const llvm::Function *> PossibleTargets;
         // check if function call can be resolved statically
         if (CS->getCalledFunction() != nullptr) {
@@ -297,7 +298,7 @@ void LLVMBasedICFG::processFunction(const llvm::Function *F, Resolver &Resolver,
   }
 }
 
-bool LLVMBasedICFG::constructDynamicCall(const llvm::Instruction *I,
+bool LLVMBasedICFG::constructDynamicCall(const llvm::Instruction *I, //NOLINT
                                          Resolver &Resolver) {
   bool NewTargetsFound = false;
   // Find vertex of calling function.
@@ -376,7 +377,7 @@ bool LLVMBasedICFG::constructDynamicCall(const llvm::Instruction *I,
 }
 
 std::unique_ptr<Resolver> LLVMBasedICFG::makeResolver(ProjectIRDB &IRDB,
-                                                      CallGraphAnalysisType CGT,
+                                                      CallGraphAnalysisType  /*CGT*/,
                                                       LLVMTypeHierarchy &TH,
                                                       LLVMPointsToInfo &PT) {
   switch (CGType) {
@@ -402,12 +403,12 @@ std::unique_ptr<Resolver> LLVMBasedICFG::makeResolver(ProjectIRDB &IRDB,
 }
 
 bool LLVMBasedICFG::isIndirectFunctionCall(const llvm::Instruction *N) const {
-  const llvm::CallBase *CallSite = llvm::cast<llvm::CallBase>(N);
+  const auto *CallSite = llvm::cast<llvm::CallBase>(N);
   return CallSite->isIndirectCall();
 }
 
 bool LLVMBasedICFG::isVirtualFunctionCall(const llvm::Instruction *N) const {
-  const llvm::CallBase *CallSite = llvm::cast<llvm::CallBase>(N);
+  const auto *CallSite = llvm::cast<llvm::CallBase>(N);
   // check potential receiver type
   const auto *RecType = getReceiverType(CallSite);
   if (!RecType) {
@@ -432,12 +433,12 @@ set<const llvm::Function *> LLVMBasedICFG::getAllFunctions() const {
 
 boost::container::flat_set<const llvm::Function *>
 LLVMBasedICFG::getAllVertexFunctions() const {
-  boost::container::flat_set<const llvm::Function *> vertexFuncs;
-  vertexFuncs.reserve(FunctionVertexMap.size());
-  for (auto v : FunctionVertexMap) {
-    vertexFuncs.insert(v.first);
+  boost::container::flat_set<const llvm::Function *> VertexFuncs;
+  VertexFuncs.reserve(FunctionVertexMap.size());
+  for (auto V : FunctionVertexMap) {
+    VertexFuncs.insert(V.first);
   }
-  return vertexFuncs;
+  return VertexFuncs;
 }
 
 std::vector<const llvm::Instruction *>
@@ -535,9 +536,9 @@ LLVMBasedICFG::getCalleesOfCallAt(const llvm::Instruction *N) const {
       }
     }
     return Callees;
-  } else {
-    return {};
-  }
+  } 
+  return {};
+ 
 }
 
 set<const llvm::Instruction *>
@@ -735,11 +736,11 @@ nlohmann::json LLVMBasedICFG::getAsJson() const {
   // iterate all graph vertices
   for (boost::tie(VIv, VIvEnd) = boost::vertices(CallGraph); VIv != VIvEnd;
        ++VIv) {
-    J[PhasarConfig::JsonCallGraphID()][CallGraph[*VIv].getFunctionName()];
+    J[PhasarConfig::jsonCallGraphId()][CallGraph[*VIv].getFunctionName()];
     // iterate all out edges of vertex vi_v
     for (boost::tie(EI, EIEnd) = boost::out_edges(*VIv, CallGraph); EI != EIEnd;
          ++EI) {
-      J[PhasarConfig::JsonCallGraphID()][CallGraph[*VIv].getFunctionName()] +=
+      J[PhasarConfig::jsonCallGraphId()][CallGraph[*VIv].getFunctionName()] +=
           CallGraph[boost::target(*EI, CallGraph)].getFunctionName();
     }
   }

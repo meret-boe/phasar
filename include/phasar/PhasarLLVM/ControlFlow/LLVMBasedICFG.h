@@ -140,9 +140,10 @@ public:
                 LLVMTypeHierarchy *TH = nullptr, LLVMPointsToInfo *PT = nullptr,
                 Soundness S = Soundness::SOUNDY);
 
-  LLVMBasedICFG(const LLVMBasedICFG &);
+  LLVMBasedICFG(const LLVMBasedICFG & /*ICF*/);
 
   ~LLVMBasedICFG() override;
+  LLVMBasedICFG& operator=(LLVMBasedICFG Other);
 
   /**
    * \return all of the functions in the IRDB, this may include some not in the

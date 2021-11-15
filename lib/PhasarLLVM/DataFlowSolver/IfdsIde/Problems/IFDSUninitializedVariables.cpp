@@ -33,6 +33,7 @@ using namespace std;
 using namespace psr;
 
 namespace psr {
+using llvm::CallBase;
 
 IFDSUninitializedVariables::IFDSUninitializedVariables(
     const ProjectIRDB *IRDB, const LLVMTypeHierarchy *TH,
@@ -43,9 +44,9 @@ IFDSUninitializedVariables::IFDSUninitializedVariables(
 }
 
 IFDSUninitializedVariables::FlowFunctionPtrType
-IFDSUninitializedVariables::getNormalFlowFunction(
+IFDSUninitializedVariables::getNormalFlowFunction( //NOLINT
     IFDSUninitializedVariables::n_t Curr,
-    IFDSUninitializedVariables::n_t Succ) {
+    IFDSUninitializedVariables::n_t  /*Succ*/) {
   //----------------------------------------------------------------------------------
   // Why do we need this case?
   // Every alloca is reached eventually by this function
@@ -161,7 +162,7 @@ IFDSUninitializedVariables::getNormalFlowFunction(
             (Source == Zero &&
              llvm::isa<llvm::UndefValue>(Store->getValueOperand()))) {
           return {Source, Store->getPointerOperand()};
-        } else if (Source ==
+        } if (Source ==
                    Store->getPointerOperand()) { // storing an initialized value
                                                  // kills the variable as it is
                                                  // now initialized too
@@ -240,7 +241,7 @@ IFDSUninitializedVariables::getCallFlowFunction(
     IFDSUninitializedVariables::f_t DestFun) {
   if (llvm::isa<llvm::CallInst>(CallSite) ||
       llvm::isa<llvm::InvokeInst>(CallSite)) {
-    const llvm::CallBase *CS = llvm::cast<llvm::CallBase>(CallSite);
+    const auto *CS = llvm::cast<llvm::CallBase>(CallSite);
     struct UVFF : FlowFunction<IFDSUninitializedVariables::d_t> {
       const llvm::Function *DestFun;
       const llvm::CallBase *CallSite;
@@ -278,8 +279,7 @@ IFDSUninitializedVariables::getCallFlowFunction(
             }
           }
           return Res;
-        } else {
-
+        }  
           //--------------------------------------------------------------
           // Why not letting the normal FF generate the allocas?
           //--------------------------------------------------------------
@@ -310,7 +310,7 @@ IFDSUninitializedVariables::getCallFlowFunction(
 
           // propagate zero
           return {Source};
-        }
+       
       }
     };
     return make_shared<UVFF>(DestFun, CS, ZeroValue);
@@ -321,12 +321,12 @@ IFDSUninitializedVariables::getCallFlowFunction(
 IFDSUninitializedVariables::FlowFunctionPtrType
 IFDSUninitializedVariables::getRetFlowFunction(
     IFDSUninitializedVariables::n_t CallSite,
-    IFDSUninitializedVariables::f_t CalleeFun,
-    IFDSUninitializedVariables::n_t ExitSite,
-    IFDSUninitializedVariables::n_t RetSite) {
+    IFDSUninitializedVariables::f_t  /*CalleeFun*/,
+    IFDSUninitializedVariables::n_t ExitInst,
+    IFDSUninitializedVariables::n_t  /*RetSite*/) {
   if (llvm::isa<llvm::CallInst>(CallSite) ||
       llvm::isa<llvm::InvokeInst>(CallSite)) {
-    const llvm::CallBase *CS = llvm::cast<llvm::CallBase>(CallSite);
+    const auto *CS = llvm::cast<llvm::CallBase>(CallSite);
     struct UVFF : FlowFunction<IFDSUninitializedVariables::d_t> {
       const llvm::CallBase *Call;
       const llvm::Instruction *Exit;
@@ -357,7 +357,7 @@ IFDSUninitializedVariables::getRetFlowFunction(
         return Ret;
       }
     };
-    return make_shared<UVFF>(CS, ExitSite);
+    return make_shared<UVFF>(CS, ExitInst);
   }
   // kill everything else
   return KillAll<IFDSUninitializedVariables::d_t>::getInstance();
@@ -366,14 +366,14 @@ IFDSUninitializedVariables::getRetFlowFunction(
 IFDSUninitializedVariables::FlowFunctionPtrType
 IFDSUninitializedVariables::getCallToRetFlowFunction(
     IFDSUninitializedVariables::n_t CallSite,
-    IFDSUninitializedVariables::n_t RetSite,
-    set<IFDSUninitializedVariables::f_t> Callees) {
+    IFDSUninitializedVariables::n_t  /*RetSite*/,
+    set<IFDSUninitializedVariables::f_t>  /*Callees*/) {
   //----------------------------------------------------------------------
   // Handle pointer/reference parameters
   //----------------------------------------------------------------------
   if (llvm::isa<llvm::CallInst>(CallSite) ||
       llvm::isa<llvm::InvokeInst>(CallSite)) {
-    const llvm::CallBase *CS = llvm::cast<llvm::CallBase>(CallSite);
+    const auto *CS = llvm::cast<llvm::CallBase>(CallSite);
     return make_shared<LambdaFlow<IFDSUninitializedVariables::d_t>>(
         [CS](IFDSUninitializedVariables::d_t Source)
             -> set<IFDSUninitializedVariables::d_t> {
@@ -395,8 +395,8 @@ IFDSUninitializedVariables::getCallToRetFlowFunction(
 
 IFDSUninitializedVariables::FlowFunctionPtrType
 IFDSUninitializedVariables::getSummaryFlowFunction(
-    IFDSUninitializedVariables::n_t CallSite,
-    IFDSUninitializedVariables::f_t DestFun) {
+    IFDSUninitializedVariables::n_t  /*CallSite*/,
+    IFDSUninitializedVariables::f_t  /*DestFun*/) {
   return nullptr;
 }
 
@@ -424,7 +424,7 @@ IFDSUninitializedVariables::createZeroValue() const {
 
 bool IFDSUninitializedVariables::isZeroValue(
     IFDSUninitializedVariables::d_t D) const {
-  return LLVMZeroValue::getInstance()->isLLVMZeroValue(D);
+  return LLVMZeroValue::getInstance()->isLLVMZeroValue(D); //NOLINT
 }
 
 void IFDSUninitializedVariables::printNode(
@@ -444,7 +444,7 @@ void IFDSUninitializedVariables::printFunction(
 
 void IFDSUninitializedVariables::emitTextReport(
     const SolverResults<IFDSUninitializedVariables::n_t,
-                        IFDSUninitializedVariables::d_t, BinaryDomain> &SR,
+                        IFDSUninitializedVariables::d_t, BinaryDomain> & /*SR*/,
     ostream &OS) {
   OS << "====================== IFDS-Uninitialized-Analysis Report "
         "======================\n";
@@ -499,22 +499,22 @@ IFDSUninitializedVariables::aggregateResults() {
     if (CurrLineNr != LineNr) {
       CurrLineNr = LineNr;
       UninitResult NewUR;
-      NewUR.line = LineNr;
-      NewUR.func_name = getFunctionNameFromIR(User.first);
-      NewUR.file_path = getFilePathFromIR(User.first);
-      NewUR.src_code = getSrcCodeFromIR(User.first);
+      NewUR.Line = LineNr;
+      NewUR.FuncName = getFunctionNameFromIR(User.first);
+      NewUR.FilePath = getFilePathFromIR(User.first);
+      NewUR.SrcCode = getSrcCodeFromIR(User.first);
       if (!UR.empty()) {
         Results.push_back(UR);
       }
       UR = NewUR;
     }
     // add current IR trace
-    UR.ir_trace[User.first] = User.second;
+    UR.IrTrace[User.first] = User.second;
     // add (possibly) new variable names
     for (const auto *UndefV : User.second) {
       auto VarName = getVarNameFromIR(UndefV);
       if (!VarName.empty()) {
-        UR.var_names.push_back(VarName);
+        UR.VarNames.push_back(VarName);
       }
     }
   }
@@ -525,27 +525,27 @@ IFDSUninitializedVariables::aggregateResults() {
 }
 
 bool IFDSUninitializedVariables::UninitResult::empty() const {
-  return line == 0;
+  return Line == 0;
 }
 
 void IFDSUninitializedVariables::UninitResult::print(std::ostream &OS) {
   OS << "Variable(s): ";
-  if (!var_names.empty()) {
-    for (size_t I = 0; I < var_names.size(); ++I) {
-      OS << var_names[I];
-      if (I < var_names.size() - 1) {
+  if (!VarNames.empty()) {
+    for (size_t I = 0; I < VarNames.size(); ++I) {
+      OS << VarNames[I];
+      if (I < VarNames.size() - 1) {
         OS << ", ";
       }
     }
     OS << '\n';
   }
-  OS << "Line       : " << line << '\n';
-  OS << "Source code: " << src_code << '\n';
-  OS << "Function   : " << func_name << '\n';
-  OS << "File       : " << file_path << '\n';
+  OS << "Line       : " << Line << '\n';
+  OS << "Source code: " << SrcCode << '\n';
+  OS << "Function   : " << FuncName << '\n';
+  OS << "File       : " << FilePath << '\n';
   OS << "\nCorresponding IR Statements and uninit. Values\n";
-  if (!ir_trace.empty()) {
-    for (const auto &Trace : ir_trace) {
+  if (!IrTrace.empty()) {
+    for (const auto &Trace : IrTrace) {
       OS << "At IR Statement: " << llvmIRToString(Trace.first) << '\n';
       for (const auto *IRVal : Trace.second) {
         OS << "   Uninit Value: " << llvmIRToString(IRVal) << '\n';

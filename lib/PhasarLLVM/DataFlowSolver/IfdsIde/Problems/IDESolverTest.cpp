@@ -37,7 +37,7 @@ IDESolverTest::IDESolverTest(const ProjectIRDB *IRDB,
                              const LLVMBasedICFG *ICF, LLVMPointsToInfo *PT,
                              std::set<std::string> EntryPoints)
     : IDETabulationProblem(IRDB, TH, ICF, PT, std::move(EntryPoints)) {
-  IDETabulationProblem::ZeroValue = createZeroValue();
+  IDETabulationProblem::ZeroValue = createZeroValue(); //NOLINT
 }
 
 // start formulating our analysis by specifying the parts required for IFDS
@@ -90,7 +90,7 @@ IDESolverTest::d_t IDESolverTest::createZeroValue() const {
 }
 
 bool IDESolverTest::isZeroValue(IDESolverTest::d_t D) const {
-  return LLVMZeroValue::getInstance()->isLLVMZeroValue(D);
+  return LLVMZeroValue::getInstance()->isLLVMZeroValue(D); //NOLINT
 }
 
 // in addition provide specifications for the IDE parts

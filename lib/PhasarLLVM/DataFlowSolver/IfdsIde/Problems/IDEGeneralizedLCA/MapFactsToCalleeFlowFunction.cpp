@@ -34,14 +34,14 @@ MapFactsToCalleeFlowFunction::MapFactsToCalleeFlowFunction(
   }
 }
 std::set<const llvm::Value *>
-MapFactsToCalleeFlowFunction::computeTargets(const llvm::Value *Source) {
+MapFactsToCalleeFlowFunction::computeTargets(const llvm::Value *Source) { //NOLINT
   std::set<const llvm::Value *> Res;
   // Handle C-style varargs functions
   if (Callee->isVarArg()) {
     // Map actual parameter into corresponding formal parameter.
     for (unsigned Idx = 0; Idx < Actuals.size(); ++Idx) {
       if (Source == Actuals[Idx] ||
-          (LLVMZeroValue::getInstance()->isLLVMZeroValue(Source) &&
+          (LLVMZeroValue::getInstance()->isLLVMZeroValue(Source) && //NOLINT
            isConstant(Actuals[Idx]))) {
         if (Idx >= Callee->arg_size() && !Callee->isDeclaration()) {
           // Over-approximate by trying to add the
@@ -69,7 +69,7 @@ MapFactsToCalleeFlowFunction::computeTargets(const llvm::Value *Source) {
         }
       }
     }
-    if (LLVMZeroValue::getInstance()->isLLVMZeroValue(Source)) {
+    if (LLVMZeroValue::getInstance()->isLLVMZeroValue(Source)) { //NOLINT
       Res.insert(Source);
     }
     return Res;
@@ -78,12 +78,12 @@ MapFactsToCalleeFlowFunction::computeTargets(const llvm::Value *Source) {
   // Map actual parameter into corresponding formal parameter.
   for (unsigned Idx = 0; Idx < Actuals.size(); ++Idx) {
     if (Source == Actuals[Idx] ||
-        (LLVMZeroValue::getInstance()->isLLVMZeroValue(Source) &&
+        (LLVMZeroValue::getInstance()->isLLVMZeroValue(Source) && //NOLINT
          isConstant(Actuals[Idx]))) {
       Res.insert(Formals[Idx]); // corresponding formal
     }
   }
-  if (LLVMZeroValue::getInstance()->isLLVMZeroValue(Source)) {
+  if (LLVMZeroValue::getInstance()->isLLVMZeroValue(Source)) { //NOLINT
     Res.insert(Source);
   }
   return Res;

@@ -2,8 +2,8 @@
  * @author Sebastian Roland <seroland86@gmail.com>
  */
 
-#ifndef TRACESTATSWRITER_H
-#define TRACESTATSWRITER_H
+#ifndef PHASAR_PHASARLLVM_DATAFLOWSOLVER_IFDSIDE_IFDSFIELDSENSTAINTANALYSIS_STATS_TRACESTATSWRITER_H
+#define PHASAR_PHASARLLVM_DATAFLOWSOLVER_IFDSIDE_IFDSFIELDSENSTAINTANALYSIS_STATS_TRACESTATSWRITER_H
 
 #include "TraceStats.h"
 
@@ -11,26 +11,27 @@
 
 #include <fstream>
 #include <string>
+#include <utility>
 
 namespace psr {
 
 class TraceStatsWriter {
 public:
-  TraceStatsWriter(const TraceStats &_traceStats, const std::string _outFile)
-      : traceStats(_traceStats), outFile(_outFile) {}
+  TraceStatsWriter(const TraceStats &TraceStats, std::string  OutFile)
+      : TraceStats(TraceStats), OutFile(std::move(OutFile)) {}
   virtual ~TraceStatsWriter() = default;
 
   virtual void write() const = 0;
 
 protected:
-  const TraceStats &getTraceStats() const { return traceStats; }
-  const std::string getOutFile() const { return outFile; }
+  [[nodiscard]] const TraceStats &getTraceStats() const { return TraceStats; }
+  [[nodiscard]] std::string getOutFile() const { return OutFile; }
 
 private:
-  const TraceStats &traceStats;
-  const std::string outFile;
+  const TraceStats &TraceStats;
+  const std::string OutFile;
 };
 
 } // namespace psr
 
-#endif // TRACESTATSWRITER_H
+#endif // PHASAR_PHASARLLVM_DATAFLOWSOLVER_IFDSIDE_IFDSFIELDSENSTAINTANALYSIS_STATS_TRACESTATSWRITER_H

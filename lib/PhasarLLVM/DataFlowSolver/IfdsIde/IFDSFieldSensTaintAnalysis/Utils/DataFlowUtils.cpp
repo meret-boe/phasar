@@ -24,7 +24,7 @@
 
 using namespace psr;
 
-static const llvm::Value *PoisonPill = reinterpret_cast<const llvm::Value *>(
+static const llvm::Value *PoisonPill = reinterpret_cast<const llvm::Value *>( //NOLINT
     "all i need is a unique llvm::Value ptr...");
 
 static const std::vector<const llvm::Value *> EmptySeq;
@@ -194,7 +194,7 @@ getMemoryLocationSeqFromMatrRec(const llvm::Value *MemLocationPart) {
   if (const auto *const ConstExpr =
           llvm::dyn_cast<llvm::ConstantExpr>(MemLocationPart)) {
     MemLocationPart =
-        const_cast<llvm::ConstantExpr *>(ConstExpr)->getAsInstruction();
+        const_cast<llvm::ConstantExpr *>(ConstExpr)->getAsInstruction(); //NOLINT
   }
 
   std::vector<const llvm::Value *> MemLocationSeq;
@@ -272,7 +272,7 @@ normalizeGlobalGEPs(const std::vector<const llvm::Value *> &MemLocationSeq) {
                                              GepInst->idx_end());
 
     auto *SplittedGEPInst = llvm::GetElementPtrInst::CreateInBounds(
-        const_cast<llvm::Value *>(NormalizedMemLocationSeq.back()),
+        const_cast<llvm::Value *>(NormalizedMemLocationSeq.back()), //NOLINT
         {Indices[0], Indices[1]}, "gepsplit0");
     NormalizedMemLocationSeq.push_back(SplittedGEPInst);
 
@@ -286,7 +286,7 @@ normalizeGlobalGEPs(const std::vector<const llvm::Value *> &MemLocationSeq) {
       NameStream << "gepsplit" << (I - 1);
 
       SplittedGEPInst = llvm::GetElementPtrInst::CreateInBounds(
-          const_cast<llvm::Value *>(NormalizedMemLocationSeq.back()),
+          const_cast<llvm::Value *>(NormalizedMemLocationSeq.back()), //NOLINT
           {ConstantZero, Index}, NameStream.str());
       NormalizedMemLocationSeq.push_back(SplittedGEPInst);
     }
@@ -488,7 +488,7 @@ getVaListMemoryLocationSeq(const llvm::Value *Value) {
         return EmptySeq;
       }
 
-      return VaListMemLocationSeq;
+      return VaListMemLocationSeq; //NOLINT
     }
   }
 
@@ -585,7 +585,7 @@ bool DataFlowUtils::isPatchableArgumentMemcpy(
 
     return isSubsetMemoryLocationSeq(getVaListMemoryLocationSeqFromFact(Fact),
                                      SrcMemLocationSeq);
-  } else if (const auto *const BitCastInst =
+  } if (const auto *const BitCastInst =
                  llvm::dyn_cast<llvm::BitCastInst>(SrcValue)) {
     auto *const PointerOperand = BitCastInst->getOperand(0);
 
@@ -664,7 +664,7 @@ std::vector<const llvm::Value *> DataFlowUtils::patchMemoryLocationFrame(
 
 static long getNumCoercedArgs(const llvm::Value *Value) {
   if (const auto *const ConstExpr = llvm::dyn_cast<llvm::ConstantExpr>(Value)) {
-    Value = const_cast<llvm::ConstantExpr *>(ConstExpr)->getAsInstruction();
+    Value = const_cast<llvm::ConstantExpr *>(ConstExpr)->getAsInstruction(); //NOLINT
   }
 
   if (llvm::isa<llvm::AllocaInst>(Value) ||
@@ -692,10 +692,10 @@ static long getNumCoercedArgs(const llvm::Value *Value) {
     }
 
     return Ret;
-  } else if (const auto *const GepInst =
+  } if (const auto *const GepInst =
                  llvm::dyn_cast<llvm::GetElementPtrInst>(Value)) {
     return getNumCoercedArgs(GepInst->getPointerOperand());
-  } else if (const auto *const LoadInst =
+  } if (const auto *const LoadInst =
                  llvm::dyn_cast<llvm::LoadInst>(Value)) {
     return getNumCoercedArgs(LoadInst->getPointerOperand());
   }
@@ -796,7 +796,7 @@ const llvm::BasicBlock *
 DataFlowUtils::getEndOfTaintedBlock(const llvm::BasicBlock *StartBasicBlock) {
   const auto *const TerminatorInst = StartBasicBlock->getTerminator();
   auto *const Function =
-      const_cast<llvm::Function *>(StartBasicBlock->getParent());
+      const_cast<llvm::Function *>(StartBasicBlock->getParent()); //NOLINT
 
   bool IsBlockStatement = llvm::isa<llvm::BranchInst>(TerminatorInst) ||
                           llvm::isa<llvm::SwitchInst>(TerminatorInst);
@@ -966,16 +966,16 @@ bool DataFlowUtils::isArrayDecay(const llvm::Value *MemLocationMatr) {
   if (const auto *const ConstExpr =
           llvm::dyn_cast<llvm::ConstantExpr>(MemLocationMatr)) {
     MemLocationMatr =
-        const_cast<llvm::ConstantExpr *>(ConstExpr)->getAsInstruction();
+        const_cast<llvm::ConstantExpr *>(ConstExpr)->getAsInstruction(); //NOLINT
   }
 
   bool IsMemLocationFrame = isMemoryLocationFrame(MemLocationMatr);
   if (IsMemLocationFrame) {
     return false;
-  } else if (const auto *const CastInst =
+  } if (const auto *const CastInst =
                  llvm::dyn_cast<llvm::CastInst>(MemLocationMatr)) {
     return isArrayDecay(CastInst->getOperand(0));
-  } else if (const auto *const GepInst =
+  } if (const auto *const GepInst =
                  llvm::dyn_cast<llvm::GetElementPtrInst>(MemLocationMatr)) {
     bool IsSrcMemLocationArrayType =
         GepInst->getPointerOperandType()->getPointerElementType()->isArrayTy();
@@ -984,7 +984,7 @@ bool DataFlowUtils::isArrayDecay(const llvm::Value *MemLocationMatr) {
     }
 
     return false;
-  } else if (const auto *const LoadInst =
+  } if (const auto *const LoadInst =
                  llvm::dyn_cast<llvm::LoadInst>(MemLocationMatr)) {
     return false;
   }
@@ -1038,15 +1038,15 @@ static std::set<std::string> readFileFromEnvVar(const char *EnvVar) {
 
   const char *FilePath = std::getenv(EnvVar);
   if (!FilePath) {
-    LOG_INFO(EnvVar << " unset");
+    LOG_INFO(std::string(EnvVar) + " unset");
     return Lines;
-  } else {
-    LOG_INFO(EnvVar << " set to: " << FilePath);
-  }
+  } 
+       LOG_INFO(std::string(EnvVar) + " set to: " + std::string(FilePath));
+ 
 
   std::ifstream Fis(FilePath);
   if (Fis.fail()) {
-    LOG_INFO("Failed to read from: " << FilePath);
+    LOG_INFO("Failed to read from: " + std::string(FilePath));
     return Lines;
   }
 

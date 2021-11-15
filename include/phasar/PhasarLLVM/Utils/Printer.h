@@ -69,11 +69,11 @@ template <typename V> struct ValuePrinter {
   ValuePrinter &operator=(ValuePrinter &&) = delete;
   virtual ~ValuePrinter() = default;
 
-  virtual void printValue(std::ostream &Os, V V) const = 0;
+  virtual void printValue(std::ostream &Os, V Val) const = 0;
 
-  virtual std::string vtoString(V V) const {
+  virtual std::string vtoString(V Val) const {
     std::stringstream Ss;
-    printValue(Ss, V);
+    printValue(Ss, Val);
     return Ss.str();
   }
 };
@@ -86,11 +86,11 @@ template <typename T> struct TypePrinter {
   TypePrinter &operator=(TypePrinter &&) = delete;
   virtual ~TypePrinter() = default;
 
-  virtual void printType(std::ostream &Os, T T) const = 0;
+  virtual void printType(std::ostream &Os, T Type) const = 0;
 
-  virtual std::string ttoString(T T) const {
+  virtual std::string ttoString(T Type) const {
     std::stringstream Ss;
-    printType(Ss, T);
+    printType(Ss, Type);
     return Ss.str();
   }
 };

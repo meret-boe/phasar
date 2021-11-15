@@ -132,12 +132,11 @@ LLVMBasedCFG::getStartPointsOf(const llvm::Function *Fun) const {
   }
   if (!Fun->isDeclaration()) {
     return {&Fun->front().front()};
-  } else {
-    LOG_IF_ENABLE(BOOST_LOG_SEV(lg::get(), DEBUG)
-                  << "Could not get starting points of '"
-                  << Fun->getName().str() << "' because it is a declaration");
-    return {};
   }
+  LOG_IF_ENABLE(BOOST_LOG_SEV(lg::get(), DEBUG)
+                << "Could not get starting points of '"
+                << Fun->getName().str() << "' because it is a declaration");
+  return {};
 }
 
 std::set<const llvm::Instruction *>
@@ -147,12 +146,12 @@ LLVMBasedCFG::getExitPointsOf(const llvm::Function *Fun) const {
   }
   if (!Fun->isDeclaration()) {
     return {&Fun->back().back()};
-  } else {
-    LOG_IF_ENABLE(BOOST_LOG_SEV(lg::get(), DEBUG)
-                  << "Could not get exit points of '" << Fun->getName().str()
-                  << "' which is declaration!");
-    return {};
-  }
+  } 
+  LOG_IF_ENABLE(BOOST_LOG_SEV(lg::get(), DEBUG)
+                << "Could not get exit points of '" << Fun->getName().str()
+                << "' which is declaration!");
+  return {};
+
 }
 
 bool LLVMBasedCFG::isCallSite(const llvm::Instruction *Inst) const {
@@ -193,9 +192,8 @@ bool LLVMBasedCFG::isFallThroughSuccessor(const llvm::Instruction *Inst,
   if (const auto *B = llvm::dyn_cast<llvm::BranchInst>(Inst)) {
     if (B->isConditional()) {
       return &B->getSuccessor(1)->front() == Succ;
-    } else {
-      return &B->getSuccessor(0)->front() == Succ;
-    }
+    } 
+    return &B->getSuccessor(0)->front() == Succ;
   }
   return false;
 }
@@ -230,7 +228,7 @@ bool LLVMBasedCFG::isSpecialMemberFunction(const llvm::Function *Fun) const {
 }
 
 SpecialMemberFunctionType
-LLVMBasedCFG::getSpecialMemberFunctionType(const llvm::Function *Fun) const {
+LLVMBasedCFG::getSpecialMemberFunctionType(const llvm::Function *Fun) const { //NOLINT
   if (!Fun) {
     return SpecialMemberFunctionType::None;
   }
@@ -266,34 +264,32 @@ LLVMBasedCFG::getSpecialMemberFunctionType(const llvm::Function *Fun) const {
   // test if codes are in function name or type information
   bool NoName = true;
   for (auto Index : Found) {
-    for (auto C = FunctionName.begin(); C < FunctionName.begin() + Index.first;
-         ++C) {
+    for (const auto *C = FunctionName.begin(); C < FunctionName.begin() + Index.first;
+         ++C) { //NOLINT
       if (isdigit(*C)) {
         short I = 0;
-        while (isdigit(*(C + I))) {
+        while (isdigit(*(C + I))) { //NOLINT
           ++I;
         }
-        std::string ST(C, C + I);
+        std::string ST(C, C + I); //NOLINT
         if (Index.first <= std::distance(FunctionName.begin(), C) + stoul(ST)) {
           NoName = false;
           break;
-        } else {
-          C = C + *C;
-        }
+        } 
+        C = C + *C; //NOLINT
       }
     }
     if (NoName) {
       return Index.second;
-    } else {
-      NoName = true;
-    }
+    } 
+    NoName = true;
   }
   return SpecialMemberFunctionType::None;
 }
 
 string LLVMBasedCFG::getStatementId(const llvm::Instruction *Inst) const {
   return llvm::cast<llvm::MDString>(
-             Inst->getMetadata(PhasarConfig::MetaDataKind())->getOperand(0))
+             Inst->getMetadata(PhasarConfig::metaDataKind())->getOperand(0))
       ->getString()
       .str();
 }
@@ -311,7 +307,7 @@ void LLVMBasedCFG::print(const llvm::Function *F, std::ostream &OS) const {
   OS << llvmIRToString(F);
 }
 
-nlohmann::json LLVMBasedCFG::getAsJson(const llvm::Function *F) const {
+nlohmann::json LLVMBasedCFG::getAsJson(const llvm::Function * /*F*/) const {
   return "";
 }
 

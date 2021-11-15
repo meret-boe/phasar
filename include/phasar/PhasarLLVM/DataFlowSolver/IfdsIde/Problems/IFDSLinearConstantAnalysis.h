@@ -35,13 +35,13 @@ class LLVMPointsToInfo;
 
 // A small pair data type to encode data flow facts for this LCA
 struct LCAPair {
-  const llvm::Value *first;
-  int second;
+  const llvm::Value *First;
+  int Second;
   LCAPair();
-  LCAPair(const llvm::Value *V, int i);
-  friend bool operator==(const LCAPair &lhs, const LCAPair &rhs);
-  friend bool operator!=(const LCAPair &lhs, const LCAPair &rhs);
-  friend bool operator<(const LCAPair &lhs, const LCAPair &rhs);
+  LCAPair(const llvm::Value *V, int I);
+  friend bool operator==(const LCAPair &Lhs, const LCAPair &Rhs);
+  friend bool operator!=(const LCAPair &Lhs, const LCAPair &Rhs);
+  friend bool operator<(const LCAPair &Lhs, const LCAPair &Rhs);
 };
 
 } // namespace psr
@@ -49,7 +49,7 @@ struct LCAPair {
 // Specialize hash to be used in containers like std::unordered_map
 namespace std {
 template <> struct hash<psr::LCAPair> {
-  std::size_t operator()(const psr::LCAPair &k) const;
+  std::size_t operator()(const psr::LCAPair &K) const;
 };
 } // namespace std
 
@@ -69,31 +69,31 @@ public:
 
   ~IFDSLinearConstantAnalysis() override = default;
 
-  FlowFunctionPtrType getNormalFlowFunction(n_t curr, n_t succ) override;
+  FlowFunctionPtrType getNormalFlowFunction(n_t Curr, n_t Succ) override;
 
-  FlowFunctionPtrType getCallFlowFunction(n_t callSite, f_t destFun) override;
+  FlowFunctionPtrType getCallFlowFunction(n_t CallSite, f_t DestFun) override;
 
-  FlowFunctionPtrType getRetFlowFunction(n_t callSite, f_t calleeFun,
-                                         n_t exitInst, n_t retSite) override;
+  FlowFunctionPtrType getRetFlowFunction(n_t CallSite, f_t CalleeFun,
+                                         n_t ExitInst, n_t RetSite) override;
 
   FlowFunctionPtrType getCallToRetFlowFunction(
-      n_t callSite, n_t retSite,
-      std::set<IFDSLinearConstantAnalysis::f_t> callees) override;
+      n_t CallSite, n_t RetSite,
+      std::set<IFDSLinearConstantAnalysis::f_t> Callees) override;
 
-  FlowFunctionPtrType getSummaryFlowFunction(n_t callSite,
-                                             f_t destFun) override;
+  FlowFunctionPtrType getSummaryFlowFunction(n_t CallSite,
+                                             f_t DestFun) override;
 
   std::map<n_t, std::set<d_t>> initialSeeds() override;
 
-  d_t createZeroValue() const override;
+  [[nodiscard]] d_t createZeroValue() const override;
 
-  bool isZeroValue(d_t d) const override;
+  [[nodiscard]] bool isZeroValue(d_t D) const override;
 
-  void printNode(std::ostream &os, n_t n) const override;
+  void printNode(std::ostream &Os, n_t N) const override;
 
-  void printDataFlowFact(std::ostream &os, d_t d) const override;
+  void printDataFlowFact(std::ostream &Os, d_t D) const override;
 
-  void printFunction(std::ostream &os, f_t m) const override;
+  void printFunction(std::ostream &Os, f_t M) const override;
 };
 
 } // namespace psr

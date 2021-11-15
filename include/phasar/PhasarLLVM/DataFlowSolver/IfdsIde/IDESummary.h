@@ -15,7 +15,7 @@ namespace psr {
 // template <typename N, typename D, typename F, typename V, typename I>
 class IDESummary {
 public:
-  IDESummary() {}
+  IDESummary() = default;
 };
 } // namespace psr
 

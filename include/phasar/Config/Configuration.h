@@ -99,6 +99,8 @@ public:
   ~PhasarConfig() = default;
   PhasarConfig(const PhasarConfig &) = delete;
   PhasarConfig(PhasarConfig &&) = delete;
+  PhasarConfig& operator=(const PhasarConfig& Other);
+  PhasarConfig& operator=(PhasarConfig&& Other) noexcept;
 
 private:
   PhasarConfig();
@@ -112,7 +114,7 @@ private:
   /// Specifies the directory in which important configuration files are
   /// located.
   inline static const std::string ConfigurationDirectory = []() {
-    char *EnvHome = std::getenv("HOME");
+    char *EnvHome = std::getenv("HOME"); //NOLINT
     std::string ConfigFolder = "config/";
     if (EnvHome) { // Check if HOME was defined in the environment
       std::string PhasarConfig = std::string(EnvHome) + "/.config/phasar/";

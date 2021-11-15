@@ -67,10 +67,10 @@ private:
 
 public:
   /// PAMM is used as singleton.
-  PAMM(const PAMM &pm) = delete;
-  PAMM(PAMM &&pm) = delete;
-  PAMM &operator=(const PAMM &pm) = delete;
-  PAMM &operator=(PAMM &&pm) = delete;
+  PAMM(const PAMM &Pm) = delete;
+  PAMM(PAMM &&Pm) = delete;
+  PAMM &operator=(const PAMM &Pm) = delete;
+  PAMM &operator=(PAMM &&Pm) = delete;
 
   /**
    * @brief Returns a reference to the PAMM object (singleton) - associated
@@ -204,17 +204,17 @@ public:
                       const std::string &DataPointId,
                       unsigned long DataPointValue = 1);
 
-  void printTimers(std::ostream &os);
+  void printTimers(std::ostream &Os);
 
-  void printCounters(std::ostream &os);
+  void printCounters(std::ostream &Os);
 
-  void printHistograms(std::ostream &os);
+  void printHistograms(std::ostream &Os);
 
   /**
    * @brief Prints the measured data to the commandline - associated macro:
    * PRINT_MEASURED_DATA
    */
-  void printMeasuredData(std::ostream &os);
+  void printMeasuredData(std::ostream &Os);
 
   /**
    * @brief Exports the measured data to JSON - associated macro:

@@ -39,7 +39,7 @@ IFDSProtoAnalysis::IFDSProtoAnalysis(const ProjectIRDB *IRDB,
 
 IFDSProtoAnalysis::FlowFunctionPtrType
 IFDSProtoAnalysis::getNormalFlowFunction(IFDSProtoAnalysis::n_t Curr,
-                                         IFDSProtoAnalysis::n_t Succ) {
+                                         IFDSProtoAnalysis::n_t  /*Succ*/) {
   if (const auto *Store = llvm::dyn_cast<llvm::StoreInst>(Curr)) {
     return make_shared<Gen<IFDSProtoAnalysis::d_t>>(Store->getPointerOperand(),
                                                     getZeroValue());
@@ -48,27 +48,27 @@ IFDSProtoAnalysis::getNormalFlowFunction(IFDSProtoAnalysis::n_t Curr,
 }
 
 IFDSProtoAnalysis::FlowFunctionPtrType
-IFDSProtoAnalysis::getCallFlowFunction(IFDSProtoAnalysis::n_t CallSite,
-                                       IFDSProtoAnalysis::f_t DestFun) {
+IFDSProtoAnalysis::getCallFlowFunction(IFDSProtoAnalysis::n_t  /*CallSite*/,
+                                       IFDSProtoAnalysis::f_t  /*DestFun*/) {
   return Identity<IFDSProtoAnalysis::d_t>::getInstance();
 }
 
 IFDSProtoAnalysis::FlowFunctionPtrType IFDSProtoAnalysis::getRetFlowFunction(
-    IFDSProtoAnalysis::n_t CallSite, IFDSProtoAnalysis::f_t CalleeFun,
-    IFDSProtoAnalysis::n_t ExitSite, IFDSProtoAnalysis::n_t RetSite) {
+    IFDSProtoAnalysis::n_t  /*CallSite*/, IFDSProtoAnalysis::f_t /*CalleeFun*/,
+    IFDSProtoAnalysis::n_t  /*ExitInst*/, IFDSProtoAnalysis::n_t /*RetSite*/) {
   return Identity<IFDSProtoAnalysis::d_t>::getInstance();
 }
 
 IFDSProtoAnalysis::FlowFunctionPtrType
 IFDSProtoAnalysis::getCallToRetFlowFunction(
-    IFDSProtoAnalysis::n_t CallSite, IFDSProtoAnalysis::n_t RetSite,
-    set<IFDSProtoAnalysis::f_t> Callees) {
+    IFDSProtoAnalysis::n_t  /*CallSite*/, IFDSProtoAnalysis::n_t  /*RetSite*/,
+    set<IFDSProtoAnalysis::f_t>  /*Callees*/) {
   return Identity<IFDSProtoAnalysis::d_t>::getInstance();
 }
 
 IFDSProtoAnalysis::FlowFunctionPtrType
-IFDSProtoAnalysis::getSummaryFlowFunction(IFDSProtoAnalysis::n_t CallSite,
-                                          IFDSProtoAnalysis::f_t DestFun) {
+IFDSProtoAnalysis::getSummaryFlowFunction(IFDSProtoAnalysis::n_t  /*CallSite*/,
+                                          IFDSProtoAnalysis::f_t  /*DestFun*/) {
   return Identity<IFDSProtoAnalysis::d_t>::getInstance();
 }
 
@@ -89,7 +89,7 @@ IFDSProtoAnalysis::d_t IFDSProtoAnalysis::createZeroValue() const {
 }
 
 bool IFDSProtoAnalysis::isZeroValue(IFDSProtoAnalysis::d_t D) const {
-  return LLVMZeroValue::getInstance()->isLLVMZeroValue(D);
+  return LLVMZeroValue::getInstance()->isLLVMZeroValue(D); //NOLINT
 }
 
 void IFDSProtoAnalysis::printNode(ostream &OS, IFDSProtoAnalysis::n_t N) const {

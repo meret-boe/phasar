@@ -9,7 +9,7 @@ namespace psr {
 void LcovWriter::write() const {
   std::ofstream Writer(getOutFile());
 
-  LOG_INFO("Writing lcov trace to: " << getOutFile());
+  LOG_INFO("Writing lcov trace to: " + getOutFile());
 
   for (const auto &FileEntry : getTraceStats().getStats()) {
     const auto File = FileEntry.first;

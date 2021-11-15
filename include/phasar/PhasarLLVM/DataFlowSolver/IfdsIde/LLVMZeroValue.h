@@ -55,13 +55,14 @@ private:
             LLVMZeroValueInternalName) {
     setAlignment(llvm::MaybeAlign(4));
   }
-  static constexpr char LLVMZeroValueInternalName[] = "zero_value";
+  static constexpr char LLVMZeroValueInternalName[] = "zero_value"; //NOLINT
 
 public:
   LLVMZeroValue(const LLVMZeroValue &Z) = delete;
   LLVMZeroValue &operator=(const LLVMZeroValue &Z) = delete;
   LLVMZeroValue(LLVMZeroValue &&Z) = delete;
   LLVMZeroValue &operator=(LLVMZeroValue &&Z) = delete;
+  ~LLVMZeroValue();
 
   [[nodiscard]] static llvm::StringRef getName() {
     return LLVMZeroValueInternalName;
@@ -78,7 +79,7 @@ public:
 
   // Do not specify a destructor (at all)!
   static LLVMZeroValue *getInstance() {
-    static auto *Zv = new LLVMZeroValue;
+    static auto *Zv = new LLVMZeroValue; //NOLINT
     return Zv;
   }
 };

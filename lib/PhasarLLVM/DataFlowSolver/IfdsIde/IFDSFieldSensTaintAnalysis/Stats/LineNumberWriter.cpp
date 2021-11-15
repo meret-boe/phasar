@@ -9,7 +9,7 @@ namespace psr {
 void LineNumberWriter::write() const {
   std::ofstream Writer(getOutFile());
 
-  LOG_INFO("Writing line number trace to: " << getOutFile());
+  LOG_INFO("Writing line number trace to: " + getOutFile());
 
   for (const auto &FileEntry : getTraceStats().getStats()) {
     const auto FunctionStats = FileEntry.second;

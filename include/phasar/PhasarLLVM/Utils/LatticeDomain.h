@@ -22,20 +22,24 @@ namespace psr {
 /// the lattice.
 struct Top {};
 
+/*
 static inline std::ostream &operator<<(std::ostream &OS,
                                        [[maybe_unused]] const Top &T) {
   return OS << "Top";
 }
+*/
 
 /// Represents the supremum of the lattice:
 /// Bottom is the least element that is greater than or equal to all elements
 /// of the lattice.
 struct Bottom {};
 
+/*
 static inline std::ostream &operator<<(std::ostream &OS,
                                        [[maybe_unused]] const Bottom &B) {
   return OS << "Bottom";
 }
+*/
 
 /// A easy shorthand to construct a complete lattice of L.
 template <typename L> using LatticeDomain = std::variant<L, Top, Bottom>;

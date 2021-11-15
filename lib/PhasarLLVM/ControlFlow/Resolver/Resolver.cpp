@@ -44,7 +44,7 @@ int getVFTIndex(const llvm::CallBase *CallSite) {
     return -2;
   }
   if (auto *CI = llvm::dyn_cast<llvm::ConstantInt>(GEP->getOperand(1))) {
-    return CI->getZExtValue();
+    return CI->getZExtValue(); //NOLINT
   }
   return -3;
 }
@@ -77,7 +77,7 @@ Resolver::Resolver(ProjectIRDB &IRDB, LLVMTypeHierarchy &TH)
 
 const llvm::Function *
 Resolver::getNonPureVirtualVFTEntry(const llvm::StructType *T, unsigned Idx,
-                                    const llvm::CallBase *CallSite) {
+                                    const llvm::CallBase * /*CallSite*/) {
   if (TH && TH->hasVFTable(T)) {
     const auto *Target = TH->getVFTable(T)->getFunction(Idx);
     if (Target->getName() != "__cxa_pure_virtual") {

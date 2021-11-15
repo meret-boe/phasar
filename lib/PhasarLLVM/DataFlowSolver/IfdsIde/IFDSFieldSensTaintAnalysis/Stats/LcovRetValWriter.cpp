@@ -46,7 +46,7 @@ static void filterReturnValues(TraceStats::FileStats &FileStats) {
 void LcovRetValWriter::write() const {
   std::ofstream Writer(getOutFile());
 
-  LOG_INFO("Writing lcov return value trace to: " << getOutFile());
+  LOG_INFO("Writing lcov return value trace to: " + getOutFile());
 
   TraceStats::FileStats Stats = getTraceStats().getStats();
 

@@ -56,7 +56,7 @@ bool DTAResolver::heuristicAntiConstructorThisType(
   return true;
 }
 
-bool DTAResolver::heuristicAntiConstructorVtablePos(
+bool DTAResolver::heuristicAntiConstructorVtablePos( //NOLINT
     const llvm::BitCastInst *BitCast) {
   // Better heuristic than the previous one, can handle the CRTP. Based on the
   // previous one.
@@ -149,13 +149,13 @@ void DTAResolver::otherInst(const llvm::Instruction *Inst) {
 
     if (SrcStructType && DestStructType &&
         heuristicAntiConstructorVtablePos(BitCast)) {
-      typegraph.addLink(DestStructType, SrcStructType);
+      Typegraph.addLink(DestStructType, SrcStructType);
     }
   }
 }
 
 set<const llvm::Function *>
-DTAResolver::resolveVirtualCall(const llvm::CallBase *CallSite) {
+DTAResolver::resolveVirtualCall(const llvm::CallBase *CallSite) { //NOLINT
   set<const llvm::Function *> PossibleCallTargets;
 
   LOG_IF_ENABLE(BOOST_LOG_SEV(lg::get(), DEBUG)
@@ -176,7 +176,7 @@ DTAResolver::resolveVirtualCall(const llvm::CallBase *CallSite) {
 
   const auto *ReceiverType = getReceiverType(CallSite);
 
-  auto PossibleTypes = typegraph.getTypes(ReceiverType);
+  auto PossibleTypes = Typegraph.getTypes(ReceiverType);
 
   // WARNING We deactivated the check on allocated because it is
   // unabled to get the types allocated in the used libraries

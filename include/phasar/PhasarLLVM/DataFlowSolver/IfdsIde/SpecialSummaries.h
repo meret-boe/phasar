@@ -47,12 +47,12 @@ private:
   // flow functions.
   SpecialSummaries() {
     // insert default flow and edge functions
-    for (auto function_name :
+    for (auto FunctionName :
          PhasarConfig::getPhasarConfig().specialFunctionNames()) {
       SpecialFlowFunctions.insert(
-          std::make_pair(function_name, Identity<D>::getInstance()));
+          std::make_pair(FunctionName, Identity<D>::getInstance()));
       SpecialEdgeFunctions.insert(
-          std::make_pair(function_name, EdgeIdentity<V>::getInstance()));
+          std::make_pair(FunctionName, EdgeIdentity<V>::getInstance()));
     }
   }
 
@@ -64,62 +64,62 @@ public:
   ~SpecialSummaries() = default;
 
   static SpecialSummaries<D, V> &getInstance() {
-    static SpecialSummaries<D, V> instance;
-    return instance;
+    static SpecialSummaries<D, V> Instance;
+    return Instance;
   }
 
   // Returns true, when an existing function is overwritten, false otherwise.
-  bool provideSpecialSummary(const std::string &name,
-                             FlowFunctionPtrType flowfunction) {
-    bool Override = containsSpecialSummary(name);
-    SpecialFlowFunctions[name] = flowfunction;
+  bool provideSpecialSummary(const std::string &Name,
+                             FlowFunctionPtrType Flowfunction) {
+    bool Override = containsSpecialSummary(Name);
+    SpecialFlowFunctions[Name] = Flowfunction;
     return Override;
   }
 
   // Returns true, when an existing function is overwritten, false otherwise.
-  bool provideSpecialSummary(const std::string &name,
-                             FlowFunctionPtrType flowfunction,
-                             std::shared_ptr<EdgeFunction<V>> edgefunction) {
-    bool Override = containsSpecialSummary(name);
-    SpecialFlowFunctions[name] = flowfunction;
-    SpecialEdgeFunctions[name] = edgefunction;
+  bool provideSpecialSummary(const std::string &Name,
+                             FlowFunctionPtrType Flowfunction,
+                             std::shared_ptr<EdgeFunction<V>> Edgefunction) {
+    bool Override = containsSpecialSummary(Name);
+    SpecialFlowFunctions[Name] = Flowfunction;
+    SpecialEdgeFunctions[Name] = Edgefunction;
     return Override;
   }
 
-  bool containsSpecialSummary(const llvm::Function *function) {
-    return containsSpecialSummary(function->getName().str());
+  bool containsSpecialSummary(const llvm::Function *Function) {
+    return containsSpecialSummary(Function->getName().str());
   }
 
-  bool containsSpecialSummary(const std::string &name) {
-    return SpecialFlowFunctions.count(name);
+  bool containsSpecialSummary(const std::string &Name) {
+    return SpecialFlowFunctions.count(Name);
   }
 
   FlowFunctionPtrType
-  getSpecialFlowFunctionSummary(const llvm::Function *function) {
-    return getSpecialFlowFunctionSummary(function->getName().str());
+  getSpecialFlowFunctionSummary(const llvm::Function *Function) {
+    return getSpecialFlowFunctionSummary(Function->getName().str());
   }
 
-  FlowFunctionPtrType getSpecialFlowFunctionSummary(const std::string &name) {
-    return SpecialFlowFunctions[name];
-  }
-
-  std::shared_ptr<EdgeFunction<V>>
-  getSpecialEdgeFunctionSummary(const llvm::Function *function) {
-    return getSpecialEdgeFunctionSummary(function->getName().str());
+  FlowFunctionPtrType getSpecialFlowFunctionSummary(const std::string &Name) {
+    return SpecialFlowFunctions[Name];
   }
 
   std::shared_ptr<EdgeFunction<V>>
-  getSpecialEdgeFunctionSummary(const std::string &name) {
-    return SpecialEdgeFunctions[name];
+  getSpecialEdgeFunctionSummary(const llvm::Function *Function) {
+    return getSpecialEdgeFunctionSummary(Function->getName().str());
   }
 
-  friend std::ostream &operator<<(std::ostream &os,
-                                  const SpecialSummaries<D> &ss) {
-    os << "SpecialSummaries:\n";
-    for (auto &entry : ss.SpecialFunctionNames) {
-      os << entry.first << " ";
+  std::shared_ptr<EdgeFunction<V>>
+  getSpecialEdgeFunctionSummary(const std::string &Name) {
+    return SpecialEdgeFunctions[Name];
+  }
+
+  friend std::ostream &operator<<(std::ostream &Os,
+                                  const SpecialSummaries<D> &Ss) {
+    Os << "SpecialSummaries:\n";
+    for (auto &Entry : Ss.SpecialFunctionNames) {
+      Os << Entry.first << " ";
     }
-    return os;
+    return Os;
   }
 };
 } // namespace psr

@@ -43,7 +43,7 @@ OTFResolver::OTFResolver(ProjectIRDB &IRDB, LLVMTypeHierarchy &TH,
 
 void OTFResolver::preCall(const llvm::Instruction *Inst) {}
 
-void OTFResolver::handlePossibleTargets(
+void OTFResolver::handlePossibleTargets( //NOLINT
     const llvm::CallBase *CallSite,
     std::set<const llvm::Function *> &CalleeTargets) {
   // if we have no inter-procedural points-to information, use call-graph
@@ -103,8 +103,6 @@ OTFResolver::resolveVirtualCall(const llvm::CallBase *CallSite) {
   auto AllocSites = PT.getReachableAllocationSites(Receiver);
   auto PossibleAllocatedTypes = getReachableTypes(*AllocSites);
 
-  const auto *ReceiverType = getReceiverType(CallSite);
-
   // Now we must check if we have found some allocated struct types
   set<const llvm::StructType *> PossibleTypes;
   for (const auto *Type : PossibleAllocatedTypes) {
@@ -129,7 +127,7 @@ OTFResolver::resolveVirtualCall(const llvm::CallBase *CallSite) {
 }
 
 std::set<const llvm::Function *>
-OTFResolver::resolveFunctionPointer(const llvm::CallBase *CallSite) {
+OTFResolver::resolveFunctionPointer(const llvm::CallBase *CallSite) { //NOLINT
   std::set<const llvm::Function *> Callees;
   if (CallSite->getCalledOperand() &&
       CallSite->getCalledOperand()->getType()->isPointerTy()) {
@@ -241,7 +239,7 @@ std::set<const llvm::Type *> OTFResolver::getReachableTypes(
 }
 
 std::vector<std::pair<const llvm::Value *, const llvm::Value *>>
-OTFResolver::getActualFormalPointerPairs(const llvm::CallBase *CallSite,
+OTFResolver::getActualFormalPointerPairs(const llvm::CallBase *CallSite, //NOLINT
                                          const llvm::Function *CalleeTarget) {
   std::vector<std::pair<const llvm::Value *, const llvm::Value *>> Pairs;
   // ordinary case
