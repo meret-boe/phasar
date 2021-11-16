@@ -115,7 +115,7 @@ private:
   const L TopElement;
 
 public:
-  AllTop(L TopElement) : TopElement(TopElement) {}
+  AllTop(L TopElement) : TopElement(std::move(TopElement)) {}
 
   ~AllTop() override = default;
 
@@ -131,7 +131,7 @@ public:
 
   bool equalTo(EdgeFunctionPtrType Other) const override {
     if (auto *Alltop = dynamic_cast<AllTop<L> *>(Other.get())) {
-      return (Alltop->topElement == TopElement);
+      return (Alltop->TopElement == TopElement);
     }
     return false;
   }

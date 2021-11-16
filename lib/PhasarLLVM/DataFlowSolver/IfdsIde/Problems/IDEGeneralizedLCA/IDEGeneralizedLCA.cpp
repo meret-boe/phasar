@@ -38,7 +38,7 @@ namespace psr {
 
 inline std::shared_ptr<FlowFunction<IDEGeneralizedLCA::d_t>>
 flow(std::function<std::set<IDEGeneralizedLCA::d_t>(IDEGeneralizedLCA::d_t)>
-         Fn) {
+         Fn) { //NOLINT
   return std::make_shared<LambdaFlow<IDEGeneralizedLCA::d_t>>(Fn);
 }
 

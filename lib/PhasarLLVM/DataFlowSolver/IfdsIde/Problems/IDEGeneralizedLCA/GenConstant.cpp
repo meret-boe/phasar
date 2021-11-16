@@ -16,7 +16,7 @@
 
 namespace psr {
 
-GenConstant::GenConstant(const IDEGeneralizedLCA::l_t &Val, size_t MaxSize)
+GenConstant::GenConstant(const IDEGeneralizedLCA::l_t &Val, size_t MaxSize) //NOLINT
     : Val(Val), MaxSize(MaxSize) {
   // TODO: remove this?
   /*std::cout << "GenConstant: {";

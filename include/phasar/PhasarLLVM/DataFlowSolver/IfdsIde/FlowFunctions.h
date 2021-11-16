@@ -88,7 +88,7 @@ public:
   using typename FlowFunction<D, Container>::container_type;
 
   LambdaFlow(std::function<container_type(D)> F) : Flow(std::move(F)) {}
-  virtual ~LambdaFlow() = default;
+  ~LambdaFlow() override = default;
   container_type computeTargets(D Source) override { return Flow(Source); }
 
 private:
@@ -154,7 +154,7 @@ protected:
 
 public:
   Gen(D GenValue, D ZeroValue) : GenValue(GenValue), ZeroValue(ZeroValue) {}
-  virtual ~Gen() = default;
+  ~Gen() override = default;
 
   container_type computeTargets(D Source) override {
     if (Source == ZeroValue) {
@@ -179,7 +179,7 @@ public:
   GenIf(container_type GenValues, std::function<bool(D)> Predicate)
       : GenValues(std::move(GenValues)), Predicate(Predicate) {}
 
-  virtual ~GenIf() = default;
+  ~GenIf() override = default;
 
   container_type computeTargets(D Source) override {
     if (Predicate(Source)) {
@@ -281,7 +281,7 @@ class KillAll : public FlowFunction<D, Container> {
 public:
   using typename FlowFunction<D, Container>::container_type;
 
-  virtual ~KillAll() = default;
+  ~KillAll() override = default;
   KillAll(const KillAll &K) = delete;
   KillAll &operator=(const KillAll &K) = delete;
   container_type computeTargets(D  /*Source*/) override { return container_type(); }

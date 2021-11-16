@@ -22,10 +22,12 @@ public:
   virtual void print(std::ostream &Os) const = 0;
 };
 
+/*
 static inline std::ostream &operator<<(std::ostream &OS, const EdgeFact &E) {
   E.print(OS);
   return OS;
 }
+*/
 
 } // namespace psr
 

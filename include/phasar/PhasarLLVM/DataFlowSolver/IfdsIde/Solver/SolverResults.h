@@ -66,7 +66,7 @@ public:
     return KeySet;
   }
 
-  std::vector<typename Table<N, D, L>::Cell> getAllResultEntries() const {
+  [[nodiscard]] std::vector<typename Table<N, D, L>::Cell> getAllResultEntries() const {
     return Results.cellVec();
   }
 };
