@@ -174,7 +174,7 @@ public:
   using typename FlowFunction<D, Container>::container_type;
 
   GenIf(D GenValue, std::function<bool(D)> Predicate)
-      : GenValues({GenValue}), Predicate(Predicate) {}
+      : GenValues({GenValue}), Predicate(std::move(Predicate)) {}
 
   GenIf(container_type GenValues, std::function<bool(D)> Predicate)
       : GenValues(std::move(GenValues)), Predicate(Predicate) {}
@@ -202,8 +202,8 @@ public:
   using typename FlowFunction<D, Container>::container_type;
 
   GenAll(container_type GenValues, D ZeroValue)
-      : GenValues(GenValues), ZeroValue(ZeroValue) {}
-  virtual ~GenAll() = default;
+      : GenValues(std::move(GenValues)), ZeroValue(ZeroValue) {}
+  ~GenAll() override = default;
   container_type computeTargets(D Source) override {
     if (Source == ZeroValue) {
       GenValues.insert(Source);
@@ -245,8 +245,8 @@ class KillIf : public FlowFunction<D, Container> {
 public:
   using typename FlowFunction<D, Container>::container_type;
 
-  KillIf(std::function<bool(D)> Predicate) : Predicate(Predicate) {}
-  virtual ~KillIf() = default;
+  KillIf(std::function<bool(D)> Predicate) : Predicate(std::move(Predicate)) {}
+  ~KillIf() override = default;
   container_type computeTargets(D Source) override {
     if (Predicate(Source)) {
       return {};
@@ -263,8 +263,8 @@ class KillMultiple : public FlowFunction<D, Container> {
 public:
   using typename FlowFunction<D, Container>::container_type;
 
-  KillMultiple(std::set<D> KillValues) : KillValues(KillValues) {}
-  virtual ~KillMultiple() = default;
+  KillMultiple(std::set<D> KillValues) : KillValues(std::move(KillValues)) {}
+  ~KillMultiple() override = default;
   container_type computeTargets(D Source) override {
     if (KillValues.find(Source) != KillValues.end()) {
       return {};

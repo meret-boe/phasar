@@ -7,8 +7,8 @@
  *     Philipp Schubert and others
  *****************************************************************************/
 
-#ifndef PHASAR_PHASARLLVM_IFDSIDE_PROBLEMS_TYPESTATEDESCRIPTIONS_CSTDFILEIOTYPESTATEDESCRIPTION_H_
-#define PHASAR_PHASARLLVM_IFDSIDE_PROBLEMS_TYPESTATEDESCRIPTIONS_CSTDFILEIOTYPESTATEDESCRIPTION_H_
+#ifndef PHASAR_PHASARLLVM_DATAFLOWSOLVER_IFDSIDE_PROBLEMS_TYPESTATEDESCRIPTIONS_CSTDFILEIOTYPESTATEDESCRIPTION_H
+#define PHASAR_PHASARLLVM_DATAFLOWSOLVER_IFDSIDE_PROBLEMS_TYPESTATEDESCRIPTIONS_CSTDFILEIOTYPESTATEDESCRIPTION_H
 
 #include <map>
 #include <set>
@@ -51,24 +51,24 @@ private:
 
   static const std::map<std::string, std::set<int>> StdFileIOFuncs;
   // delta matrix to implement the state machine's delta function
-  static const CSTDFILEIOState Delta[3][5];
+  static const CSTDFILEIOState Delta[3][5]; //NOLINT
   static CSTDFILEIOToken funcNameToToken(const std::string &F);
 
 public:
-  bool isFactoryFunction(const std::string &F) const override;
-  bool isConsumingFunction(const std::string &F) const override;
-  bool isAPIFunction(const std::string &F) const override;
-  TypeStateDescription::State
+  [[nodiscard]] bool isFactoryFunction(const std::string &F) const override;
+  [[nodiscard]] bool isConsumingFunction(const std::string &F) const override;
+  [[nodiscard]] bool isAPIFunction(const std::string &F) const override;
+  [[nodiscard]] TypeStateDescription::State
   getNextState(std::string Tok, TypeStateDescription::State S) const override;
-  std::string getTypeNameOfInterest() const override;
-  std::set<int> getConsumerParamIdx(const std::string &F) const override;
-  std::set<int> getFactoryParamIdx(const std::string &F) const override;
-  std::string stateToString(TypeStateDescription::State S) const override;
-  TypeStateDescription::State bottom() const override;
-  TypeStateDescription::State top() const override;
-  TypeStateDescription::State uninit() const override;
-  TypeStateDescription::State start() const override;
-  TypeStateDescription::State error() const override;
+  [[nodiscard]] std::string getTypeNameOfInterest() const override;
+  [[nodiscard]] std::set<int> getConsumerParamIdx(const std::string &F) const override;
+  [[nodiscard]] std::set<int> getFactoryParamIdx(const std::string &F) const override;
+  [[nodiscard]] std::string stateToString(TypeStateDescription::State S) const override;
+  [[nodiscard]] TypeStateDescription::State bottom() const override;
+  [[nodiscard]] TypeStateDescription::State top() const override;
+  [[nodiscard]] TypeStateDescription::State uninit() const override;
+  [[nodiscard]] TypeStateDescription::State start() const override;
+  [[nodiscard]] TypeStateDescription::State error() const override;
 };
 
 } // namespace psr

@@ -29,201 +29,203 @@ namespace psr {
 
 class DOTConfig {
 public:
-  static const std::string CFNodeAttr() { return CFNode; }
-  static const std::string CFIntraEdgeAttr() { return CFIntraEdge; }
-  static const std::string CFInterEdgeAttr() { return CFInterEdge; }
+  static  std::string cfNodeAttr() { return CFNode; }
+  static  std::string cfIntraEdgeAttr() { return CFIntraEdge; }
+  static  std::string cfInterEdgeAttr() { return CFInterEdge; }
 
-  static const std::string FactNodeAttr() { return FactNode; }
-  static const std::string FactIDEdgeAttr() { return FactIDEdge; }
-  static const std::string FactCrossEdgeAttr() { return FactCrossEdge; }
-  static const std::string FactInterEdgeAttr() { return FactInterEdge; }
+  static  std::string factNodeAttr() { return FactNode; }
+  static  std::string factIdEdgeAttr() { return FactIDEdge; }
+  static  std::string factCrossEdgeAttr() { return FactCrossEdge; }
+  static  std::string factInterEdgeAttr() { return FactInterEdge; }
 
-  static const std::string LambdaNodeAttr() { return LambdaNode; }
-  static const std::string LambdaIDEdgeAttr() { return LambdaIDEdge; }
-  static const std::string LambdaInterEdgeAttr() { return LambdaInterEdge; }
+  static  std::string lambdaNodeAttr() { return LambdaNode; }
+  static  std::string lambdaIdEdgeAttr() { return LambdaIDEdge; }
+  static  std::string lambdaInterEdgeAttr() { return LambdaInterEdge; }
 
   static void
-  importDOTConfig(std::string ConfigPath = PhasarConfig::PhasarDirectory());
+  importDOTConfig(std::string ConfigPath = PhasarConfig::phasarDirectory());
 
   static DOTConfig &getDOTConfig();
   ~DOTConfig() = default;
   DOTConfig(const DOTConfig &) = delete;
   DOTConfig(DOTConfig &&) = delete;
+  DOTConfig& operator=(DOTConfig Other);
+  DOTConfig& operator=(DOTConfig&& Other) noexcept;
 
 private:
   DOTConfig() = default;
-  inline static const std::string fontSize = "fontsize=11";
-  inline static const std::string arrowSize = "arrowsize=0.7";
+  inline static const std::string FontSize = "fontsize=11";
+  inline static const std::string ArrowSize = "arrowsize=0.7";
 
-  inline static std::string CFNode = "node [style=filled, shape=record]";
-  inline static std::string CFIntraEdge = "edge []";
-  inline static std::string CFInterEdge = "edge [weight=0.1]";
-  inline static std::string FactNode = "node [style=rounded]";
-  inline static std::string FactIDEdge =
-      "edge [style=dotted, arrowhead=normal, " + fontSize + ", " + arrowSize +
+  inline static std::string CFNode = "node [style=filled, shape=record]"; //NOLINT
+  inline static std::string CFIntraEdge = "Edge []";                      //NOLINT
+  inline static std::string CFInterEdge = "Edge [weight=0.1]";            //NOLINT
+  inline static std::string FactNode = "node [style=rounded]";            //NOLINT
+  inline static std::string FactIDEdge =                                  //NOLINT
+      "Edge [style=dotted, arrowhead=normal, " + FontSize + ", " + ArrowSize +
       ']';
-  inline static std::string FactCrossEdge =
-      "edge [style=dotted, arrowhead=normal, " + fontSize + ", " + arrowSize +
+  inline static std::string FactCrossEdge =                               //NOLINT
+      "Edge [style=dotted, arrowhead=normal, " + FontSize + ", " + ArrowSize +
       ']';
-  inline static std::string FactInterEdge =
-      "edge [weight=0.1, style=dashed, " + fontSize + ", " + arrowSize + ']';
-  inline static std::string LambdaNode = "node [style=rounded]";
-  inline static std::string LambdaIDEdge =
-      "edge [style=dotted, arrowhead=normal, " + fontSize + ", " + arrowSize +
+  inline static std::string FactInterEdge =                               //NOLINT
+      "Edge [weight=0.1, style=dashed, " + FontSize + ", " + ArrowSize + ']';
+  inline static std::string LambdaNode = "node [style=rounded]";          //NOLINT
+  inline static std::string LambdaIDEdge =                                //NOLINT
+      "Edge [style=dotted, arrowhead=normal, " + FontSize + ", " + ArrowSize +
       ']';
-  inline static std::string LambdaInterEdge =
-      "edge [weight=0.1, style=dashed, " + fontSize + ", " + arrowSize + ']';
+  inline static std::string LambdaInterEdge =                             //NOLINT
+      "Edge [weight=0.1, style=dashed, " + FontSize + ", " + ArrowSize + ']';
 };
 
 struct DOTNode {
-  /* stmt id = <func-name>_<stmt-id>
-   * e.g. foo_42 for the statement w/ id 42 in function foo
+  /* stmt Id = <func-name>_<stmt-Id>
+   * e.g. foo_42 for the statement w/ Id 42 in function foo
    *
-   * fact id = <func-name>_<fact-id>_<stmt-id>
+   * fact Id = <func-name>_<fact-Id>_<stmt-Id>
    * e.g. fact i in main valid at statement 3 : main_1_3
    * Note that in this example fact i is the very first valid fact
-   * encountered so the fact-id is 1 (zero value has fact-id 0)
+   * encountered so the fact-Id is 1 (zero value has fact-Id 0)
    */
-  std::string id;
-  std::string funcName;
-  std::string label;
-  std::string stmtId;
-  unsigned factId;
-  bool isVisible = true;
+  std::string Id;
+  std::string FuncName;
+  std::string Label;
+  std::string StmtId;
+  unsigned FactId{};
+  bool IsVisible = true;
 
   DOTNode() = default;
-  DOTNode(std::string fName, std::string l, std::string sId, unsigned fId = 0,
-          bool isStmt = true, bool isv = true);
-  std::string str(const std::string &indent = "") const;
+  DOTNode(std::string FName, std::string L, std::string SId, unsigned FId = 0,
+          bool IsStmt = true, bool Isv = true);
+  [[nodiscard]] std::string str(const std::string &Indent = "") const;
 };
 
-bool operator<(const DOTNode &lhs, const DOTNode &rhs);
-bool operator==(const DOTNode &lhs, const DOTNode &rhs);
-std::ostream &operator<<(std::ostream &os, const DOTNode &node);
+bool operator<(const DOTNode &Lhs, const DOTNode &Rhs);
+bool operator==(const DOTNode &Lhs, const DOTNode &Rhs);
+std::ostream &operator<<(std::ostream &Os, const DOTNode &Node);
 
 struct DOTEdge {
-  DOTNode source;
-  DOTNode target;
-  bool isVisible;
-  std::string edgeFnLabel;
-  std::string valueLabel;
+  DOTNode Source;
+  DOTNode Target;
+  bool IsVisible;
+  std::string EdgeFnLabel;
+  std::string ValueLabel;
 
-  DOTEdge(DOTNode src, DOTNode tar, bool isv = true, std::string efl = "",
-          std::string vl = "");
-  std::string str(const std::string &indent = "") const;
+  DOTEdge(DOTNode Src, DOTNode Tar, bool Isv = true, std::string Efl = "",
+          std::string Vl = "");
+  [[nodiscard]] std::string str(const std::string &Indent = "") const;
 };
 
-bool operator<(const DOTEdge &lhs, const DOTEdge &rhs);
-std::ostream &operator<<(std::ostream &os, const DOTEdge &edge);
+bool operator<(const DOTEdge &Lhs, const DOTEdge &Rhs);
+std::ostream &operator<<(std::ostream &Os, const DOTEdge &Edge);
 
 struct DOTFactSubGraph {
-  // fact subgraph id = <func-name>_<fact-id>
-  std::string id;
-  unsigned factId;
-  std::string label;
-  // stmt-id -> fact-node
-  std::map<std::string, DOTNode, stringIDLess> nodes;
-  std::set<DOTEdge> edges;
+  // fact subgraph Id = <func-name>_<fact-Id>
+  std::string Id;
+  unsigned FactId;
+  std::string Label;
+  // stmt-Id -> fact-node
+  std::map<std::string, DOTNode, StringIdLess> Nodes;
+  std::set<DOTEdge> Edges;
 
-  std::string str(const std::string &indent = "") const;
+  [[nodiscard]] std::string str(const std::string &Indent = "") const;
 };
 
-std::ostream &operator<<(std::ostream &os, const DOTFactSubGraph &factSG);
+std::ostream &operator<<(std::ostream &Os, const DOTFactSubGraph &FactSg);
 
 struct DOTFunctionSubGraph {
-  // function subgraph id = <func-name>
-  std::string id;
-  std::set<DOTNode> stmts;
-  // fact-id -> fact-subgraph
-  std::map<unsigned, DOTFactSubGraph> facts;
-  std::set<DOTEdge> intraCFEdges;
+  // function subgraph Id = <func-name>
+  std::string Id;
+  std::set<DOTNode> Stmts;
+  // fact-Id -> fact-subgraph
+  std::map<unsigned, DOTFactSubGraph> Facts;
+  std::set<DOTEdge> IntraCfEdges;
   /// d1 -> d2 where d1 != d2
-  std::set<DOTEdge> crossFactEdges;
+  std::set<DOTEdge> CrossFactEdges;
 
-  std::string str(const std::string &indent = "") const;
-  DOTFactSubGraph *getOrCreateFactSG(unsigned factID, std::string &label);
+  [[nodiscard]] std::string str(const std::string &Indent = "") const;
+  DOTFactSubGraph *getOrCreateFactSG(unsigned FactId, std::string &Label);
   // TODO: pass the actual lambda EF name and value as parameter from DOTGraph
-  std::string generateLambdaSG(const std::string &indent = "") const;
+  [[nodiscard]] std::string generateLambdaSG(const std::string &Indent = "") const;
   void createLayoutCFNodes();
   void createLayoutFactNodes();
   void createLayoutFactEdges();
 };
 
-std::ostream &operator<<(std::ostream &os,
-                         const DOTFunctionSubGraph &functionSG);
+std::ostream &operator<<(std::ostream &Os,
+                         const DOTFunctionSubGraph &FunctionSg);
 
 template <typename D> struct DOTGraph {
-  std::string label;
-  std::map<std::string, DOTFunctionSubGraph> functions;
-  std::set<DOTEdge> interCFEdges;
-  std::set<DOTEdge> interLambdaEdges;
-  std::set<DOTEdge> interFactEdges;
+  std::string Label;
+  std::map<std::string, DOTFunctionSubGraph> Functions;
+  std::set<DOTEdge> InterCfEdges;
+  std::set<DOTEdge> InterLambdaEdges;
+  std::set<DOTEdge> InterFactEdges;
 
   DOTGraph() = default;
 
-  unsigned getFactID(D fact) {
-    unsigned id = 0;
-    if (DtoFactId.count(fact)) {
-      id = DtoFactId[fact];
+  unsigned getFactID(D Fact) {
+    unsigned Id = 0;
+    if (DtoFactId.count(Fact)) {
+      Id = DtoFactId[Fact];
     } else {
-      id = factIDCount;
-      DtoFactId[fact] = factIDCount++;
+      Id = FactIdCount;
+      DtoFactId[Fact] = FactIdCount++;
     }
-    return id;
+    return Id;
   }
 
-  bool containsFactSG(std::string fName, unsigned factID) {
-    if (functions.count(fName)) {
-      if (functions[fName].facts.count(factID)) {
+  bool containsFactSG(const std::string& FName, unsigned FactId) {
+    if (Functions.count(FName)) {
+      if (Functions[FName].Facts.count(FactId)) {
         return true;
       }
     }
     return false;
   }
 
-  std::string str() const {
-    std::string indent = "  ";
-    std::string str = "digraph {\n" + indent + "label=\"" + label + "\"\n";
+  [[nodiscard]] std::string str() const {
+    std::string Indent = "  ";
+    std::string Str = "digraph {\n" + Indent + "label=\"" + Label + "\"\n";
     // Print function subgraphs
-    str += '\n' + indent + "// Function sub graphs\n";
-    for (auto fsg : functions) {
-      fsg.second.createLayoutCFNodes();
-      fsg.second.createLayoutFactNodes();
-      fsg.second.createLayoutFactEdges();
-      str += fsg.second.str(indent) + "\n\n";
+    Str += '\n' + Indent + "// Function sub graphs\n";
+    for (auto Fsg : Functions) {
+      Fsg.second.createLayoutCFNodes();
+      Fsg.second.createLayoutFactNodes();
+      Fsg.second.createLayoutFactEdges();
+      Str += Fsg.second.str(Indent) + "\n\n";
     }
 
-    // Print inter control flow edges
-    str += indent + "// Inter-procedural control flow edges\n" + indent +
-           DOTConfig::CFInterEdgeAttr() + '\n';
-    for (DOTEdge e : interCFEdges) {
-      str += e.str(indent) + '\n';
+    // Print inter control flow Edges
+    Str += Indent + "// Inter-procedural control flow Edges\n" + Indent +
+           DOTConfig::cfInterEdgeAttr() + '\n';
+    for (const DOTEdge& E : InterCfEdges) {
+      Str += E.str(Indent) + '\n';
     }
 
-    // Print inter lambda edges
-    str += '\n' + indent + "// Inter-procedural lambda edges\n" + indent +
-           DOTConfig::LambdaInterEdgeAttr() + '\n';
-    for (DOTEdge e : interLambdaEdges) {
-      str += e.str(indent) + '\n';
+    // Print inter lambda Edges
+    Str += '\n' + Indent + "// Inter-procedural lambda Edges\n" + Indent +
+           DOTConfig::lambdaInterEdgeAttr() + '\n';
+    for (const DOTEdge& E : InterLambdaEdges) {
+      Str += E.str(Indent) + '\n';
     }
 
-    // Print inter fact edges
-    str += '\n' + indent + "// Inter-procedural fact edges\n" + indent +
-           DOTConfig::FactInterEdgeAttr() + '\n';
-    for (DOTEdge e : interFactEdges) {
-      str += e.str(indent) + '\n';
+    // Print inter fact Edges
+    Str += '\n' + Indent + "// Inter-procedural fact Edges\n" + Indent +
+           DOTConfig::factInterEdgeAttr() + '\n';
+    for (const DOTEdge& E : InterFactEdges) {
+      Str += E.str(Indent) + '\n';
     }
-    return str + '}';
+    return Str + '}';
   }
 
-  friend std::ostream &operator<<(std::ostream &os, const DOTGraph<D> &graph) {
-    return os << graph.str();
+  friend std::ostream &operator<<(std::ostream &Os, const DOTGraph<D> &Graph) {
+    return Os << Graph.str();
   }
 
 private:
   // We introduce a fact-ID for data-flow facts D since only statements N have
   // an ID
-  unsigned factIDCount = 1;
+  unsigned FactIdCount = 1;
   std::map<D, unsigned> DtoFactId;
 };
 

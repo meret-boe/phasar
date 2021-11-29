@@ -369,8 +369,8 @@ protected:
 
 public:
   StrongUpdateStore(const llvm::StoreInst *S, std::function<bool(D)> P)
-      : Store(S), Predicate(P) {}
-  virtual ~StrongUpdateStore() = default;
+      : Store(S), Predicate(std::move(P)) {}
+  ~StrongUpdateStore() override = default;
 
   std::set<D> computeTargets(D Source) override {
     if (Source == Store->getPointerOperand()) {

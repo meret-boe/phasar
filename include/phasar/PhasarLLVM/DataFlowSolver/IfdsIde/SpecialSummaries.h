@@ -14,8 +14,8 @@
  *      Author: philipp
  */
 
-#ifndef PHASAR_PHASARLLVM_IFDSIDE_SPECIALSUMMARIES_H_
-#define PHASAR_PHASARLLVM_IFDSIDE_SPECIALSUMMARIES_H_
+#ifndef PHASAR_PHASARLLVM_DATAFLOWSOLVER_IFDSIDE_SPECIALSUMMARIES_H
+#define PHASAR_PHASARLLVM_DATAFLOWSOLVER_IFDSIDE_SPECIALSUMMARIES_H
 
 #include <map>
 #include <memory>
@@ -47,7 +47,7 @@ private:
   // flow functions.
   SpecialSummaries() {
     // insert default flow and edge functions
-    for (auto FunctionName :
+    for (auto FunctionName : //NOLINT
          PhasarConfig::getPhasarConfig().specialFunctionNames()) {
       SpecialFlowFunctions.insert(
           std::make_pair(FunctionName, Identity<D>::getInstance()));

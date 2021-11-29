@@ -23,10 +23,10 @@ namespace psr {
 
 template <typename E> class TwoElementSet {
 private:
-  const E first, second;
+  const E First, Second;
 
 public:
-  TwoElementSet(E first, E second) : first(first), second(second){};
+  TwoElementSet(E First, E Second) : First(First), Second(Second){};
   std::size_t size() { return 2; }
   virtual ~TwoElementSet() = default;
 };

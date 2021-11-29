@@ -38,7 +38,8 @@ class StringRef;
 
 namespace psr {
 
-static inline void deleteValue(llvm::Value *V) { V->deleteValue(); }
+
+static inline void deleteValue(llvm::Value *V) { V->deleteValue(); } //NOLINT
 
 /**
  * @brief Checks if the given LLVM Value is a LLVM Function Pointer.

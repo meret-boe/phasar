@@ -30,7 +30,7 @@ IFDSTypeAnalysis::IFDSTypeAnalysis(const ProjectIRDB *IRDB,
                                    LLVMPointsToInfo *PT,
                                    std::set<std::string> EntryPoints)
     : IFDSTabulationProblem(IRDB, TH, ICF, PT, std::move(EntryPoints)) {
-  IFDSTypeAnalysis::ZeroValue = createZeroValue();
+  IFDSTypeAnalysis::ZeroValue = createZeroValue(); //NOLINT
 }
 
 IFDSTypeAnalysis::FlowFunctionPtrType

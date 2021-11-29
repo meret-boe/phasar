@@ -21,9 +21,9 @@
 
 namespace psr {
 
-std::string readFile(const std::string &path);
+std::string readFile(const std::string &Path);
 
-void writeFile(const std::string &path, const std::string &content);
+void writeFile(const std::string &Path, const std::string &Content);
 
 } // namespace psr
 

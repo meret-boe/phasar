@@ -33,7 +33,7 @@ IFDSSignAnalysis::IFDSSignAnalysis(const ProjectIRDB *IRDB,
                                    LLVMPointsToInfo *PT,
                                    std::set<std::string> EntryPoints)
     : IFDSTabulationProblem(IRDB, TH, ICF, PT, std::move(EntryPoints)) {
-  IFDSSignAnalysis::ZeroValue = createZeroValue();
+  IFDSSignAnalysis::ZeroValue = createZeroValue(); //NOLINT
 }
 
 IFDSSignAnalysis::FlowFunctionPtrType

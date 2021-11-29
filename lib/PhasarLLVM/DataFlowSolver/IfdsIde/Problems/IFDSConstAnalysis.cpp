@@ -45,7 +45,7 @@ IFDSConstAnalysis::IFDSConstAnalysis(const ProjectIRDB *IRDB,
   REG_HISTOGRAM("Context-relevant Pointer", PAMM_SEVERITY_LEVEL::Full);
   REG_COUNTER("[Calls] getContextRelevantPointsToSet", 0,
               PAMM_SEVERITY_LEVEL::Full);
-  IFDSTabulationProblem::ZeroValue = createZeroValue();
+  IFDSTabulationProblem::ZeroValue = createZeroValue(); //NOLINT
 }
 
 IFDSConstAnalysis::FlowFunctionPtrType

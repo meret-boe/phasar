@@ -32,7 +32,7 @@ const std::map<std::string, std::set<int>>
 // STAR = 2
 //
 // States: UNINIT = 0, KDF_FETCHED = 1, ERROR = 2, BOT = 3
-const OpenSSLEVPKDFDescription::OpenSSLEVPKDFState
+const OpenSSLEVPKDFDescription::OpenSSLEVPKDFState //NOLINT
     OpenSSLEVPKDFDescription::Delta[3][4] = {
         /* EVP_KDF_FETCH */
         {OpenSSLEVPKDFState::KDF_FETCHED, OpenSSLEVPKDFState::ERROR,
@@ -68,14 +68,13 @@ TypeStateDescription::State
 OpenSSLEVPKDFDescription::getNextState(std::string Tok,
                                        TypeStateDescription::State S) const {
   if (isAPIFunction(Tok)) {
-    auto Ret = Delta[static_cast<std::underlying_type_t<OpenSSLEVTKDFToken>>(
+    auto Ret = Delta[static_cast<std::underlying_type_t<OpenSSLEVTKDFToken>>( //NOLINT
         funcNameToToken(Tok))][S];
     // std::cout << "Delta[" << Tok << ", " << stateToString(S)
     //           << "] = " << stateToString(ret) << std::endl;
     return Ret;
-  } else {
-    return OpenSSLEVPKDFState::BOT;
-  }
+  }      return OpenSSLEVPKDFState::BOT;
+ 
 }
 
 std::string OpenSSLEVPKDFDescription::getTypeNameOfInterest() const {
@@ -142,11 +141,10 @@ OpenSSLEVPKDFDescription::OpenSSLEVTKDFToken
 OpenSSLEVPKDFDescription::funcNameToToken(const std::string &F) {
   if (F == "EVP_KDF_fetch") {
     return OpenSSLEVTKDFToken::EVP_KDF_FETCH;
-  } else if (F == "EVP_KDF_free") {
+  } if (F == "EVP_KDF_free") {
     return OpenSSLEVTKDFToken::EVP_KDF_FREE;
-  } else {
-    return OpenSSLEVTKDFToken::STAR;
-  }
+  }      return OpenSSLEVTKDFToken::STAR;
+ 
 }
 
 } // namespace psr

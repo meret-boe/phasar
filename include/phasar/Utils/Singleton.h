@@ -21,13 +21,13 @@ namespace psr {
 
 template <typename T> class Singleton {
 public:
-  Singleton(const Singleton &s) = delete;
-  Singleton(Singleton &&s) = delete;
-  Singleton &operator=(const Singleton &s) = delete;
-  Singleton &operator=(Singleton &&s) = delete;
-  static T &Instance() {
-    static T value;
-    return value;
+  Singleton(const Singleton &S) = delete;
+  Singleton(Singleton &&S) = delete;
+  Singleton &operator=(const Singleton &S) = delete;
+  Singleton &operator=(Singleton &&S) = delete;
+  static T &instance() {
+    static T Value;
+    return Value;
   }
 
 protected:

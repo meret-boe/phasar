@@ -40,7 +40,7 @@ IFDSTaintAnalysis::IFDSTaintAnalysis(
     std::set<std::string> EntryPoints)
     : IFDSTabulationProblem(IRDB, TH, ICF, PT, std::move(EntryPoints)),
       SourceSinkFunctions(TSF) {
-  IFDSTaintAnalysis::ZeroValue = createZeroValue();
+  IFDSTaintAnalysis::ZeroValue = createZeroValue(); //NOLINT
 }
 
 IFDSTaintAnalysis::FlowFunctionPtrType

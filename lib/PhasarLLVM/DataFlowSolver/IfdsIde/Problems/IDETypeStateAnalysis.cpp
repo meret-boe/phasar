@@ -46,7 +46,7 @@ IDETypeStateAnalysis::IDETypeStateAnalysis(const ProjectIRDB *IRDB,
                                            std::set<std::string> EntryPoints)
     : IDETabulationProblem(IRDB, TH, ICF, PT, std::move(EntryPoints)), TSD(TSD),
       TOP(TSD.top()), BOTTOM(TSD.bottom()) {
-  IDETabulationProblem::ZeroValue = createZeroValue();
+  IDETabulationProblem::ZeroValue = createZeroValue(); //NOLINT
 }
 
 // Start formulating our analysis by specifying the parts required for IFDS

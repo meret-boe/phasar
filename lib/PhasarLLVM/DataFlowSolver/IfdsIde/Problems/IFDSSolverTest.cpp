@@ -33,7 +33,7 @@ IFDSSolverTest::IFDSSolverTest(const ProjectIRDB *IRDB,
                                const LLVMBasedICFG *ICF, LLVMPointsToInfo *PT,
                                std::set<std::string> EntryPoints)
     : IFDSTabulationProblem(IRDB, TH, ICF, PT, std::move(EntryPoints)) {
-  IFDSSolverTest::ZeroValue = createZeroValue();
+  IFDSSolverTest::ZeroValue = createZeroValue(); //NOLINT
 }
 
 IFDSSolverTest::FlowFunctionPtrType

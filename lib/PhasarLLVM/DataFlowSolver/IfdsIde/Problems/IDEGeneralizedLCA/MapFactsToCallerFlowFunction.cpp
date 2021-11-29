@@ -54,7 +54,7 @@ MapFactsToCallerFlowFunction::computeTargets(const llvm::Value *Source) { //NOLI
       }
     }
     // Generate the varargs things by using an over-approximation
-    if (Source == AllocVarArg && Source->getType()->isPointerTy()) {
+    if (Source == AllocVarArg && Source->getType()->isPointerTy()) { //NOLINT
       for (unsigned Idx = Formals.size(); Idx < Actuals.size(); ++Idx) {
         Res.insert(Actuals[Idx]);
       }

@@ -14,8 +14,8 @@
  *      Author: philipp
  */
 
-#include <cstdlib>
 #include <llvm/IR/Instruction.h>
+#include <cstdlib>
 
 #include "boost/algorithm/string/trim.hpp"
 
@@ -57,8 +57,8 @@ bool isAllocaInstOrHeapAllocaFunction(const llvm::Value *V) noexcept {
   if (V) {
     if (llvm::isa<llvm::AllocaInst>(V)) {
       return true;
-    } else if (llvm::isa<llvm::CallInst>(V) || llvm::isa<llvm::InvokeInst>(V)) {
-      const llvm::CallBase *CallSite = llvm::cast<llvm::CallBase>(V);
+    } if (llvm::isa<llvm::CallInst>(V) || llvm::isa<llvm::InvokeInst>(V)) {
+      const auto *CallSite = llvm::cast<llvm::CallBase>(V);
       return CallSite->getCalledFunction() != nullptr &&
              HeapAllocationFunctions.count(
                  CallSite->getCalledFunction()->getName().str());
@@ -145,12 +145,12 @@ static llvm::ModuleSlotTracker &getModuleSlotTrackerFor(const llvm::Value *V) {
       ModuleToSlotTracker;
   const auto *M = getModuleFromVal(V);
 
-  auto &ret = ModuleToSlotTracker[M];
-  if (!ret) {
-    ret = std::make_unique<llvm::ModuleSlotTracker>(M);
+  auto &Ret = ModuleToSlotTracker[M];
+  if (!Ret) {
+    Ret = std::make_unique<llvm::ModuleSlotTracker>(M);
   }
 
-  return *ret;
+  return *Ret;
 }
 
 std::string llvmIRToString(const llvm::Value *V) {
@@ -196,14 +196,14 @@ globalValuesUsedinFunction(const llvm::Function *F) {
 
 std::string getMetaDataID(const llvm::Value *V) {
   if (const auto *Inst = llvm::dyn_cast<llvm::Instruction>(V)) {
-    if (auto *Metadata = Inst->getMetadata(PhasarConfig::MetaDataKind())) {
+    if (auto *Metadata = Inst->getMetadata(PhasarConfig::metaDataKind())) {
       return llvm::cast<llvm::MDString>(Metadata->getOperand(0))
           ->getString()
           .str();
     }
 
   } else if (const auto *GV = llvm::dyn_cast<llvm::GlobalVariable>(V)) {
-    if (auto *Metadata = GV->getMetadata(PhasarConfig::MetaDataKind())) {
+    if (auto *Metadata = GV->getMetadata(PhasarConfig::metaDataKind())) {
       return llvm::cast<llvm::MDString>(Metadata->getOperand(0))
           ->getString()
           .str();
@@ -216,13 +216,13 @@ std::string getMetaDataID(const llvm::Value *V) {
   return "-1";
 }
 
-llvmValueIDLess::llvmValueIDLess() : sless(stringIDLess()) {}
+LlvmValueIdLess::LlvmValueIdLess() : Sless(StringIdLess()) {}
 
-bool llvmValueIDLess::operator()(const llvm::Value *Lhs,
+bool LlvmValueIdLess::operator()(const llvm::Value *Lhs,
                                  const llvm::Value *Rhs) const {
   std::string LhsId = getMetaDataID(Lhs);
   std::string RhsId = getMetaDataID(Rhs);
-  return sless(LhsId, RhsId);
+  return Sless(LhsId, RhsId);
 }
 
 int getFunctionArgumentNr(const llvm::Argument *Arg) {
@@ -261,9 +261,9 @@ const llvm::Instruction *getNthInstruction(const llvm::Function *F,
     for (const auto &I : BB) {
       if (Current == Idx) {
         return &I;
-      } else {
-        ++Current;
-      }
+      } 
+      ++Current;
+     
     }
   }
   return nullptr;
@@ -359,26 +359,26 @@ const llvm::StoreInst *getNthStoreInstruction(const llvm::Function *F,
 }
 
 bool isVarAnnotationIntrinsic(const llvm::Function *F) {
-  static const llvm::StringRef kVarAnnotationName("llvm.var.annotation");
-  return F->getName() == kVarAnnotationName;
+  static const llvm::StringRef KVarAnnotationName("llvm.var.annotation");
+  return F->getName() == KVarAnnotationName;
 }
 
-const llvm::StringRef
+const llvm::StringRef //NOLINT
 getVarAnnotationIntrinsicName(const llvm::CallInst *CallInst) {
-  const int kPointerGlobalStringIdx = 1;
-  llvm::ConstantExpr *ce = llvm::cast<llvm::ConstantExpr>(
-      CallInst->getOperand(kPointerGlobalStringIdx));
-  assert(ce != nullptr);
-  assert(ce->getOpcode() == llvm::Instruction::GetElementPtr);
-  assert(llvm::dyn_cast<llvm::GlobalVariable>(ce->getOperand(0)) != nullptr);
-  llvm::GlobalVariable *annoteStr =
-      llvm::dyn_cast<llvm::GlobalVariable>(ce->getOperand(0));
+  const int KPointerGlobalStringIdx = 1;
+  auto *Ce = llvm::cast<llvm::ConstantExpr>(
+      CallInst->getOperand(KPointerGlobalStringIdx));
+  assert(Ce != nullptr);
+  assert(Ce->getOpcode() == llvm::Instruction::GetElementPtr);
+  assert(llvm::dyn_cast<llvm::GlobalVariable>(Ce->getOperand(0)) != nullptr);
+  auto *AnnoteStr =
+      llvm::dyn_cast<llvm::GlobalVariable>(Ce->getOperand(0));
   assert(llvm::dyn_cast<llvm::ConstantDataSequential>(
-      annoteStr->getInitializer()));
-  llvm::ConstantDataSequential *data =
-      llvm::dyn_cast<llvm::ConstantDataSequential>(annoteStr->getInitializer());
-  assert(data->isString());
-  return data->getAsString();
+      AnnoteStr->getInitializer()));
+  auto *Data =
+      llvm::dyn_cast<llvm::ConstantDataSequential>(AnnoteStr->getInitializer());
+  assert(Data->isString());
+  return Data->getAsString();
 }
 
 } // namespace psr

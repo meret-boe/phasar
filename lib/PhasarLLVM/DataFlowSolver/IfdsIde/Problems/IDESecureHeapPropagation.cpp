@@ -26,7 +26,7 @@ IDESecureHeapPropagation::IDESecureHeapPropagation(
     const LLVMBasedICFG *ICF, LLVMPointsToInfo *PT,
     std::set<std::string> EntryPoints)
     : IDETabulationProblem(IRDB, TH, ICF, PT, std::move(EntryPoints)) {
-  ZeroValue = createZeroValue();
+  ZeroValue = createZeroValue(); //NOLINT
 }
 
 IDESecureHeapPropagation::FlowFunctionPtrType

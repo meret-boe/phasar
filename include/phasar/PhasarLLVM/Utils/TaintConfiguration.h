@@ -96,19 +96,19 @@ private:
   /// Holds all sink instruction
   std::set<const llvm::Instruction *> SinkInstructions;
   /// Holds all initial seeds
-  std::map<const llvm::Instruction *, std::set<D>> seedMap;
+  std::map<const llvm::Instruction *, std::set<D>> SeedMap;
 
-  void importSourceSinkFunctions(const std::string &FilePath) {
+  void importSourceSinkFunctions(const std::string &FilePath) { //NOLINT
     std::cout << "Parsing JSON with source and sink functions\n";
     if (boost::filesystem::exists(FilePath) &&
         !boost::filesystem::is_directory(FilePath)) {
-      std::ifstream ifs(FilePath);
-      if (ifs.is_open()) {
-        std::stringstream iss;
-        iss << ifs.rdbuf();
-        ifs.close();
+      std::ifstream Ifs(FilePath);
+      if (Ifs.is_open()) {
+        std::stringstream Iss;
+        Iss << Ifs.rdbuf();
+        Ifs.close();
         nlohmann::json SSFunctions;
-        iss >> SSFunctions;
+        Iss >> SSFunctions;
         std::cout << std::setw(2) << SSFunctions << '\n';
         if (SSFunctions.find(SourceJSONId) != SSFunctions.end()) {
           // Discarding default source functions
@@ -161,10 +161,10 @@ private:
 
 public:
   struct All {
-    friend bool operator==(const All &Lhs, const All &Rhs) { return true; }
+    friend bool operator==(const All & /*Lhs*/, const All & /*Rhs*/) { return true; }
   };
   struct None {
-    friend bool operator==(const None &Lhs, const None &Rhs) { return true; }
+    friend bool operator==(const None & /*Lhs*/, const None & /*Rhs*/) { return true; }
   };
   /**
    * Encapsulates all taint-relevant information of a source function.
@@ -187,13 +187,13 @@ public:
         : Name(std::move(FunctionName)), TaintedArgs(std::move(Args)),
           TaintsReturn(Ret){};
     bool isTaintedArg(unsigned ArgIdx) {
-      if (auto pval = std::get_if<TaintConfiguration<D>::All>(&TaintedArgs)) {
+      if (auto Pval = std::get_if<TaintConfiguration<D>::All>(&TaintedArgs)) {
         return true;
-      } else if (auto pval =
+      } if (auto Pval =
                      std::get_if<TaintConfiguration<D>::None>(&TaintedArgs)) {
         return false;
-      } else if (auto pval = std::get_if<std::vector<unsigned>>(&TaintedArgs)) {
-        return find(pval->begin(), pval->end(), ArgIdx) != pval->end();
+      } if (auto Pval = std::get_if<std::vector<unsigned>>(&TaintedArgs)) {
+        return find(Pval->begin(), Pval->end(), ArgIdx) != Pval->end();
       }
       llvm_unreachable("Something went wrong, unexpected type");
       return false;
@@ -201,18 +201,19 @@ public:
     friend std::ostream &operator<<(std::ostream &OS,
                                     const SourceFunction &SF) {
       OS << "F: " << SF.Name << " Args: [ ";
-      if (auto pval =
+      if (auto Pval =
               std::get_if<TaintConfiguration<D>::All>(&SF.TaintedArgs)) {
         OS << "All"
            << " ";
-      } else if (auto pval = std::get_if<TaintConfiguration<D>::None>(
+      } else if (auto Pval = std::get_if<TaintConfiguration<D>::None>(
                      &SF.TaintedArgs)) {
         OS << "None"
            << " ";
-      } else if (auto pval =
+      } else if (auto Pval =
                      std::get_if<std::vector<unsigned>>(&SF.TaintedArgs)) {
-        for (auto Arg : *pval)
+        for (auto Arg : *Pval) {
           OS << Arg << " ";
+}
       } else {
         llvm_unreachable("Something went wrong, unexpected type");
       }
@@ -242,30 +243,30 @@ public:
                      Args)
         : Name(std::move(FunctionName)), LeakedArgs(std::move(Args)){};
     bool isLeakedArg(unsigned ArgIdx) {
-      if (auto pval = std::get_if<TaintConfiguration<D>::All>(&LeakedArgs)) {
+      if (auto Pval = std::get_if<TaintConfiguration<D>::All>(&LeakedArgs)) {
         return true;
-      } else if (auto pval =
+      } if (auto Pval =
                      std::get_if<TaintConfiguration<D>::None>(&LeakedArgs)) {
         return false;
-      } else if (auto pval = std::get_if<std::vector<unsigned>>(&LeakedArgs)) {
-        return find(pval->begin(), pval->end(), ArgIdx) != pval->end();
-      } else {
-        throw std::runtime_error("Something went wrong, unexpected type");
-      }
+      } if (auto Pval = std::get_if<std::vector<unsigned>>(&LeakedArgs)) {
+        return find(Pval->begin(), Pval->end(), ArgIdx) != Pval->end();
+      }          throw std::runtime_error("Something went wrong, unexpected type");
+     
     }
     friend std::ostream &operator<<(std::ostream &OS, const SinkFunction &SF) {
       OS << "F: " << SF.Name << " Args: [ ";
-      if (auto pval = std::get_if<TaintConfiguration<D>::All>(&SF.LeakedArgs)) {
+      if (auto Pval = std::get_if<TaintConfiguration<D>::All>(&SF.LeakedArgs)) {
         OS << "All"
            << " ";
-      } else if (auto pval =
+      } else if (auto Pval =
                      std::get_if<TaintConfiguration<D>::None>(&SF.LeakedArgs)) {
         OS << "None"
            << " ";
-      } else if (auto pval =
+      } else if (auto Pval =
                      std::get_if<std::vector<unsigned>>(&SF.LeakedArgs)) {
-        for (auto Arg : *pval)
+        for (auto Arg : *Pval) {
           OS << Arg << " ";
+}
       } else {
         throw std::runtime_error("Something went wrong, unexpected type");
       }
@@ -343,35 +344,35 @@ public:
    * @brief Specify initial seeds the analysis starts with
    */
   TaintConfiguration(std::map<const llvm::Instruction *, std::set<D>> Seeds)
-      : seedMap(Seeds) {}
+      : SeedMap(Seeds) {}
   ~TaintConfiguration() = default;
 
   void addInitialSeeds(std::map<const llvm::Instruction *, std::set<D>> Seeds) {
-    seedMap = Seeds;
+    SeedMap = Seeds;
   }
   std::map<const llvm::Instruction *, std::set<D>> getInitialSeeds() {
-    return seedMap;
+    return SeedMap;
   }
-  void addSource(SourceFunction src) {
-    Sources.insert(make_pair(src.Name, src));
+  void addSource(SourceFunction Src) {
+    Sources.insert(make_pair(Src.Name, Src));
   }
-  void addSink(SinkFunction snk) { Sinks.insert(make_pair(snk.Name, snk)); }
-  bool isSource(const std::string &FunctionName) const {
+  void addSink(SinkFunction Snk) { Sinks.insert(make_pair(Snk.Name, Snk)); }
+  [[nodiscard]] bool isSource(const std::string &FunctionName) const {
     return Sources.find(FunctionName) != Sources.end();
   }
   bool isSource(const llvm::Instruction *I) const {
     return SourceInstructions.count(I);
   }
-  bool isSink(const std::string &FunctionName) const {
+  [[nodiscard]] bool isSink(const std::string &FunctionName) const {
     return Sinks.find(FunctionName) != Sinks.end();
   }
   bool isSink(const llvm::Instruction *I) const {
     return SinkInstructions.count(I);
   }
-  SourceFunction getSource(const std::string &FunctionName) const {
+  [[nodiscard]] SourceFunction getSource(const std::string &FunctionName) const {
     return Sources.at(FunctionName);
   }
-  SinkFunction getSink(const std::string &FunctionName) const {
+  [[nodiscard]] SinkFunction getSink(const std::string &FunctionName) const {
     return Sinks.at(FunctionName);
   }
 
@@ -382,8 +383,9 @@ public:
       OS << SF.second << "\n";
     }
     OS << "Sink Functions:\n";
-    for (auto SF : TSF.Sinks)
+    for (auto SF : TSF.Sinks) {
       OS << SF.second << "\n";
+}
     return OS;
   }
 };

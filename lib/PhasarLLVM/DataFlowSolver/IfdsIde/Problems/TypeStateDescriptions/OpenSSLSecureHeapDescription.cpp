@@ -30,7 +30,7 @@ const std::map<std::string, std::set<int>>
 // SECURE_CLEAR_FREE = 3, STAR = 4
 //
 // States: BOT = 0, UNINIT = 1, ALLOCATED = 2, ZEROED = 3, FREED = 4, ERROR = 5
-const OpenSSLSecureHeapDescription::OpenSSLSecureHeapState
+const OpenSSLSecureHeapDescription::OpenSSLSecureHeapState //NOLINT
     OpenSSLSecureHeapDescription::Delta[5][6] = {
         // SECURE_MALLOC
         {OpenSSLSecureHeapState::ALLOCATED, OpenSSLSecureHeapState::ALLOCATED,
@@ -56,7 +56,7 @@ const OpenSSLSecureHeapDescription::OpenSSLSecureHeapState
 OpenSSLSecureHeapDescription::OpenSSLSecureHeapDescription(
     IDESolver<IDESecureHeapPropagationAnalysisDomain>
         &SecureHeapPropagationResults)
-    : secureHeapPropagationResults(SecureHeapPropagationResults) {}
+    : SecureHeapPropagationResults(SecureHeapPropagationResults) {}
 
 bool OpenSSLSecureHeapDescription::isFactoryFunction(
     const std::string &F) const {
@@ -86,10 +86,9 @@ TypeStateDescription::State OpenSSLSecureHeapDescription::getNextState(
     auto Ftok = static_cast<std::underlying_type_t<OpenSSLSecureHeapToken>>(
         funcNameToToken(Tok));
 
-    return Delta[Ftok][S];
-  } else {
-    return OpenSSLSecureHeapState::BOT;
-  }
+    return Delta[Ftok][S]; //NOLINT
+  }      return OpenSSLSecureHeapState::BOT;
+ 
 }
 
 TypeStateDescription::State OpenSSLSecureHeapDescription::getNextState(
@@ -98,17 +97,16 @@ TypeStateDescription::State OpenSSLSecureHeapDescription::getNextState(
   if (isAPIFunction(Tok)) {
     auto Ftok = static_cast<std::underlying_type_t<OpenSSLSecureHeapToken>>(
         funcNameToToken(Tok));
-    auto Results = secureHeapPropagationResults.resultAt(
+    auto Results = SecureHeapPropagationResults.resultAt(
         CallSite, SecureHeapFact::INITIALIZED);
     if (Results != SecureHeapValue::INITIALIZED) {
       // std::cerr << "ERROR: SecureHeap not initialized at "
       //          << llvmIRToShortString(CS.getInstruction()) << std::endl;
       return error();
     }
-    return Delta[Ftok][S];
-  } else {
-    return error();
-  }
+    return Delta[Ftok][S]; //NOLINT
+  }      return error();
+ 
 }
 
 std::string OpenSSLSecureHeapDescription::getTypeNameOfInterest() const {

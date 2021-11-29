@@ -54,7 +54,7 @@ template <typename AnalysisDomainTy> struct DataFlowFactPrinter {
 
   virtual void printDataFlowFact(std::ostream &Os, D Fact) const = 0;
 
-  virtual std::string dtoString(D Fact) const {
+  [[nodiscard]] virtual std::string dtoString(D Fact) const {
     std::stringstream Ss;
     printDataFlowFact(Ss, Fact);
     return Ss.str();

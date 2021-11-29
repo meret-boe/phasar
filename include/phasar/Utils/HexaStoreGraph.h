@@ -28,89 +28,89 @@ namespace psr {
 
 template <typename S, typename E, typename D> class HexaStoreGraph {
 private:
-  Table<S, E, D> sed;
-  Table<S, D, E> sde;
-  Table<E, S, D> esd;
-  Table<E, D, S> eds;
-  Table<D, S, E> dse;
-  Table<D, E, S> des;
+  Table<S, E, D> Sed;
+  Table<S, D, E> Sde;
+  Table<E, S, D> Esd;
+  Table<E, D, S> Eds;
+  Table<D, S, E> Dse;
+  Table<D, E, S> Des;
 
 public:
   HexaStoreGraph() = default;
 
   ~HexaStoreGraph() = default;
 
-  void insertEdge(S src, E edge, D dest) {
-    sed.insert(src, edge, dest);
-    sde.insert(src, dest, edge);
-    esd.insert(edge, src, dest);
-    eds.insert(edge, dest, src);
-    dse.insert(dest, src, edge);
-    des.insert(dest, edge, src);
+  void insertEdge(S Src, E Edge, D Dest) {
+    Sed.insert(Src, Edge, Dest);
+    Sde.insert(Src, Dest, Edge);
+    Esd.insert(Edge, Src, Dest);
+    Eds.insert(Edge, Dest, Src);
+    Dse.insert(Dest, Src, Edge);
+    Des.insert(Dest, Edge, Src);
   }
 
-  void removeEdge(S src, E edge, D dest) {
-    sed.remove(src, edge);
-    sde.remove(src, dest);
-    esd.remove(edge, src);
-    eds.remove(edge, dest);
-    dse.remove(dest, src);
-    des.remove(dest, edge);
+  void removeEdge(S Src, E Edge, D Dest) {
+    Sed.remove(Src, Edge);
+    Sde.remove(Src, Dest);
+    Esd.remove(Edge, Src);
+    Eds.remove(Edge, Dest);
+    Dse.remove(Dest, Src);
+    Des.remove(Dest, Edge);
   }
 
-  bool containsEdge(S src, E edge, D dest) { return sed.contains(src, edge); }
+  bool containsEdge(S Src, E Edge, D  /*Dest*/) { return Sed.contains(Src, Edge); }
 
-  D getDbySE(S src, E edge) { return sed.get(src, edge); }
+  D getDbySE(S Src, E Edge) { return Sed.get(Src, Edge); }
 
-  E getEbySD(S src, D dest) { return sde.get(src, dest); }
+  E getEbySD(S Src, D Dest) { return Sde.get(Src, Dest); }
 
-  D getDbyES(E edge, S src) { return esd.get(edge, src); }
+  D getDbyES(E Edge, S Src) { return Esd.get(Edge, Src); }
 
-  S getSbyED(E edge, D dest) { return eds.get(edge, dest); }
+  S getSbyED(E Edge, D Dest) { return Eds.get(Edge, Dest); }
 
-  E getEbyDS(D dest, S src) { return dse.get(dest, src); }
+  E getEbyDS(D Dest, S Src) { return Dse.get(Dest, Src); }
 
-  S getSyDE(D dest, E edge) { return des.get(dest, edge); }
+  S getSyDE(D Dest, E Edge) { return Des.get(Dest, Edge); }
 
   void clear() {
-    sed.clear();
-    sde.clear();
-    esd.clear();
-    eds.clear();
-    dse.clear();
-    des.clear();
+    Sed.clear();
+    Sde.clear();
+    Esd.clear();
+    Eds.clear();
+    Dse.clear();
+    Des.clear();
   }
 
-  bool empty() { return sed.empty(); }
+  bool empty() { return Sed.empty(); }
 
-  std::set<typename Table<S, E, D>::Cell> tripleSet() { return sed.cellSet(); }
+  std::set<typename Table<S, E, D>::Cell> tripleSet() { return Sed.cellSet(); }
 
-  std::multiset<S> sourceSet() { return sed.rowKeySet(); }
+  std::multiset<S> sourceSet() { return Sed.rowKeySet(); }
 
-  std::multiset<E> edgeSet() { return sed.columnKeySet(); }
+  std::multiset<E> edgeSet() { return Sed.columnKeySet(); }
 
-  std::multiset<D> destinationSet() { return sed.values(); }
+  std::multiset<D> destinationSet() { return Sed.values(); }
 
-  void loadHexaStoreGraphFromDB(const std::string &tablename) {
+  void loadHexaStoreGraphFromDB(const std::string & /*Tablename*/) {
     std::cerr << "Not implemented yet!" << std::endl;
   }
 
-  void storeHexaStoreGraphToDB(const std::string &tablename) {
+  void storeHexaStoreGraphToDB(const std::string & /*Tablename*/) {
     std::cerr << "Not implemented yet!" << std::endl;
   }
 
-  friend bool operator==(const HexaStoreGraph<S, E, D> &lhs,
-                         const HexaStoreGraph<S, E, D> &rhs) {
-    return lhs.sed == rhs.sed;
+  friend bool operator==(const HexaStoreGraph<S, E, D> &Lhs,
+                         const HexaStoreGraph<S, E, D> &Rhs) {
+    return Lhs.Sed == Rhs.Sed;
   }
 
-  friend bool operator<(const HexaStoreGraph<S, E, D> &lhs,
-                        const HexaStoreGraph<S, E, D> &rhs) {
-    return lhs.sed < rhs.sed;
+  friend bool operator<(const HexaStoreGraph<S, E, D> &Lhs,
+                        const HexaStoreGraph<S, E, D> &Rhs) {
+    return Lhs.Sed < Rhs.Sed;
   }
 
-  friend std::ostream &operator<<(std::ostream &os, const HexaStoreGraph &hsg) {
-    return os << hsg.sed;
+  friend std::ostream &operator<<(std::ostream &Os, const HexaStoreGraph &Hsg) {
+    return Os << Hsg.Sed;
   }
 };
 

@@ -34,7 +34,7 @@ namespace psr {
 
 LCAPair::LCAPair() : First(nullptr), Second(0) {}
 
-LCAPair::LCAPair(const llvm::Value *V, int I) : First(V), Second(I) {}
+LCAPair::LCAPair(const llvm::Value *V, int I) : First(V), Second(I) {} 
 
 bool operator==(const LCAPair &Lhs, const LCAPair &Rhs) {
   return tie(Lhs.First, Lhs.Second) == tie(Rhs.First, Rhs.Second);
@@ -53,7 +53,7 @@ IFDSLinearConstantAnalysis::IFDSLinearConstantAnalysis(
     const LLVMBasedICFG *ICF, LLVMPointsToInfo *PT,
     std::set<std::string> EntryPoints)
     : IFDSTabulationProblem(IRDB, TH, ICF, PT, std::move(EntryPoints)) {
-  IFDSLinearConstantAnalysis::ZeroValue = createZeroValue();
+  IFDSLinearConstantAnalysis::ZeroValue = createZeroValue(); //NOLINT
 }
 
 IFDSLinearConstantAnalysis::FlowFunctionPtrType

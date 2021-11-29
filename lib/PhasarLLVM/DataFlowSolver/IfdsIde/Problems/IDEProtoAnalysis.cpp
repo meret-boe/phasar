@@ -38,7 +38,7 @@ IDEProtoAnalysis::IDEProtoAnalysis(const ProjectIRDB *IRDB,
                                    LLVMPointsToInfo *PT,
                                    std::set<std::string> EntryPoints)
     : IDETabulationProblem(IRDB, TH, ICF, PT, std::move(EntryPoints)) {
-  IDETabulationProblem::ZeroValue = createZeroValue();
+  IDETabulationProblem::ZeroValue = createZeroValue(); //NOLINT
 }
 
 // start formulating our analysis by specifying the parts required for IFDS

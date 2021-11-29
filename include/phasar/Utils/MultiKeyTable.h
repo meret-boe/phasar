@@ -26,25 +26,25 @@ namespace psr {
 
 template <typename R, typename C, typename V> class MultiKeyTable {
 private:
-  std::unordered_multimap<R, std::unordered_multimap<C, V>> multi_key_table;
+  std::unordered_multimap<R, std::unordered_multimap<C, V>> MultiKeyTableObj;
 
 public:
   struct Cell {
-    R r;
-    C c;
-    V v;
-    Cell(R row, C col, V val) : r(row), c(col), v(val) {}
-    R getRowKey() { return r; }
-    C getColumnKey() { return c; }
-    V getValue() { return v; }
-    friend std::ostream &operator<<(std::ostream &os, const Cell &c) {
-      return os << "Cell: " << c.r << ", " << c.c << ", " << c.v;
+    R Row;
+    C Col;
+    V Val;
+    Cell(R Row, C Col, V Val) : Row(Row), Col(Col), Val(Val) {}
+    R getRowKey() { return Row; }
+    C getColumnKey() { return Col; }
+    V getValue() { return Val; }
+    friend std::ostream &operator<<(std::ostream &Os, const Cell &Cel) {
+      return Os << "Cell: " << Cel.Row << ", " << Cel.Col << ", " << Cel.Val;
     }
-    friend bool operator<(const Cell &lhs, const Cell &rhs) {
-      return std::tie(lhs.r, lhs.c, lhs.v) < std::tie(rhs.r, rhs.c, rhs.v);
+    friend bool operator<(const Cell &Lhs, const Cell &Rhs) {
+      return std::tie(Lhs.Row, Lhs.Col, Lhs.Val) < std::tie(Rhs.Row, Rhs.Col, Rhs.Val);
     }
-    friend bool operator==(const Cell &lhs, const Cell &rhs) {
-      return std::tie(lhs.r, lhs.c, lhs.v) == std::tie(rhs.r, rhs.c, rhs.v);
+    friend bool operator==(const Cell &Lhs, const Cell &Rhs) {
+      return std::tie(Lhs.Row, Lhs.Col, Lhs.Val) == std::tie(Rhs.Row, Rhs.Col, Rhs.Val);
     }
   };
 
@@ -52,166 +52,180 @@ public:
 
   ~MultiKeyTable() = default;
 
-  MultiKeyTable(const MultiKeyTable &t) = default;
+  MultiKeyTable(const MultiKeyTable &T) = default;
 
-  MultiKeyTable(MultiKeyTable &&t) = default;
+  MultiKeyTable(MultiKeyTable &&T)  noexcept = default;
 
-  MultiKeyTable &operator=(const MultiKeyTable &t) = default;
+  MultiKeyTable &operator=(const MultiKeyTable &T) = default;
 
-  MultiKeyTable &operator=(MultiKeyTable &&t) = default;
+  MultiKeyTable &operator=(MultiKeyTable &&T)  noexcept = default;
 
-  V insert(R r, C c, V v) {
+  V insert(R Ro, C Co, V Va) {
     // Associates the specified value with the specified keys.
-    multi_key_table[r][c] = v;
-    return v;
+    MultiKeyTableObj[Ro][Co] = Va;
+    return Va;
   }
 
-  void clear() { multi_key_table.clear(); }
+  void clear() { MultiKeyTableObj.clear(); }
 
-  bool empty() { return multi_key_table.empty(); }
+  bool empty() { return MultiKeyTableObj.empty(); }
 
-  size_t size() { return multi_key_table.size(); }
+  size_t size() { return MultiKeyTableObj.size(); }
 
   std::multiset<Cell> cellSet() {
     // Returns a set of all row key / column key / value triplets.
-    std::multiset<Cell> s;
-    for (auto &m1 : multi_key_table) {
-      for (auto &m2 : m1.second) {
-        s.insert(Cell(m1.first, m2.first, m2.second));
+    std::multiset<Cell> S;
+    for (auto &M1 : MultiKeyTableObj) {
+      for (auto &M2 : M1.second) {
+        S.insert(Cell(M1.first, M2.first, M2.second));
       }
     }
-    return s;
+    return S;
   }
 
-  std::unordered_multimap<R, V> column(C columnKey) {
+  std::unordered_multimap<R, V> column(C ColumnKey) {
     // Returns a view of all mappings that have the given column key.
-    std::unordered_multimap<R, V> column;
-    for (auto &row : multi_key_table) {
-      if (row.second.count(columnKey))
-        column[row.first] = row.second[columnKey];
+    std::unordered_multimap<R, V> Column;
+    for (auto &Row : MultiKeyTableObj) {
+      if (Row.second.count(ColumnKey)) {
+        Column[Row.first] = Row.second[ColumnKey];
+      }
     }
-    return column;
+    return Column;
   }
 
   std::multiset<C> columnKeySet() {
     // Returns a set of column keys that have one or more values in the
     // table.
-    std::multiset<C> colkeys;
-    for (auto &m1 : multi_key_table)
-      for (auto &m2 : m1.second)
-        colkeys.insert(m2.first);
-    return colkeys;
+    std::multiset<C> Colkeys;
+    for (auto &M1 : MultiKeyTableObj){
+      for (auto &M2 : M1.second) {
+        Colkeys.insert(M2.first);
+      }
+}
+    return Colkeys;
   }
 
   std::unordered_multimap<C, std::unordered_multimap<R, V>> columnMap() {
     // Returns a view that associates each column key with the corresponding
     // map from row keys to values.
-    std::unordered_multimap<C, std::unordered_multimap<R, V>> columnmap;
-    for (auto &m1 : multi_key_table) {
-      for (auto &m2 : multi_key_table.second) {
-        columnmap[m2.first][m1.first] = m2.second;
+    std::unordered_multimap<C, std::unordered_multimap<R, V>> Columnmap;
+    for (auto &M1 : MultiKeyTableObj) {
+      for (auto &M2 : MultiKeyTableObj.second) {
+        Columnmap[M2.first][M1.first] = M2.second;
       }
     }
-    return columnmap;
+    return Columnmap;
   }
 
-  bool contains(R rowKey, C columnKey) {
+  bool contains(R RowKey, C ColumnKey) {
     // Returns true if the table contains a mapping with the specified row
     // and column keys.
-    if (multi_key_table.count(rowKey))
-      return multi_key_table[rowKey].count(columnKey);
+    if (MultiKeyTableObj.count(RowKey)) {
+      return MultiKeyTableObj[RowKey].count(ColumnKey);
+}
     return false;
   }
 
-  bool containsColumn(C columnKey) {
+  bool containsColumn(C ColumnKey) {
     // Returns true if the table contains a mapping with the specified
     // column.
-    for (auto &m1 : multi_key_table)
-      if (m1.second.count(columnKey))
+    for (auto &M1 : MultiKeyTableObj) {
+      if (M1.second.count(ColumnKey)) {
         return true;
+}
+}
     return false;
   }
 
-  bool containsRow(R rowKey) {
+  bool containsRow(R RowKey) {
     // Returns true if the table contains a mapping with the specified row
     // key.
-    return multi_key_table.count(rowKey);
+    return MultiKeyTableObj.count(RowKey);
   }
 
-  bool containsValue(V value) {
+  bool containsValue(V Value) {
     // Returns true if the table contains a mapping with the specified
     // value.
-    for (auto &m1 : multi_key_table)
-      for (auto &m2 : m1.second)
-        if (value == m2.second)
+    for (auto &M1 : MultiKeyTableObj) {
+      for (auto &M2 : M1.second) {
+        if (Value == M2.second) {
           return true;
+}
+}
+}
     return false;
   }
 
-  V get(R rowKey, C columnKey) {
+  V get(R RowKey, C ColumnKey) {
     // Returns the value corresponding to the given row and column keys, or null
     // if no such mapping exists.
     // if (table.count(rowKey))
     //	if (table[rowKey].count(columnKey))
-    return multi_key_table[rowKey][columnKey];
+    return MultiKeyTableObj[RowKey][ColumnKey];
     // return V();
   }
 
-  V remove(R rowKey, C columnKey) {
+  V remove(R RowKey, C ColumnKey) {
     // Removes the mapping, if any, associated with the given keys.
-    V v;
-    if (contains(rowKey, columnKey)) {
-      v = multi_key_table[rowKey][columnKey];
-      multi_key_table[rowKey].erase(columnKey);
+    V Va;
+    if (contains(RowKey, ColumnKey)) {
+      Va = MultiKeyTableObj[RowKey][ColumnKey];
+      MultiKeyTableObj[RowKey].erase(ColumnKey);
     }
-    return v;
+    return Va;
   }
 
-  std::unordered_multimap<C, V> &row(R rowKey) {
+  std::unordered_multimap<C, V> &row(R RowKey) {
     // Returns a view of all mappings that have the given row key.
-    return multi_key_table[rowKey];
+    return MultiKeyTableObj[RowKey];
   }
 
   std::multiset<R> rowKeySet() {
     // Returns a set of row keys that have one or more values in the table.
-    std::multiset<R> s;
-    for (auto &m1 : multi_key_table)
-      s.insert(m1.first);
-    return s;
+    std::multiset<R> S;
+    for (auto &M1 : MultiKeyTableObj) {
+      S.insert(M1.first);
+}
+    return S;
   }
 
   std::unordered_multimap<R, std::unordered_multimap<C, V>> rowMap() {
     // Returns a view that associates each row key with the corresponding
     // map from column keys to values.
-    return multi_key_table;
+    return MultiKeyTableObj;
   }
 
   std::multiset<V> values() {
     // Returns a collection of all values, which may contain duplicates.
-    std::multiset<V> s;
-    for (auto &m1 : multi_key_table)
-      for (auto &m2 : m1.second)
-        s.insert(m2.second);
-    return s;
+    std::multiset<V> S;
+    for (auto &M1 : MultiKeyTableObj) {
+      for (auto &M2 : M1.second) {
+        S.insert(M2.second);
+}
+}
+    return S;
   }
 
-  friend bool operator==(const MultiKeyTable<R, C, V> &lhs,
-                         const MultiKeyTable<R, C, V> &rhs) {
-    return lhs.multi_key_table == rhs.multi_key_table;
+  friend bool operator==(const MultiKeyTable<R, C, V> &Lhs,
+                         const MultiKeyTable<R, C, V> &Rhs) {
+    return Lhs.MultiKeyTableObj == Rhs.MultiKeyTableObj;
   }
 
-  friend bool operator<(const MultiKeyTable<R, C, V> &lhs,
-                        const MultiKeyTable<R, C, V> &rhs) {
-    return lhs.multi_key_table < rhs.multi_key_table;
+  friend bool operator<(const MultiKeyTable<R, C, V> &Lhs,
+                        const MultiKeyTable<R, C, V> &Rhs) {
+    return Lhs.MultiKeyTableObj < Rhs.MultiKeyTableObj;
   }
 
-  friend std::ostream &operator<<(std::ostream &os,
-                                  const MultiKeyTable<R, C, V> &t) {
-    for (auto &m1 : t.multi_key_table)
-      for (auto &m2 : m1.second)
-        os << "< " << m1.first << " , " << m2.first << " , " << m2.second
+  friend std::ostream &operator<<(std::ostream &Os,
+                                  const MultiKeyTable<R, C, V> &T) {
+    for (auto &M1 : T.multi_key_table) {
+      for (auto &M2 : M1.second) {
+        Os << "< " << M1.first << " , " << M2.first << " , " << M2.second
            << " >\n";
-    return os;
+}
+}
+    return Os;
   }
 };
 

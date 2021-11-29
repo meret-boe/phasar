@@ -36,7 +36,7 @@ const std::map<std::string, std::set<int>>
 // delta[Token][State] = next State
 // Token: FOPEN = 0, FCLOSE = 1, STAR = 2
 // States: UNINIT = 0, OPENED = 1, CLOSED = 2, ERROR = 3, BOT = 4
-const CSTDFILEIOTypeStateDescription::CSTDFILEIOState
+const CSTDFILEIOTypeStateDescription::CSTDFILEIOState //NOLINT
     CSTDFILEIOTypeStateDescription::Delta[3][5] = {
         /* FOPEN */
         {CSTDFILEIOState::OPENED, CSTDFILEIOState::OPENED,
@@ -76,15 +76,15 @@ TypeStateDescription::State CSTDFILEIOTypeStateDescription::getNextState(
     auto X = static_cast<std::underlying_type_t<CSTDFILEIOToken>>(
         funcNameToToken(Tok));
 
-    auto Ret = Delta[X][S];
+    auto Ret = Delta[X][S]; //NOLINT
     // if (ret == error()) {
     //  std::cerr << "getNextState(" << Tok << ", " << stateToString(S)
     //            << ") = " << stateToString(Ret) << std::endl;
     // }
     return Ret;
-  } else {
-    return CSTDFILEIOState::BOT;
   }
+  
+    return CSTDFILEIOState::BOT;
 }
 
 std::string CSTDFILEIOTypeStateDescription::getTypeNameOfInterest() const {
@@ -159,11 +159,11 @@ CSTDFILEIOTypeStateDescription::CSTDFILEIOToken
 CSTDFILEIOTypeStateDescription::funcNameToToken(const std::string &F) {
   if (F == "fopen" || F == "fdopen") {
     return CSTDFILEIOToken::FOPEN;
-  } else if (F == "fclose") {
+  } if (F == "fclose") {
     return CSTDFILEIOToken::FCLOSE;
-  } else {
-    return CSTDFILEIOToken::STAR;
-  }
+  } 
+  return CSTDFILEIOToken::STAR;
+ 
 }
 
 } // namespace psr

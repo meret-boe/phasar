@@ -53,7 +53,7 @@ IDELinearConstantAnalysis::IDELinearConstantAnalysis(
     const LLVMBasedICFG *ICF, LLVMPointsToInfo *PT,
     std::set<std::string> EntryPoints)
     : IDETabulationProblem(IRDB, TH, ICF, PT, std::move(EntryPoints)) {
-  IDETabulationProblem::ZeroValue = createZeroValue();
+  IDETabulationProblem::ZeroValue = createZeroValue(); //NOLINT
 }
 
 IDELinearConstantAnalysis::~IDELinearConstantAnalysis() {
@@ -204,7 +204,7 @@ IDELinearConstantAnalysis::getRetFlowFunction(
   // Handle the case: %x = call i32 ...
   if (CallSite->getType()->isIntegerTy()) {
     const auto *Return = llvm::dyn_cast<llvm::ReturnInst>(ExitInst);
-    auto *ReturnValue = Return->getReturnValue();
+    auto *ReturnValue = Return->getReturnValue(); //NOLINT
     struct LCAFF : FlowFunction<IDELinearConstantAnalysis::d_t> {
       IDELinearConstantAnalysis::n_t CallSite;
       IDELinearConstantAnalysis::d_t ReturnValue;
@@ -335,7 +335,7 @@ IDELinearConstantAnalysis::getNormalEdgeFunction( //NOLINT
     LOG_IF_ENABLE(BOOST_LOG_SEV(lg::get(), DEBUG) << ' ');
     const auto *GV = llvm::dyn_cast<llvm::GlobalVariable>(CurrNode);
     const auto *CI = llvm::dyn_cast<llvm::ConstantInt>(GV->getInitializer());
-    auto IntConst = CI->getSExtValue();
+    auto IntConst = CI->getSExtValue(); //NOLINT
     return make_shared<IDELinearConstantAnalysis::GenConstant>(IntConst);
   }
 
@@ -435,7 +435,7 @@ IDELinearConstantAnalysis::getReturnEdgeFunction(
   // Case: Returning constant integer
   if (isZeroValue(ExitNode) && !isZeroValue(RetNode)) {
     const auto *Return = llvm::dyn_cast<llvm::ReturnInst>(ExitInst);
-    auto *ReturnValue = Return->getReturnValue();
+    auto *ReturnValue = Return->getReturnValue(); //NOLINT
     if (auto *CI = llvm::dyn_cast<llvm::ConstantInt>(ReturnValue)) {
       auto IntConst = CI->getSExtValue();
       return make_shared<IDELinearConstantAnalysis::GenConstant>(IntConst);

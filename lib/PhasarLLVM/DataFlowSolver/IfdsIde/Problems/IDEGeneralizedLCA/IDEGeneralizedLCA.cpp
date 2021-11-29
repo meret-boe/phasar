@@ -50,7 +50,7 @@ IDEGeneralizedLCA::IDEGeneralizedLCA(
     std::set<std::string> EntryPoints, size_t MaxSetSize)
     : IDETabulationProblem(IRDB, TH, ICF, PT, std::move(EntryPoints)),
       MaxSetSize(MaxSetSize) {
-  this->ZeroValue = createZeroValue();
+  this->ZeroValue = createZeroValue(); //NOLINT
 }
 
 // flow functions

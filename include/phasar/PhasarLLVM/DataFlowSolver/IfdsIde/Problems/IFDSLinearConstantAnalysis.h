@@ -7,8 +7,8 @@
  *     Philipp Schubert and others
  *****************************************************************************/
 
-#ifndef PHASAR_PHASARLLVM_IFDSIDE_PROBLEMS_IFDSLINEARCONSTANTANALYSIS_H_
-#define PHASAR_PHASARLLVM_IFDSIDE_PROBLEMS_IFDSLINEARCONSTANTANALYSIS_H_
+#ifndef PHASAR_PHASARLLVM_DATAFLOWSOLVER_IFDSIDE_PROBLEMS_IFDSLINEARCONSTANTANALYSIS_H
+#define PHASAR_PHASARLLVM_DATAFLOWSOLVER_IFDSIDE_PROBLEMS_IFDSLINEARCONSTANTANALYSIS_H
 
 #include <map>
 #include <memory>
@@ -35,8 +35,8 @@ class LLVMPointsToInfo;
 
 // A small pair data type to encode data flow facts for this LCA
 struct LCAPair {
-  const llvm::Value *First;
-  int Second;
+  const llvm::Value *First; //NOLINT
+  int Second; //NOLINT
   LCAPair();
   LCAPair(const llvm::Value *V, int I);
   friend bool operator==(const LCAPair &Lhs, const LCAPair &Rhs);

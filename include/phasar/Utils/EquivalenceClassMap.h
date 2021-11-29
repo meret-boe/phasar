@@ -7,8 +7,8 @@
  *     Florian Sattler and others
  *****************************************************************************/
 
-#ifndef PHASAR_UTILS_EQUIVALENCELCASSMAP_H_
-#define PHASAR_UTILS_EQUIVALENCELCASSMAP_H_
+#ifndef PHASAR_UTILS_EQUIVALENCECLASSMAP_H
+#define PHASAR_UTILS_EQUIVALENCECLASSMAP_H
 
 #include <initializer_list>
 #include <optional>
@@ -99,7 +99,7 @@ public:
   // Inserts Key into the corresponding equivalence class for Value. If Value
   // is not already in the map a new equivalence class is created.
   template <typename... Ts>
-  insert_return_type try_emplace(KeyT &&Key, Ts &&...Args) {
+  insert_return_type tryEmplace(KeyT &&Key, Ts &&...Args) {
     ValueT Val{std::forward<Ts...>(Args...)};
 
     for (auto &KVPair : StoredData) {
@@ -115,7 +115,7 @@ public:
   // Inserts Key into the corresponding equivalence class for Value. If Value
   // is not already in the map a new equivalence class is created.
   template <typename... Ts>
-  insert_return_type try_emplace(const KeyT &Key, Ts &&...Args) {
+  insert_return_type tryEmplace(const KeyT &Key, Ts &&...Args) {
     ValueT Val{std::forward<Ts...>(Args...)};
 
     for (auto &KVPair : StoredData) {
@@ -170,4 +170,4 @@ private:
 
 } // namespace psr
 
-#endif // PHASAR_UTILS_EQUIVALENCELCASSMAP_H_
+#endif // PHASAR_UTILS_EQUIVALENCECLASSMAP_H

@@ -40,7 +40,7 @@ IFDSUninitializedVariables::IFDSUninitializedVariables(
     const LLVMBasedICFG *ICF, LLVMPointsToInfo *PT,
     std::set<std::string> EntryPoints)
     : IFDSTabulationProblem(IRDB, TH, ICF, PT, std::move(EntryPoints)) {
-  IFDSUninitializedVariables::ZeroValue = createZeroValue();
+  IFDSUninitializedVariables::ZeroValue = createZeroValue(); //NOLINT
 }
 
 IFDSUninitializedVariables::FlowFunctionPtrType
