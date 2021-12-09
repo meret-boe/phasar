@@ -14,8 +14,8 @@
  *      Author: philipp
  */
 
-#ifndef PHASAR_PHASARLLVM_MONO_PROBLEMS_INTRAMONOFULLCONSTANTPROPAGATION_H_
-#define PHASAR_PHASARLLVM_MONO_PROBLEMS_INTRAMONOFULLCONSTANTPROPAGATION_H_
+#ifndef PHASAR_PHASARLLVM_DATAFLOWSOLVER_MONO_PROBLEMS_INTRAMONOFULLCONSTANTPROPAGATION_H
+#define PHASAR_PHASARLLVM_DATAFLOWSOLVER_MONO_PROBLEMS_INTRAMONOFULLCONSTANTPROPAGATION_H
 
 #include <cstdint>
 #include <map>
@@ -72,7 +72,7 @@ public:
 
 private:
   static LatticeDomain<plain_d_t>
-  executeBinOperation(const unsigned Op, plain_d_t Lop, plain_d_t Rop);
+  executeBinOperation( unsigned Op, plain_d_t Lop, plain_d_t Rop);
 
 public:
   IntraMonoFullConstantPropagation(const ProjectIRDB *IRDB,
@@ -81,23 +81,23 @@ public:
                                    const LLVMPointsToInfo *PT,
                                    std::set<std::string> EntryPoints = {});
 
-  ~IntraMonoFullConstantPropagation() override = default;
+  ~IntraMonoFullConstantPropagation()  = default;
 
-  mono_container_t normalFlow(n_t Inst, const mono_container_t &In) override;
+  mono_container_t normalFlow(n_t Inst, const mono_container_t &In) ;
 
   mono_container_t merge(const mono_container_t &Lhs,
-                         const mono_container_t &Rhs) override;
+                         const mono_container_t &Rhs) ;
 
-  bool equal_to(const mono_container_t &Lhs,
-                const mono_container_t &Rhs) override;
+  bool equalTo(const mono_container_t &Lhs,
+                const mono_container_t &Rhs) ;
 
-  std::unordered_map<n_t, mono_container_t> initialSeeds() override;
+  std::unordered_map<n_t, mono_container_t> initialSeeds() ;
 
-  void printNode(std::ostream &OS, n_t Inst) const override;
+  void printNode(std::ostream &OS, n_t Inst) const ;
 
-  void printDataFlowFact(std::ostream &OS, d_t Fact) const override;
+  void printDataFlowFact(std::ostream &OS, d_t Fact) const ;
 
-  void printFunction(std::ostream &OS, f_t Fun) const override;
+  void printFunction(std::ostream &OS, f_t Fun) const ;
 };
 
 } // namespace psr
@@ -110,16 +110,16 @@ struct hash<std::pair<
     psr::LatticeDomain<psr::IntraMonoFullConstantPropagation::plain_d_t>>> {
   size_t operator()(const std::pair<const llvm::Value *,
                                     psr::LatticeDomain<int64_t>> &P) const {
-    std::hash<const llvm::Value *> hash_ptr;
-    size_t hp = hash_ptr(P.first);
-    size_t hu = 0;
+    std::hash<const llvm::Value *> HashPtr;
+    size_t Hp = HashPtr(P.first);
+    size_t Hu = 0;
     // returns nullptr if P.second is Top or Bottom, a valid pointer otherwise
-    if (auto Ptr =
+    if (const auto *Ptr =
             std::get_if<psr::IntraMonoFullConstantPropagation::plain_d_t>(
                 &P.second)) {
-      hu = *Ptr;
+      Hu = *Ptr;
     }
-    return hp ^ (hu << 1);
+    return Hp ^ (Hu << 1);
   }
 };
 

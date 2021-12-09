@@ -173,7 +173,7 @@ public:
     insert(First, Last);
   }
 
-  BitVectorSet<T> setUnion(const BitVectorSet<T> &Other) const {
+  BitVectorSet<T> setUnion(const BitVectorSet<T> &Other) const { //NOLINT
     size_t MaxSize = std::max(Bits.size(), Other.Bits.size());
     BitVectorSet<T> Res(MaxSize);
     // temp variable necessary because return type of |= is not const
@@ -182,7 +182,7 @@ public:
     return Res;
   }
 
-  BitVectorSet<T> setIntersect(const BitVectorSet<T> &Other) const {
+  [[nodiscard]] BitVectorSet<T> setIntersect(const BitVectorSet<T> &Other) const {
     size_t MaxSize = std::max(Bits.size(), Other.Bits.size());
     BitVectorSet<T> Res(MaxSize);
     // temp variable necessary because return type of &= is not const
@@ -191,7 +191,7 @@ public:
     return Res;
   }
 
-  bool includes(const BitVectorSet<T> &Other) const {
+  [[nodiscard]] bool includes(const BitVectorSet<T> &Other) const {
     // check if Other contains 1's at positions where this does not
     // Other is longer
     if (Bits.size() < Other.Bits.size()) {
@@ -227,7 +227,7 @@ public:
       if (Bits.size() <= Search->second) {
         Bits.resize(Search->second + 1);
       }
-      Bits[Search->second] = true;
+      Bits.set(Search->second);
     } else {
       // Data unknown
       size_t Idx = Position.left.size();
@@ -235,7 +235,7 @@ public:
       if (Bits.size() <= Position.left.size()) {
         Bits.resize(Position.left.size());
       }
-      Bits[Idx] = true;
+      Bits.set(Idx);
     }
   }
 

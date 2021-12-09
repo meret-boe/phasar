@@ -14,8 +14,8 @@
  *      Author: richard leer
  */
 
-#ifndef PHASAR_PHASARLLVM_MONO_PROBLEMS_INTERMONOTAINTANALYSIS_H_
-#define PHASAR_PHASARLLVM_MONO_PROBLEMS_INTERMONOTAINTANALYSIS_H_
+#ifndef PHASAR_PHASARLLVM_DATAFLOWSOLVER_MONO_PROBLEMS_INTERMONOTAINTANALYSIS_H
+#define PHASAR_PHASARLLVM_DATAFLOWSOLVER_MONO_PROBLEMS_INTERMONOTAINTANALYSIS_H
 
 #include <map>
 #include <set>
@@ -65,7 +65,7 @@ public:
   mono_container_t merge(const mono_container_t &Lhs,
                          const mono_container_t &Rhs) override;
 
-  bool equal_to(const mono_container_t &Lhs,
+  bool equalTo(const mono_container_t &Lhs,
                 const mono_container_t &Rhs) override;
 
   mono_container_t normalFlow(n_t Inst, const mono_container_t &In) override;
@@ -88,7 +88,7 @@ public:
 
   void printFunction(std::ostream &OS, f_t Fun) const override;
 
-  const std::map<n_t, std::set<d_t>> &getAllLeaks() const;
+  [[nodiscard]] const std::map<n_t, std::set<d_t>> &getAllLeaks() const;
 
 private:
   const TaintConfiguration<d_t> &TSF;

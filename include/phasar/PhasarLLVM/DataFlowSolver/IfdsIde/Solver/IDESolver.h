@@ -1253,7 +1253,7 @@ protected:
                   << " (result of previous compose)";
                   BOOST_LOG_SEV(lg::get(), DEBUG) << ' ');
 
-    EdgeFunctionPtrType JumpFnE = [SourceVal]() {
+    EdgeFunctionPtrType JumpFnE = [&]() {
       const auto RevLookupResult = JumpFn->reverseLookup(Target, TargetVal);
       if (RevLookupResult) {
         const auto &JumpFnContainer = RevLookupResult->get();

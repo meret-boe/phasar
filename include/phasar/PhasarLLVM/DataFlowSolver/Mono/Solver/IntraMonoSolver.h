@@ -110,7 +110,7 @@ public:
     }
   }
 
-  mono_container_t getResultsAt(n_t n) { return Analysis[n]; }
+  mono_container_t getResultsAt(n_t N) { return Analysis[N]; }
 
   virtual void dumpResults(std::ostream &OS = std::cout) {
     OS << "Intra-Monotone solver results:\n"

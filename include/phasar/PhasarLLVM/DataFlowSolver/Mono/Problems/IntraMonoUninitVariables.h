@@ -51,25 +51,25 @@ public:
                            const LLVMBasedCFG *CF, const LLVMPointsToInfo *PT,
                            std::set<std::string> EntryPoints = {});
 
-  ~IntraMonoUninitVariables() override = default;
+  ~IntraMonoUninitVariables()  = default;
 
   mono_container_t merge(const mono_container_t &Lhs,
-                         const mono_container_t &Rhs) override;
+                         const mono_container_t &Rhs) ;
 
-  bool equal_to(const mono_container_t &Lhs,
-                const mono_container_t &Rhs) override;
+  bool equalTo(const mono_container_t &Lhs,
+                const mono_container_t &Rhs) ;
 
-  mono_container_t allTop() override;
+  mono_container_t allTop() ;
 
-  mono_container_t normalFlow(n_t Inst, const mono_container_t &In) override;
+  mono_container_t normalFlow(n_t Inst, const mono_container_t &In) ;
 
-  std::unordered_map<n_t, mono_container_t> initialSeeds() override;
+  std::unordered_map<n_t, mono_container_t> initialSeeds() ;
 
-  void printNode(std::ostream &OS, n_t Inst) const override;
+  void printNode(std::ostream &OS, n_t Inst) const ;
 
-  void printDataFlowFact(std::ostream &OS, d_t Fact) const override;
+  void printDataFlowFact(std::ostream &OS, d_t Fact) const ;
 
-  void printFunction(std::ostream &OS, f_t Fun) const override;
+  void printFunction(std::ostream &OS, f_t Fun) const ;
 };
 
 } // namespace psr

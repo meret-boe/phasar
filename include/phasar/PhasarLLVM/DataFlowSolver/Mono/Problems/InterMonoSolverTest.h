@@ -14,8 +14,8 @@
  *      Author: philipp
  */
 
-#ifndef PHASAR_PHASARLLVM_MONO_PROBLEMS_INTERMONOSOLVERTEST_H_
-#define PHASAR_PHASARLLVM_MONO_PROBLEMS_INTERMONOSOLVERTEST_H_
+#ifndef PHASAR_PHASARLLVM_DATAFLOWSOLVER_MONO_PROBLEMS_INTERMONOSOLVERTEST_H
+#define PHASAR_PHASARLLVM_DATAFLOWSOLVER_MONO_PROBLEMS_INTERMONOSOLVERTEST_H
 
 #include <set>
 #include <string>
@@ -62,7 +62,7 @@ public:
   mono_container_t merge(const mono_container_t &Lhs,
                          const mono_container_t &Rhs) override;
 
-  bool equal_to(const mono_container_t &Lhs,
+  bool equalTo(const mono_container_t &Lhs,
                 const mono_container_t &Rhs) override;
 
   mono_container_t normalFlow(n_t Inst, const mono_container_t &In) override;

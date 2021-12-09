@@ -14,8 +14,8 @@
  *      Author: philipp
  */
 
-#ifndef PHASAR_PHASARLLVM_MONO_INTERMONOPROBLEM_H_
-#define PHASAR_PHASARLLVM_MONO_INTERMONOPROBLEM_H_
+#ifndef PHASAR_PHASARLLVM_DATAFLOWSOLVER_MONO_INTERMONOPROBLEM_H
+#define PHASAR_PHASARLLVM_DATAFLOWSOLVER_MONO_INTERMONOPROBLEM_H
 
 #include <set>
 #include <string>
@@ -43,7 +43,7 @@ public:
   using mono_container_t = typename AnalysisDomainTy::mono_container_t;
 
   static_assert(std::is_base_of_v<ICFG<n_t, f_t>, i_t>,
-                "I must implement the ICFG interface!");
+             "I must implement the ICFG interface!");
 
 protected:
   const i_t *ICF;
@@ -57,13 +57,13 @@ public:
 
   ~InterMonoProblem() override = default;
 
-  InterMonoProblem(const InterMonoProblem &copy) = delete;
+  InterMonoProblem(const InterMonoProblem &Copy) = delete;
 
-  InterMonoProblem(InterMonoProblem &&move) = delete;
+  InterMonoProblem(InterMonoProblem &&Move) = delete;
 
-  InterMonoProblem &operator=(const InterMonoProblem &copy) = delete;
+  InterMonoProblem &operator=(const InterMonoProblem &Copy) = delete;
 
-  InterMonoProblem &operator=(InterMonoProblem &&move) = delete;
+  InterMonoProblem &operator=(InterMonoProblem &&Move) = delete;
 
   virtual mono_container_t callFlow(n_t CallSite, f_t Callee,
                                     const mono_container_t &In) = 0;
@@ -76,7 +76,7 @@ public:
                                          std::set<f_t> Callees,
                                          const mono_container_t &In) = 0;
 
-  const i_t *getICFG() const { return ICF; }
+  [[nodiscard]] const i_t *getICFG() const { return ICF; }
 };
 
 } // namespace psr

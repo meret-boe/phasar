@@ -18,17 +18,17 @@ namespace psr {
 
 struct WPDSSolverConfig {
   WPDSSolverConfig() = default;
-  WPDSSolverConfig(bool recordWitnesses, WPDSSearchDirection searchDirection,
-                   WPDSType wpdsty);
+  WPDSSolverConfig(bool RecordWitnesses, WPDSSearchDirection SearchDirection,
+                   WPDSType Wpdsty);
   ~WPDSSolverConfig() = default;
   WPDSSolverConfig(const WPDSSolverConfig &) = default;
   WPDSSolverConfig &operator=(const WPDSSolverConfig &) = default;
   WPDSSolverConfig(WPDSSolverConfig &&) = default;
   WPDSSolverConfig &operator=(WPDSSolverConfig &&) = default;
-  bool recordWitnesses = false;
-  WPDSSearchDirection searchDirection = WPDSSearchDirection::FORWARD;
-  WPDSType wpdsty = WPDSType::FWPDS;
-  friend std::ostream &operator<<(std::ostream &os, const WPDSSolverConfig &sc);
+  bool RecordWitnesses = false;
+  WPDSSearchDirection SearchDirection = WPDSSearchDirection::FORWARD;
+  WPDSType Wpdsty = WPDSType::FWPDS;
+  friend std::ostream &operator<<(std::ostream &Os, const WPDSSolverConfig &Sc);
 };
 
 } // namespace psr

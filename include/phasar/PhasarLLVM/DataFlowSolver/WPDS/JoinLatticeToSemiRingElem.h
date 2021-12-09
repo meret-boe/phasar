@@ -30,58 +30,58 @@ template <typename V> class JoinLatticeToSemiRingElem : public wali::SemElem {
 public:
   std::shared_ptr<EdgeFunction<V>> F;
   JoinLattice<V> &L;
-  V v;
+  V ValV;
 
   JoinLatticeToSemiRingElem(std::shared_ptr<EdgeFunction<V>> F,
                             JoinLattice<V> &L)
       : wali::SemElem(), F(F), L(L) {}
-  virtual ~JoinLatticeToSemiRingElem() = default;
+   ~JoinLatticeToSemiRingElem() override = default;
 
-  std::ostream &print(std::ostream &os) const override { return os << *F; }
+  std::ostream &print(std::ostream &Os) const override { return Os << *F; }
 
-  wali::sem_elem_t one() const override {
+  [[nodiscard]] wali::sem_elem_t one() const override {
     // std::cout << "JoinLatticeToSemiRingElem::one()" << std::endl;
     return wali::ref_ptr<JoinLatticeToSemiRingElem<V>>(
         new JoinLatticeToSemiRingElem(
             std::make_shared<AllBottom<V>>(L.bottomElement()), L));
   }
 
-  wali::sem_elem_t zero() const override {
+  [[nodiscard]] wali::sem_elem_t zero() const override {
     // std::cout << "JoinLatticeToSemiRingElem::zero()" << std::endl;
     return wali::ref_ptr<JoinLatticeToSemiRingElem<V>>(
         new JoinLatticeToSemiRingElem(
             std::make_shared<AllTop<V>>(L.topElement()), L));
   }
 
-  wali::sem_elem_t extend(SemElem *se) override {
+  wali::sem_elem_t extend(SemElem *Se) override {
     // std::cout << "JoinLatticeToSemiRingElem::extend()" << std::endl;
     auto ThisF = static_cast<JoinLatticeToSemiRingElem *>(this);
-    auto ThatF = static_cast<JoinLatticeToSemiRingElem *>(se);
+    auto ThatF = static_cast<JoinLatticeToSemiRingElem *>(Se);
     return wali::ref_ptr<JoinLatticeToSemiRingElem<V>>(
         new JoinLatticeToSemiRingElem(ThisF->F->composeWith(ThatF->F), L));
   }
 
-  wali::sem_elem_t combine(SemElem *se) override {
+  wali::sem_elem_t combine(SemElem *Se) override {
     // std::cout << "JoinLatticeToSemiRingElem::combine()" << std::endl;
     auto ThisF = static_cast<JoinLatticeToSemiRingElem *>(this);
-    auto ThatF = static_cast<JoinLatticeToSemiRingElem *>(se);
+    auto ThatF = static_cast<JoinLatticeToSemiRingElem *>(Se);
     return wali::ref_ptr<JoinLatticeToSemiRingElem<V>>(
         new JoinLatticeToSemiRingElem(ThisF->F->joinWith(ThatF->F), L));
   }
 
-  bool equal(SemElem *se) const override {
+  bool equal(SemElem *Se) const override {
     // std::cout << "JoinLatticeToSemiRingElem::equal()" << std::endl;
     auto ThisF = static_cast<const JoinLatticeToSemiRingElem *>(this);
-    auto ThatF = static_cast<const JoinLatticeToSemiRingElem *>(se);
+    auto ThatF = static_cast<const JoinLatticeToSemiRingElem *>(Se);
     return ThisF->F->equal_to(ThatF->F);
   }
 };
 
 template <typename V>
-std::ostream &operator<<(std::ostream &os,
+std::ostream &operator<<(std::ostream &Os,
                          const JoinLatticeToSemiRingElem<V> &ETS) {
-  ETS.print(os);
-  return os;
+  ETS.print(Os);
+  return Os;
 }
 
 } // namespace psr

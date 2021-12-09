@@ -7,8 +7,8 @@
  *     Philipp Schubert, Linus Jungemann, and others
  *****************************************************************************/
 
-#ifndef PHASAR_PHASARLLVM_MONO_PROBLEMS_INTERMONOFULLCONSTANTPROPAGATION_H_
-#define PHASAR_PHASARLLVM_MONO_PROBLEMS_INTERMONOFULLCONSTANTPROPAGATION_H_
+#ifndef PHASAR_PHASARLLVM_DATAFLOWSOLVER_MONO_PROBLEMS_INTERMONOFULLCONSTANTPROPAGATION_H
+#define PHASAR_PHASARLLVM_DATAFLOWSOLVER_MONO_PROBLEMS_INTERMONOFULLCONSTANTPROPAGATION_H
 
 #include <cstdint>
 #include <map>
@@ -20,6 +20,7 @@
 #include "phasar/PhasarLLVM/DataFlowSolver/Mono/Problems/IntraMonoFullConstantPropagation.h"
 #include "phasar/PhasarLLVM/Domain/AnalysisDomain.h"
 #include "phasar/PhasarLLVM/Utils/LatticeDomain.h"
+
 
 namespace llvm {
 class Value;
@@ -54,35 +55,35 @@ public:
                                    const LLVMPointsToInfo *PT,
                                    std::set<std::string> EntryPoints = {});
 
-  ~InterMonoFullConstantPropagation() override = default;
+  ~InterMonoFullConstantPropagation()  = default;
 
-  mono_container_t normalFlow(n_t Inst, const mono_container_t &In) override;
+  mono_container_t normalFlow(n_t Inst, const mono_container_t &In);
 
   mono_container_t callFlow(n_t CallSite, f_t Callee,
-                            const mono_container_t &In) override;
+                            const mono_container_t &In) ;
 
   mono_container_t returnFlow(n_t CallSite, f_t Callee, n_t ExitStmt,
-                              n_t RetSite, const mono_container_t &In) override;
+                              n_t RetSite, const mono_container_t &In) ;
 
   mono_container_t callToRetFlow(n_t CallSite, n_t RetSite,
                                  std::set<f_t> Callees,
-                                 const mono_container_t &In) override;
+                                 const mono_container_t &In) ;
 
   mono_container_t merge(const mono_container_t &Lhs,
-                         const mono_container_t &Rhs) override;
+                         const mono_container_t &Rhs) ;
 
-  bool equal_to(const mono_container_t &Lhs,
-                const mono_container_t &Rhs) override;
+  bool equalTo(const mono_container_t &Lhs,
+                const mono_container_t &Rhs) ;
 
-  std::unordered_map<n_t, mono_container_t> initialSeeds() override;
+  std::unordered_map<n_t, mono_container_t> initialSeeds() ;
 
-  void printNode(std::ostream &OS, n_t Inst) const override;
+  void printNode(std::ostream &OS, n_t Inst) const ;
 
-  void printDataFlowFact(std::ostream &OS, d_t Fact) const override;
+  void printDataFlowFact(std::ostream &OS, d_t Fact) const ;
 
-  void printFunction(std::ostream &OS, f_t Fun) const override;
+  void printFunction(std::ostream &OS, f_t Fun) const ;
 
-  void printContainer(std::ostream &OS, mono_container_t Con) const override;
+  void printContainer(std::ostream &OS, mono_container_t Con) const ;
 };
 
 } // namespace psr
