@@ -42,6 +42,12 @@ IFDSUninitializedVariables::IFDSUninitializedVariables(
   IFDSUninitializedVariables::ZeroValue = createZeroValue();
 }
 
+const IFDSUninitializedVariables::l_t IFDSUninitializedVariables::TOP =
+    numeric_limits<IFDSUninitializedVariables::l_t>::min();
+
+const IFDSUninitializedVariables::l_t IFDSUninitializedVariables::BOTTOM =
+    numeric_limits<IFDSUninitializedVariables::l_t>::max();
+
 IFDSUninitializedVariables::FlowFunctionPtrType
 IFDSUninitializedVariables::getNormalFlowFunction(
     IFDSUninitializedVariables::n_t Curr,
@@ -559,5 +565,116 @@ const std::map<IFDSUninitializedVariables::n_t,
 IFDSUninitializedVariables::getAllUndefUses() const {
   return UndefValueUses;
 }
+
+void IFDSUninitializedVariables::stripBottomResults(
+    std::unordered_map<IFDSUninitializedVariables::d_t,
+                       IFDSUninitializedVariables::l_t> &Res) {
+  for (auto It = Res.begin(); It != Res.end();) {
+    if (It->second == IFDSUninitializedVariables::BOTTOM) {
+      It = Res.erase(It);
+    } else {
+      ++It;
+    }
+  }
+}
+
+
+IFDSUninitializedVariables::uninit_results_t
+IFDSUninitializedVariables::getUnitializedResults(
+    SolverResults<IFDSUninitializedVariables::n_t,
+                  IFDSUninitializedVariables::d_t,
+                  IFDSUninitializedVariables::l_t>
+        SR) {
+  std::map<std::string, std::map<unsigned, UninitResult>> AggResults;
+  std::cout << "\n==== Computing Uninitialized Variables Results ====\n";
+  for (const auto *F : ICF->getAllFunctions()) {
+    std::string FName = getFunctionNameFromIR(F);
+    std::cout << "\n-- Function: " << FName << " --\n";
+    std::map<unsigned, UninitResult> FResults;
+    std::set<std::string> AllocatedVars;
+    for (const auto *Stmt : ICF->getAllInstructionsOf(F)) {
+      unsigned Lnr = getLineFromIR(Stmt);
+      std::cout << "\nIR : " << NtoString(Stmt) << "\nLNR: " << Lnr << '\n';
+      // We skip statements with no source code mapping
+      if (Lnr == 0) {
+        std::cout << "Skipping this stmt!\n";
+        continue;
+      }
+      UninitResult *UninitRes = &FResults[Lnr];
+      // Check if it is a new result
+      if (UninitRes->src_code.empty()) {
+        std::string SourceCode = getSrcCodeFromIR(Stmt);
+        // Skip results for line containing only closed braces which is the
+        // case for functions with void return value
+        if (SourceCode == "}") {
+          FResults.erase(Lnr);
+          continue;
+        }
+        UninitRes->src_code = SourceCode;
+        UninitRes->line_nr = Lnr;
+      }
+      UninitRes->ir_trace.push_back(Stmt);
+      if (Stmt->isTerminator() && !ICF->isExitInst(Stmt)) {
+        std::cout << "Delete result since stmt is Terminator or Exit!\n";
+        FResults.erase(Lnr);
+      } else {
+        // check results of succ(stmt)
+        std::unordered_map<d_t, l_t> Results;
+        if (ICF->isExitInst(Stmt)) {
+          Results = SR.resultsAt(Stmt, true);
+        } else {
+          // It's not a terminator inst, hence it has only a single successor
+          const auto *Succ = ICF->getSuccsOf(Stmt)[0];
+          std::cout << "Succ stmt: " << NtoString(Succ) << '\n';
+          Results = SR.resultsAt(Succ, true);
+        }
+        stripBottomResults(Results);
+        std::set<std::string> ValidVarsAtStmt;
+        for (auto Res : Results) {
+          auto VarName = getVarNameFromIR(Res.first);
+          std::cout << "  D: " << DtoString(Res.first)
+                    << " | V: " << LtoString(Res.second)
+                    << " | Var: " << VarName << '\n';
+          if (!VarName.empty()) {
+            // Only store/overwrite values of variables from allocas or globals
+            // unless there is no value stored for a variable
+            if (llvm::isa<llvm::AllocaInst>(Res.first) ||
+                llvm::isa<llvm::GlobalVariable>(Res.first)) {
+              // lcaRes->variableToValue.find(varName) ==
+              // lcaRes->variableToValue.end()) {
+              ValidVarsAtStmt.insert(VarName);
+              AllocatedVars.insert(VarName);
+              UninitRes->variableToValue[VarName] = Res.second;
+            } else if (AllocatedVars.find(VarName) == AllocatedVars.end()) {
+              ValidVarsAtStmt.insert(VarName);
+              UninitRes->variableToValue[VarName] = Res.second;
+            }
+          }
+        }
+        // remove no longer valid variables at current IR stmt
+        for (auto It = UninitRes->variableToValue.begin();
+             It != UninitRes->variableToValue.end();) {
+          if (ValidVarsAtStmt.find(It->first) == ValidVarsAtStmt.end()) {
+            std::cout << "Erase var: " << It->first << '\n';
+            It = UninitRes->variableToValue.erase(It);
+          } else {
+            ++It;
+          }
+        }
+      }
+    }
+    // delete entries with no result
+    for (auto It = FResults.begin(); It != FResults.end();) {
+      if (It->second.variableToValue.empty()) {
+        It = FResults.erase(It);
+      } else {
+        ++It;
+      }
+    }
+    AggResults[FName] = FResults;
+  }
+  return AggResults;
+}
+
 
 } // namespace psr

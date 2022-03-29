@@ -31,6 +31,7 @@ protected:
 
   IDELinearConstantAnalysis::lca_results_t
   doAnalysis(const std::string &LlvmFilePath, bool PrintDump = false) {
+
     auto IR_Files = {PathToLlFiles + LlvmFilePath};
     IRDB = std::make_unique<ProjectIRDB>(IR_Files, IRDBOptions::WPA);
     ValueAnnotationPass::resetValueID();

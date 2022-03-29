@@ -107,7 +107,7 @@ template <typename AnalysisDomainTy> struct EdgeFactPrinter {
 
   virtual void printEdgeFact(std::ostream &os, l_t l) const = 0;
 
-  [[nodiscard]] virtual std::string LtoString(l_t l) const {
+  virtual std::string LtoString(l_t l) const {
     std::stringstream ss;
     printEdgeFact(ss, l);
     return ss.str();

@@ -18,6 +18,9 @@ using namespace psr;
 
 class IFDSTaintAnalysisTest : public ::testing::Test {
 protected:
+  using LCACompactResult_t =
+      std::tuple<std::string, std::size_t, std::string, int64_t>;
+      
   const std::string PathToLlFiles =
       unittest::PathToLLTestFiles + "taint_analysis/";
   const std::set<std::string> EntryPoints = {"main"};

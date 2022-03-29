@@ -19,6 +19,11 @@ using namespace psr;
 
 class IFDSUninitializedVariablesTest : public ::testing::Test {
 protected:
+
+  using UninitCompactResult_t =
+      std::tuple<std::string, std::size_t, std::string, int64_t>;
+
+
   const std::string PathToLlFiles =
       unittest::PathToLLTestFiles + "uninitialized_variables/";
   const std::set<std::string> EntryPoints = {"main"};
@@ -32,16 +37,6 @@ protected:
   IFDSUninitializedVariablesTest() = default;
   ~IFDSUninitializedVariablesTest() override = default;
 
-  void initialize(const std::vector<std::string> &IRFiles) {
-    IRDB = make_unique<ProjectIRDB>(IRFiles, IRDBOptions::WPA);
-    TH = make_unique<LLVMTypeHierarchy>(*IRDB);
-    PT = make_unique<LLVMPointsToSet>(*IRDB);
-    ICFG = make_unique<LLVMBasedICFG>(*IRDB, CallGraphAnalysisType::OTF,
-                                      EntryPoints, TH.get(), PT.get());
-    // TSF = new TaintSensitiveFunctions(true);
-    UninitProblem = make_unique<IFDSUninitializedVariables>(
-        IRDB.get(), TH.get(), ICFG.get(), PT.get(), EntryPoints);
-  }
 
   void SetUp() override {
     boost::log::core::get()->set_logging_enabled(false);
@@ -50,91 +45,96 @@ protected:
 
   void TearDown() override {}
 
-  void compareResults(map<int, set<string>> &GroundTruth) {
+  IFDSUninitializedVariables::uninit_results_t
+  doAnalysis(const std::string &LlvmFilePath, bool PrintDump = false) {
 
-    map<int, set<string>> FoundUninitUses;
-    for (const auto &Kvp : UninitProblem->getAllUndefUses()) {
-      auto InstID = stoi(getMetaDataID(Kvp.first));
-      set<string> UndefValueIds;
-      for (const auto *UV : Kvp.second) {
-        UndefValueIds.insert(getMetaDataID(UV));
-      }
-      FoundUninitUses[InstID] = UndefValueIds;
+    auto IR_Files = {PathToLlFiles + LlvmFilePath};
+    IRDB = std::make_unique<ProjectIRDB>(IR_Files, IRDBOptions::WPA);
+    LLVMTypeHierarchy TH(*IRDB);
+    LLVMPointsToSet PT(*IRDB);
+    LLVMBasedICFG ICFG(*IRDB, CallGraphAnalysisType::OTF, {"main"}, &TH, &PT,
+                       Soundness::Soundy, /*IncludeGlobals*/ true);
+
+    IFDSUninitializedVariables UninitProblem(IRDB.get(), &TH, &ICFG, &PT, {"main"});
+
+    IFDSSolver Solver(UninitProblem);
+    Solver.solve();
+    if (PrintDump) {
+      IRDB->print();
+      ICFG.print();
+      Solver.dumpResults();
     }
 
-    EXPECT_EQ(FoundUninitUses, GroundTruth);
+    return UninitProblem.getUnitializedResults(Solver.getSolverResults());
+  }
+
+
+
+
+  static void compareResults(IFDSUninitializedVariables::uninit_results_t &Results,
+                             std::set<UninitCompactResult_t> &GroundTruth) {
+    std::set<UninitCompactResult_t> RelevantResults;
+    for (auto G : GroundTruth) {
+      std::string FName = std::get<0>(G);
+      unsigned Line = std::get<1>(G);
+      if (Results.find(FName) != Results.end()) {
+        if (auto It = Results[FName].find(Line); It != Results[FName].end()) {
+          for (const auto &VarToVal : It->second.variableToValue) {
+            RelevantResults.emplace(FName, Line, VarToVal.first,
+                                    VarToVal.second);
+          }
+        }
+      }
+    }
+    EXPECT_EQ(RelevantResults, GroundTruth);
   }
 }; // Test Fixture
 
 TEST_F(IFDSUninitializedVariablesTest, UninitTest_01_SHOULD_NOT_LEAK) {
-  initialize({PathToLlFiles + "all_uninit_cpp_dbg.ll"});
-  IFDSSolver Solver(*UninitProblem);
-  Solver.solve();
+  auto Results = doAnalysis("all_uninit_cpp_dbg.ll");
   // all_uninit.cpp does not contain undef-uses
-  map<int, set<string>> GroundTruth;
-  compareResults(GroundTruth);
+  std::set<UninitCompactResult_t> GroundTruth;
+  compareResults(Results, GroundTruth);
 }
 
 TEST_F(IFDSUninitializedVariablesTest, UninitTest_02_SHOULD_LEAK) {
-  initialize({PathToLlFiles + "binop_uninit_cpp_dbg.ll"});
-  IFDSSolver Solver(*UninitProblem);
-  Solver.solve();
+  auto Results = doAnalysis("binop_uninit_cpp_dbg.ll");
 
+  std::set<UninitCompactResult_t> GroundTruth;
+  GroundTruth.emplace("main", 2, "i", "?");
   // binop_uninit uses uninitialized variable i in 'int j = i + 10;'
-  map<int, set<string>> GroundTruth;
-  // %4 = load i32, i32* %2, ID: 6 ;  %2 is the uninitialized variable i
-  GroundTruth[6] = {"1"};
-  // %5 = add nsw i32 %4, 10 ;        %4 is undef, since it is loaded from
-  // undefined alloca; not sure if it is necessary to report again
-  GroundTruth[7] = {"6"};
-  compareResults(GroundTruth);
+  GroundTruth.emplace("main", 3, "j", "i + 10");
+  compareResults(Results, GroundTruth);
 }
 TEST_F(IFDSUninitializedVariablesTest, UninitTest_03_SHOULD_LEAK) {
-  initialize({PathToLlFiles + "callnoret_c_dbg.ll"});
-  IFDSSolver Solver(*UninitProblem);
-  Solver.solve();
-
+  auto Results = doAnalysis("callnoret_c_dbg.ll");
+  std::set<UninitCompactResult_t> GroundTruth;
+  GroundTruth.emplace("main", 2, "a", "?");
   // callnoret uses uninitialized variable a in 'return a + 10;' of addTen(int)
-  map<int, set<string>> GroundTruth;
+  GroundTruth.emplace("main", 4, "a", "a + 10");
+  GroundTruth.emplace("main", 5, "d", "?");
 
-  // %4 = load i32, i32* %2 ; %2 is the parameter a of addTen(int) containing
-  // undef
-  GroundTruth[5] = {"0"};
-  // The same as in test2: is it necessary to report again?
-  GroundTruth[6] = {"5"};
-  // %5 = load i32, i32* %2 ; %2 is the uninitialized variable a
-  GroundTruth[16] = {"9"};
-  // The same as in test2: is it necessary to report again? (the analysis does
-  // not)
-  // GroundTruth[17] = {"16"};
-
-  compareResults(GroundTruth);
+  compareResults(Results,GroundTruth);
 }
 
 TEST_F(IFDSUninitializedVariablesTest, UninitTest_04_SHOULD_NOT_LEAK) {
-  initialize({PathToLlFiles + "ctor_default_cpp_dbg.ll"});
-  IFDSSolver Solver(*UninitProblem);
-  Solver.solve();
+  auto Results = doAnalysis("ctor_default_cpp_dbg.ll");
+  std::set<UninitCompactResult_t> GroundTruth;
   // ctor.cpp does not contain undef-uses
-  map<int, set<string>> GroundTruth;
-  compareResults(GroundTruth);
+  compareResults(Results, GroundTruth);
 }
 
 TEST_F(IFDSUninitializedVariablesTest, UninitTest_05_SHOULD_NOT_LEAK) {
-  initialize({PathToLlFiles + "struct_member_init_cpp_dbg.ll"});
-  IFDSSolver Solver(*UninitProblem);
-  Solver.solve();
+  auto Results = doAnalysis("struct_member_init_cpp_dbg.ll");
+  std::set<UninitCompactResult_t> GroundTruth;
   // struct_member_init.cpp does not contain undef-uses
-  map<int, set<string>> GroundTruth;
-  compareResults(GroundTruth);
+  compareResults(Results, GroundTruth);
 }
 TEST_F(IFDSUninitializedVariablesTest, UninitTest_06_SHOULD_NOT_LEAK) {
-  initialize({PathToLlFiles + "struct_member_uninit_cpp_dbg.ll"});
-  IFDSSolver Solver(*UninitProblem);
-  Solver.solve();
+  auto Results = doAnalysis("ctor_default_cpp_dbg.ll");
+  std::set<UninitCompactResult_t> GroundTruth;
   // struct_member_uninit.cpp does not contain undef-uses
-  map<int, set<string>> GroundTruth;
-  compareResults(GroundTruth);
+  compareResults(Results, GroundTruth);
 }
 /****************************************************************************************
  * fails due to field-insensitivity + struct ignorance + clang compiler hacks
@@ -156,12 +156,10 @@ Solver(*UninitProblem, false); Solver.solve();
 }
 *****************************************************************************************/
 TEST_F(IFDSUninitializedVariablesTest, UninitTest_08_SHOULD_NOT_LEAK) {
-  initialize({PathToLlFiles + "global_variable_cpp_dbg.ll"});
-  IFDSSolver Solver(*UninitProblem);
-  Solver.solve();
+  auto Results = doAnalysis("global_variable_cpp_dbg.ll");
+  std::set<UninitCompactResult_t> GroundTruth;
   // global_variable.cpp does not contain undef-uses
-  map<int, set<string>> GroundTruth;
-  compareResults(GroundTruth);
+  compareResults(Results, GroundTruth);
 }
 /****************************************************************************************
  * failssince @i is uninitialized in the c++ code, but initialized in the
@@ -181,32 +179,22 @@ Solver(*UninitProblem, false); Solver.solve();
 }
 *****************************************************************************************/
 TEST_F(IFDSUninitializedVariablesTest, UninitTest_10_SHOULD_LEAK) {
-  initialize({PathToLlFiles + "return_uninit_cpp_dbg.ll"});
-  IFDSSolver Solver(*UninitProblem);
-  Solver.solve();
-  UninitProblem->emitTextReport(Solver.getSolverResults(), std::cout);
-  map<int, set<string>> GroundTruth;
-  //%2 = load i32, i32 %1
-  GroundTruth[2] = {"0"};
-  // What about this call?
-  // %3 = call i32 @_Z3foov()
-  // GroundTruth[8] = {""};
-  compareResults(GroundTruth);
+
+  auto Results = doAnalysis("return_uninit_cpp_dbg.ll");
+  std::set<UninitCompactResult_t> GroundTruth;
+  GroundTruth.emplace("main", 2, "a", "?");
+  compareResults(Results, GroundTruth);
 }
 
 TEST_F(IFDSUninitializedVariablesTest, UninitTest_11_SHOULD_NOT_LEAK) {
-
-  initialize({PathToLlFiles + "sanitizer_cpp_dbg.ll"});
-  IFDSSolver Solver(*UninitProblem);
-  Solver.solve();
-  map<int, set<string>> GroundTruth;
+  auto Results = doAnalysis("sanitizer_cpp_dbg.ll");
+  std::set<UninitCompactResult_t> GroundTruth;
   // all undef-uses are sanitized;
   // However, the uninitialized variable j is read, which causes the analysis to
   // report an undef-use
-  // 6 => {2}
-
-  GroundTruth[6] = {"2"};
-  compareResults(GroundTruth);
+  GroundTruth.emplace("main", 4, "i", "?");
+  GroundTruth.emplace("main", 4, "j", "?");
+  compareResults(Results, GroundTruth);
 }
 //---------------------------------------------------------------------
 // Not relevant any more; Test case covered by UninitTest_11
@@ -225,26 +213,20 @@ Solver(*UninitProblem, true); Solver.solve();
 }
 */
 TEST_F(IFDSUninitializedVariablesTest, UninitTest_13_SHOULD_NOT_LEAK) {
-
-  initialize({PathToLlFiles + "sanitizer2_cpp_dbg.ll"});
-  IFDSSolver Solver(*UninitProblem);
-  Solver.solve();
+  auto Results = doAnalysis("ctor_default_cpp_dbg.ll");
+  std::set<UninitCompactResult_t> GroundTruth;
   // The undef-uses do not affect the program behaviour, but are of course still
   // found and reported
-  map<int, set<string>> GroundTruth;
-  GroundTruth[9] = {"2"};
-  compareResults(GroundTruth);
+  GroundTruth.emplace("main", 3, "t", "?");
+  compareResults(Results, GroundTruth);
 }
 TEST_F(IFDSUninitializedVariablesTest, UninitTest_14_SHOULD_LEAK) {
-
-  initialize({PathToLlFiles + "uninit_c_dbg.ll"});
-  IFDSSolver Solver(*UninitProblem);
-  Solver.solve();
-  map<int, set<string>> GroundTruth;
-  GroundTruth[14] = {"1"};
-  GroundTruth[15] = {"2"};
-  GroundTruth[16] = {"14", "15"};
-  compareResults(GroundTruth);
+  auto Results = doAnalysis("uninit_c_dbg.ll");
+  std::set<UninitCompactResult_t> GroundTruth;
+  GroundTruth.emplace("main", 3, "a", "?");
+  GroundTruth.emplace("main", 4, "b", "?");
+  GroundTruth.emplace("main", 7, "e", "a*b");
+  compareResults(Results, GroundTruth);
 }
 /****************************************************************************************
  * Fails probably due to field-insensitivity
@@ -280,20 +262,13 @@ GroundTruth;
 }
 *****************************************************************************************/
 TEST_F(IFDSUninitializedVariablesTest, UninitTest_16_SHOULD_LEAK) {
-
-  initialize({PathToLlFiles + "growing_example_cpp_dbg.ll"});
-  IFDSSolver Solver(*UninitProblem);
-  Solver.solve();
-
-  map<int, set<string>> GroundTruth;
-  // TODO remove GT[11]
-  GroundTruth[11] = {"0"};
-
-  GroundTruth[16] = {"2"};
-  GroundTruth[18] = {"16"};
-  GroundTruth[34] = {"24"};
-
-  compareResults(GroundTruth);
+  auto Results = doAnalysis("growing_example_cpp_dbg.ll");
+  std::set<UninitCompactResult_t> GroundTruth;
+  GroundTruth.emplace("main", 2, "i", "?");
+  GroundTruth.emplace("main", 3, "j", "?");
+  GroundTruth.emplace("main", 4, "k", "?");
+  GroundTruth.emplace("main", 3, "k", "?+12");
+  compareResults(Results, GroundTruth);
 }
 
 /****************************************************************************************
@@ -350,40 +325,18 @@ Solver(*UninitProblem, false); Solver.solve();
 }
 *****************************************************************************************/
 TEST_F(IFDSUninitializedVariablesTest, UninitTest_20_SHOULD_LEAK) {
-
-  initialize({PathToLlFiles + "recursion_cpp_dbg.ll"});
-  IFDSSolver_P<IFDSUninitializedVariables> Solver(*UninitProblem);
-  Solver.solve();
-
-  map<int, set<string>> GroundTruth;
-  // Leaks at 11 and 14 due to field-insensitivity
-  GroundTruth[11] = {"2"};
-  GroundTruth[14] = {"2"};
-
-  // Load uninitialized variable i
-  GroundTruth[31] = {"24"};
-  // Load recursive return-value for returning it
-  GroundTruth[20] = {"1"};
-  // Load return-value of foo in main
-  GroundTruth[29] = {"28"};
-  // Analysis does not check uninit on actualparameters
-  // GroundTruth[32] = {"31"};
-  compareResults(GroundTruth);
+  auto Results = doAnalysis("recursion_cpp_dbg.ll");
+  std::set<UninitCompactResult_t> GroundTruth;
+  GroundTruth.emplace("main", 2, "i", "?");
+  GroundTruth.emplace("main", 3, "j", "i");
+  compareResults(Results, GroundTruth);
 }
 TEST_F(IFDSUninitializedVariablesTest, UninitTest_21_SHOULD_LEAK) {
-
-  initialize({PathToLlFiles + "virtual_call_cpp_dbg.ll"});
-  IFDSSolver_P<IFDSUninitializedVariables> Solver(*UninitProblem);
-  Solver.solve();
-
-  map<int, set<string>> GroundTruth = {
-      {3, {"0"}}, {8, {"5"}}, {10, {"5"}}, {35, {"34"}}, {37, {"17"}}};
-  // 3  => {0}; due to field-insensitivity
-  // 8  => {5}; due to field-insensitivity
-  // 10 => {5}; due to alias-unawareness
-  // 35 => {34}; actual leak
-  // 37 => {17}; actual leak
-  compareResults(GroundTruth);
+  auto Results = doAnalysis("virtual_call_cpp_dbg.ll");
+  std::set<UninitCompactResult_t> GroundTruth;
+  GroundTruth.emplace("main", 2, "i", "?");
+  GroundTruth.emplace("main", 3, "baz", "?");
+  compareResults(Results, GroundTruth);
 }
 int main(int Argc, char **Argv) {
   ::testing::InitGoogleTest(&Argc, Argv);

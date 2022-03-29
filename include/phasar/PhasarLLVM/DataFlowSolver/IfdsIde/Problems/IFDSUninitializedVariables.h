@@ -37,20 +37,30 @@ class IFDSUninitializedVariables
 private:
   struct UninitResult {
     UninitResult() = default;
-    unsigned int line = 0;
+    unsigned line_nr = 0;
+
     std::string func_name;
     std::string file_path;
+
     std::string src_code;
+
+    std::map<std::string, l_t> variableToValue;
     std::vector<std::string> var_names;
-    std::map<IFDSUninitializedVariables::n_t,
-             std::set<IFDSUninitializedVariables::d_t>>
-        ir_trace;
+    std::vector<IFDSUninitializedVariables::n_t> ir_trace;
     bool empty() const;
     void print(std::ostream &os);
   };
+      
   std::map<n_t, std::set<d_t>> UndefValueUses;
 
 public:
+  using uninit_results_t = std::map<std::string, std::map<unsigned, UninitResult>>;
+  
+  static void stripBottomResults(std::unordered_map<d_t, l_t> &Res);
+
+  static const l_t TOP;
+  static const l_t BOTTOM;
+
   IFDSUninitializedVariables(const ProjectIRDB *IRDB,
                              const LLVMTypeHierarchy *TH,
                              const LLVMBasedICFG *ICF, LLVMPointsToInfo *PT,
@@ -89,6 +99,8 @@ public:
   const std::map<n_t, std::set<d_t>> &getAllUndefUses() const;
 
   std::vector<UninitResult> aggregateResults();
+
+  uninit_results_t getUnitializedResults(SolverResults<n_t, d_t, l_t> SR);
 };
 
 } // namespace psr
